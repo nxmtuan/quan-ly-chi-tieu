@@ -139,8 +139,12 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
     List<_CategoryAmountItem> chartItems,
     double chartSize,
   ) {
+    final chartSignature = chartItems
+        .map((item) => '${item.category.id}:${item.amount}')
+        .join('|');
+
     return PieChart(
-      key: const ValueKey(_CategoryChartView.pie),
+      key: ValueKey('pie-$chartSignature'),
       duration: const Duration(milliseconds: 320),
       curve: Curves.easeOutCubic,
       PieChartData(
@@ -175,13 +179,16 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
   }
 
   Widget _buildBarChart(List<_CategoryAmountItem> chartItems) {
+    final chartSignature = chartItems
+        .map((item) => '${item.category.id}:${item.amount}')
+        .join('|');
     final maxAmount = chartItems.fold<double>(
       0,
       (value, item) => item.amount > value ? item.amount : value,
     );
 
     return BarChart(
-      key: const ValueKey(_CategoryChartView.bar),
+      key: ValueKey('bar-$chartSignature'),
       duration: const Duration(milliseconds: 100),
       curve: Curves.easeOutQuad,
       BarChartData(
