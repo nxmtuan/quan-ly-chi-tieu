@@ -23,6 +23,8 @@ const _modernChartPalette = [
   Color(0xFF66BB6A),
 ];
 
+enum _CategoryChartView { pie, bar }
+
 class RecentTransactions extends ConsumerStatefulWidget {
   const RecentTransactions({super.key, required this.transactions});
 
@@ -45,7 +47,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 304,
+          height: 340,
           child: total == 0
               ? const FlatCard(child: Center(child: Text('Chưa có dữ liệu')))
               : _CategoryDonutChart(items: items, total: total),
@@ -158,6 +160,8 @@ class _CategoryDonutChart extends StatefulWidget {
 
 class _CategoryDonutChartState extends State<_CategoryDonutChart> {
   int _touchedIndex = -1;
+  int? _touchedBarIndex;
+  _CategoryChartView _selectedChartView = _CategoryChartView.pie;
 
   @override
   Widget build(BuildContext context) {
@@ -180,47 +184,208 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
         builder: (context, constraints) {
           final width = constraints.maxWidth;
           final chartSize = width < 360 ? 210.0 : 232.0;
+          final isPieChart = _selectedChartView == _CategoryChartView.pie;
 
-          return Center(
-            child: SizedBox(
-              width: chartSize,
-              height: chartSize,
-              child: PieChart(
-                duration: const Duration(milliseconds: 320),
-                curve: Curves.easeOutCubic,
-                PieChartData(
-                  centerSpaceRadius: 0,
-                  sectionsSpace: 4,
-                  startDegreeOffset: -90,
-                  pieTouchData: PieTouchData(
-                    touchCallback: (event, response) {
-                      final touchedSection = response?.touchedSection;
-                      final index = touchedSection?.touchedSectionIndex ?? -1;
-
-                      if (!event.isInterestedForInteractions ||
-                          index < 0 ||
-                          index >= chartItems.length) {
-                        if (_touchedIndex != -1) {
-                          setState(() => _touchedIndex = -1);
-                        }
-                        return;
-                      }
-
-                      if (_touchedIndex != index) {
-                        setState(() => _touchedIndex = index);
-                      }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Cơ cấu chi tiêu',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ),
+                  _ChartViewSwitch(
+                    selectedView: _selectedChartView,
+                    onSelected: (view) {
+                      setState(() {
+                        _selectedChartView = view;
+                      });
                     },
                   ),
-                  sections: [
-                    for (final entry in chartItems.indexed)
-                      _buildSection(entry.$1, entry.$2, chartSize),
-                  ],
+                ],
+              ),
+              const SizedBox(height: 14),
+              Expanded(
+                child: Center(
+                  child: SizedBox(
+                    width: isPieChart ? chartSize : width,
+                    height: chartSize,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 220),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeOutCubic,
+                      child: isPieChart
+                          ? _buildPieChart(chartItems, chartSize)
+                          : _buildBarChart(chartItems),
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           );
         },
       ),
+    );
+  }
+
+  Widget _buildPieChart(
+    List<_CategoryAmountItem> chartItems,
+    double chartSize,
+  ) {
+    return PieChart(
+      key: const ValueKey(_CategoryChartView.pie),
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+      PieChartData(
+        centerSpaceRadius: 0,
+        sectionsSpace: 4,
+        startDegreeOffset: -90,
+        pieTouchData: PieTouchData(
+          touchCallback: (event, response) {
+            final touchedSection = response?.touchedSection;
+            final index = touchedSection?.touchedSectionIndex ?? -1;
+
+            if (!event.isInterestedForInteractions ||
+                index < 0 ||
+                index >= chartItems.length) {
+              if (_touchedIndex != -1) {
+                setState(() => _touchedIndex = -1);
+              }
+              return;
+            }
+
+            if (_touchedIndex != index) {
+              setState(() => _touchedIndex = index);
+            }
+          },
+        ),
+        sections: [
+          for (final entry in chartItems.indexed)
+            _buildSection(entry.$1, entry.$2, chartSize),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBarChart(List<_CategoryAmountItem> chartItems) {
+    final maxAmount = chartItems.fold<double>(
+      0,
+      (value, item) => item.amount > value ? item.amount : value,
+    );
+
+    return BarChart(
+      key: const ValueKey(_CategoryChartView.bar),
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOutQuad,
+      BarChartData(
+        minY: 0,
+        maxY: maxAmount == 0 ? 1 : maxAmount * 1.28,
+        alignment: BarChartAlignment.spaceAround,
+        gridData: const FlGridData(show: false),
+        borderData: FlBorderData(show: false),
+        titlesData: FlTitlesData(
+          show: true,
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 46,
+              getTitlesWidget: (value, meta) {
+                final index = value.toInt();
+                if (index < 0 || index >= chartItems.length) {
+                  return const SizedBox.shrink();
+                }
+
+                final item = chartItems[index];
+                final isTouched = index == _touchedBarIndex;
+
+                return SideTitleWidget(
+                  meta: meta,
+                  space: 8,
+                  child: _BarCategoryIcon(item: item, selected: isTouched),
+                );
+              },
+            ),
+          ),
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+        ),
+        barTouchData: BarTouchData(
+          enabled: true,
+          handleBuiltInTouches: false,
+          touchCallback: (event, response) {
+            final groupIndex = response?.spot?.touchedBarGroupIndex;
+
+            if (event.isInterestedForInteractions && groupIndex != null) {
+              if (_touchedBarIndex != groupIndex) {
+                setState(() => _touchedBarIndex = groupIndex);
+              }
+              return;
+            }
+
+            if (_touchedBarIndex != null) {
+              setState(() => _touchedBarIndex = null);
+            }
+          },
+        ),
+        barGroups: [
+          for (final entry in chartItems.indexed)
+            _buildBarGroup(entry.$1, entry.$2),
+        ],
+      ),
+    );
+  }
+
+  BarChartGroupData _buildBarGroup(int index, _CategoryAmountItem item) {
+    final isTouched = index == _touchedBarIndex;
+    final percent = ((item.amount / widget.total) * 100).round();
+
+    return BarChartGroupData(
+      x: index,
+      barRods: [
+        BarChartRodData(
+          toY: item.amount,
+          width: isTouched ? 30 : 24,
+          gradient: LinearGradient(
+            colors: [
+              item.color.withValues(alpha: 0.62),
+              item.color,
+            ],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+          ),
+          borderRadius: BorderRadius.circular(9),
+          label: BarChartRodLabel(
+            text: '$percent%',
+            style: TextStyle(
+              color: item.color,
+              fontWeight: FontWeight.w900,
+              fontSize: isTouched ? 28 : 16,
+              shadows: const [
+                Shadow(
+                  color: Colors.white,
+                  blurRadius: 6,
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -320,6 +485,127 @@ class _CategoryBadge extends StatelessWidget {
               size: selected ? 20 : 17,
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BarCategoryIcon extends StatelessWidget {
+  const _BarCategoryIcon({required this.item, required this.selected});
+
+  final _CategoryAmountItem item;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: '${item.category.name}: ${formatCurrency(item.amount)}',
+      child: AnimatedScale(
+        scale: selected ? 1.14 : 1,
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          width: selected ? 42 : 36,
+          height: selected ? 42 : 36,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: item.color.withValues(alpha: 0.24)),
+            boxShadow: [
+              BoxShadow(
+                color: item.color.withValues(alpha: selected ? 0.22 : 0.12),
+                blurRadius: selected ? 10 : 7,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Container(
+            margin: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: item.color.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Icon(
+              item.category.iconData,
+              color: item.color,
+              size: selected ? 20 : 17,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChartViewSwitch extends StatelessWidget {
+  const _ChartViewSwitch({
+    required this.selectedView,
+    required this.onSelected,
+  });
+
+  final _CategoryChartView selectedView;
+  final ValueChanged<_CategoryChartView> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.28)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _ChartViewButton(
+            icon: Icons.pie_chart_rounded,
+            isSelected: selectedView == _CategoryChartView.pie,
+            onTap: () => onSelected(_CategoryChartView.pie),
+          ),
+          _ChartViewButton(
+            icon: Icons.bar_chart_rounded,
+            isSelected: selectedView == _CategoryChartView.bar,
+            onTap: () => onSelected(_CategoryChartView.bar),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChartViewButton extends StatelessWidget {
+  const _ChartViewButton({
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(11),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        width: 42,
+        height: 32,
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.14)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: Icon(
+          icon,
+          size: 22,
+          color: isSelected ? AppColors.primary : AppColors.textSecondary,
         ),
       ),
     );
