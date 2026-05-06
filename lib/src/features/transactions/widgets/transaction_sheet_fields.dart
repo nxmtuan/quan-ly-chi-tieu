@@ -1,5 +1,56 @@
 part of '../add_transaction_sheet.dart';
 
+String formatAmountInput(num amount) {
+  return _formatThousands(amount.round().toString());
+}
+
+double? parseAmountInput(String input) {
+  final rawDigits = input.replaceAll('.', '').trim();
+  if (rawDigits.isEmpty) {
+    return null;
+  }
+
+  return double.tryParse(rawDigits);
+}
+
+String _formatThousands(String digits) {
+  if (digits.isEmpty) {
+    return '';
+  }
+
+  final buffer = StringBuffer();
+  for (var index = 0; index < digits.length; index++) {
+    final remaining = digits.length - index;
+    buffer.write(digits[index]);
+    if (remaining > 1 && remaining % 3 == 1) {
+      buffer.write('.');
+    }
+  }
+
+  return buffer.toString();
+}
+
+class _AmountInputFormatter extends TextInputFormatter {
+  const _AmountInputFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digitsOnly = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digitsOnly.isEmpty) {
+      return const TextEditingValue(text: '');
+    }
+
+    final formatted = _formatThousands(digitsOnly);
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
+
 class _TypeToggle extends StatelessWidget {
   const _TypeToggle({required this.type, required this.onChanged});
 
@@ -186,34 +237,52 @@ class _AmountCard extends StatelessWidget {
         children: [
           _RequiredLabel(label: 'Số tiền', color: actionColor),
           const SizedBox(height: 6),
-          TextField(
-            controller: controller,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-            ],
-            style: const TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 30,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.7,
-            ),
-            decoration: const InputDecoration(
-              hintText: '0đ',
-              hintStyle: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 30,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.7,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: const [_AmountInputFormatter()],
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.7,
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: '0',
+                    hintStyle: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 30,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.7,
+                    ),
+                    filled: false,
+                    fillColor: Colors.transparent,
+                    isDense: true,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
               ),
-              filled: false,
-              fillColor: Colors.transparent,
-              isDense: true,
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-            ),
+              const SizedBox(width: 8),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 3),
+                child: Text(
+                  'đ',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.7,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

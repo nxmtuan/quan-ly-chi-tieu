@@ -54,7 +54,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
 
     final transaction = widget.transaction;
     if (transaction != null) {
-      _amountController.text = transaction.amount.toStringAsFixed(0);
+      _amountController.text = formatAmountInput(transaction.amount);
       _noteController.text = transaction.note;
       _type = transaction.type;
       _date = transaction.date;
@@ -214,7 +214,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   }
 
   Future<void> _saveTransaction() async {
-    final amount = double.tryParse(_amountController.text);
+    final amount = parseAmountInput(_amountController.text);
     if (amount == null || amount <= 0 || _categoryId == null) {
       return;
     }
