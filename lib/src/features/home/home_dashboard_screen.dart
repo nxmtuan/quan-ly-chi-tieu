@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../models/auth_user.dart';
 import '../../models/transaction.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/transaction_provider.dart';
 import 'widgets/recent_transactions.dart';
 import 'widgets/summary_card.dart';
@@ -28,6 +31,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final authUser = ref.watch(authProvider);
     final allTransactions = ref.watch(transactionsProvider);
     final monthTransactions = [
       for (final transaction in allTransactions)
@@ -86,44 +90,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ],
                             ),
                           ),
-                          Container(
-                            width: 66,
-                            height: 66,
-                            decoration: BoxDecoration(
-                              color: colors.surface,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: colors.shadow.withValues(
-                                    alpha: isDark ? 0.3 : 0.08,
-                                  ),
-                                  blurRadius: isDark ? 10 : 22,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
-                            ),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Icon(
-                                  Icons.notifications_none_rounded,
-                                  color: colors.onSurface,
-                                  size: 31,
-                                ),
-                                Positioned(
-                                  top: 14,
-                                  right: 14,
-                                  child: Container(
-                                    width: 10,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFF2F72),
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          _ProfileAvatarButton(
+                            authUser: authUser,
+                            onTap: () => context.go('/settings'),
                           ),
                         ],
                       )
@@ -215,4 +184,96 @@ bool _isSameMonth(DateTime a, DateTime b) {
 
 DateTime _monthStart(DateTime date) {
   return DateTime(date.year, date.month);
+}
+
+class _ProfileAvatarButton extends StatelessWidget {
+  const _ProfileAvatarButton({required this.authUser, required this.onTap});
+
+  final AuthUser? authUser;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final avatarLabel = _avatarLabel(authUser);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: 66,
+        height: 66,
+        padding: const EdgeInsets.all(7),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: colors.shadow.withValues(alpha: isDark ? 0.3 : 0.08),
+              blurRadius: isDark ? 10 : 22,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: authUser == null
+                ? AppColors.primary.withValues(alpha: 0.12)
+                : const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: _buildAvatarContent(avatarLabel),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAvatarContent(String avatarLabel) {
+    final photoUrl = authUser?.photoUrl;
+    if (photoUrl == null || photoUrl.isEmpty) {
+      return _AvatarFallback(label: avatarLabel);
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Image.network(
+        photoUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _AvatarFallback(label: avatarLabel);
+        },
+      ),
+    );
+  }
+
+  String _avatarLabel(AuthUser? authUser) {
+    final source = authUser?.name.trim();
+    if (source == null || source.isEmpty) {
+      return 'A';
+    }
+
+    return source.substring(0, 1).toUpperCase();
+  }
+}
+
+class _AvatarFallback extends StatelessWidget {
+  const _AvatarFallback({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: AppColors.primary,
+          fontSize: 24,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5,
+        ),
+      ),
+    );
+  }
 }
