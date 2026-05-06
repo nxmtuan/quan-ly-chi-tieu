@@ -76,19 +76,83 @@ class _AuthSettingsRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (authUser == null) {
+      if (kIsWeb) {
+        return InkWell(
+          onTap: null,
+          borderRadius: BorderRadius.circular(context.scaled(24)),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.scaled(8),
+              vertical: context.scaled(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: context.scaled(46),
+                      height: context.scaled(46),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.13),
+                        borderRadius: BorderRadius.circular(
+                          context.scaled(16),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.login_rounded,
+                        color: AppColors.primary,
+                        size: context.scaled(22),
+                      ),
+                    ),
+                    SizedBox(width: context.scaled(14)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Tài khoản',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                              fontSize: context.scaledFont(15, min: 14),
+                            ),
+                          ),
+                          SizedBox(height: context.scaled(5)),
+                          Text(
+                            'Kết nối tài khoản Google',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: context.scaledFont(12, min: 12),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: context.scaled(12)),
+                SizedBox(
+                  height: context.scaled(42),
+                  child: const Align(
+                    alignment: Alignment.centerLeft,
+                    child: GoogleWebSignInButton(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
       return _SettingsRow(
         icon: Icons.login_rounded,
         iconColor: AppColors.primary,
-        title: kIsWeb ? 'Tài khoản' : 'Đăng nhập',
+        title: 'Đăng nhập',
         subtitle: 'Kết nối tài khoản Google',
-        trailing: kIsWeb
-            ? const SizedBox(
-                width: 220,
-                height: 44,
-                child: GoogleWebSignInButton(),
-              )
-            : const Icon(Icons.login_rounded),
-        onTap: kIsWeb ? null : () => _signIn(context, ref),
+        trailing: const Icon(Icons.login_rounded),
+        onTap: () => _signIn(context, ref),
       );
     }
 
@@ -125,23 +189,24 @@ class _SettingsTipCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlatCard(
-      radius: 24,
+      radius: context.scaled(24),
       color: AppColors.primaryLight,
       child: Row(
         children: [
           Container(
-            width: 52,
-            height: 52,
+            width: context.scaled(48),
+            height: context.scaled(48),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.85),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(context.scaled(15)),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.tips_and_updates_rounded,
               color: AppColors.primary,
+              size: context.scaled(22),
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: context.scaled(14)),
           const Expanded(
             child: Text(
               'Ghi lại các khoản chi nhỏ mỗi ngày để có bức tranh tài chính rõ hơn.',
@@ -186,45 +251,49 @@ class _SettingsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(context.scaled(24)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.scaled(8),
+          vertical: context.scaled(12),
+        ),
         child: Row(
           children: [
             Container(
-              width: 50,
-              height: 50,
+              width: context.scaled(46),
+              height: context.scaled(46),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.13),
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(context.scaled(16)),
               ),
-              child: Icon(icon, color: iconColor),
+              child: Icon(icon, color: iconColor, size: context.scaled(22)),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: context.scaled(14)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
+                      fontSize: context.scaledFont(15, min: 14),
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  SizedBox(height: context.scaled(5)),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textSecondary,
-                      fontSize: 12,
+                      fontSize: context.scaledFont(12, min: 12),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: context.scaled(12)),
             trailing,
           ],
         ),
@@ -238,8 +307,8 @@ class _DividerIndent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(left: 72),
+    return Padding(
+      padding: EdgeInsets.only(left: context.scaled(66)),
       child: Divider(height: 1, color: AppColors.border),
     );
   }
@@ -261,9 +330,9 @@ class _ThemeModeSheet extends StatelessWidget {
         top: false,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            16,
+            context.scaled(16),
             0,
-            16,
+            context.scaled(16),
             appSheetBottomPadding(context),
           ),
           child: Column(
@@ -274,7 +343,7 @@ class _ThemeModeSheet extends StatelessWidget {
                 subtitle: 'Áp dụng cho toàn bộ ứng dụng.',
                 showCloseButton: false,
               ),
-              const SizedBox(height: 54),
+              SizedBox(height: context.scaled(54)),
               Row(
                 children: [
                   Expanded(
@@ -285,7 +354,7 @@ class _ThemeModeSheet extends StatelessWidget {
                       onTap: () => onSelected(ThemeMode.system),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: context.scaled(10)),
                   Expanded(
                     child: _ThemeModeOption(
                       icon: Icons.light_mode_rounded,
@@ -294,7 +363,7 @@ class _ThemeModeSheet extends StatelessWidget {
                       onTap: () => onSelected(ThemeMode.light),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: context.scaled(10)),
                   Expanded(
                     child: _ThemeModeOption(
                       icon: Icons.dark_mode_rounded,
@@ -305,7 +374,7 @@ class _ThemeModeSheet extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: context.scaled(18)),
               AppPrimaryButton(
                 label: 'Đóng',
                 color: AppColors.primary,
@@ -338,15 +407,18 @@ class _ThemeModeOption extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(context.scaled(18)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.scaled(10),
+          vertical: context.scaled(14),
+        ),
         decoration: BoxDecoration(
           color: isActive
               ? AppColors.primary.withValues(alpha: 0.1)
               : Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
             color: isActive
                 ? AppColors.primary.withValues(alpha: 0.55)
@@ -358,21 +430,21 @@ class _ThemeModeOption extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 42,
-              height: 42,
+              width: context.scaled(40),
+              height: context.scaled(40),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(context.scaled(13)),
               ),
-              child: Icon(icon, color: color, size: 22),
+              child: Icon(icon, color: color, size: context.scaled(20)),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: context.scaled(10)),
             Text(
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: color,
-                fontSize: 13,
+                fontSize: context.scaledFont(13, min: 12),
                 fontWeight: FontWeight.w800,
               ),
             ),

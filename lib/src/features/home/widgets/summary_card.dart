@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/adaptive.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../providers/transaction_provider.dart';
@@ -28,6 +29,9 @@ class SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final verticalSpacing = context.scaled(14);
+    final cardSpacing = context.scaled(10);
+
     return Column(
       children: [
         _MonthSelectorBar(
@@ -37,7 +41,7 @@ class SummaryCard extends StatelessWidget {
           onPickMonth: onPickMonth,
           onNextMonth: onNextMonth,
         ),
-        const SizedBox(height: 18),
+        SizedBox(height: verticalSpacing),
         Row(
           children: [
             Expanded(
@@ -49,7 +53,7 @@ class SummaryCard extends StatelessWidget {
                 backgroundColor: const Color(0xFFFFF2F6),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: cardSpacing),
             Expanded(
               child: _SummaryMetricCard(
                 label: 'Thu nhập',
@@ -61,7 +65,7 @@ class SummaryCard extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: context.scaled(14)),
         _BalanceBanner(balance: summary.balance),
       ],
     );

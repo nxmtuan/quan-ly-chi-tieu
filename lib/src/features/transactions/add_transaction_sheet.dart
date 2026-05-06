@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/adaptive.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_table_calendar.dart';

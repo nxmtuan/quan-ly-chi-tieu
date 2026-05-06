@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/adaptive.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_table_calendar.dart';
 import '../../core/widgets/flat_card.dart';
@@ -44,24 +45,22 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         .fold<double>(0, (total, transaction) => total + transaction.amount);
 
     return ListView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
+          padding: EdgeInsets.fromLTRB(
+            context.scaled(24),
+            context.scaled(16),
+            context.scaled(24),
+            context.scaled(120),
+          ),
           children: [
             Text(
               'Lịch giao dịch',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 letterSpacing: -0.7,
+                fontSize: context.scaled(27),
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Mọi thao tác với ngày tháng đều dùng Table Calendar.',
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 22),
+            SizedBox(height: context.scaled(22)),
             AppTableCalendar(
               focusedDay: _focusedDay,
               selectedDay: _selectedDay,
@@ -76,22 +75,27 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 setState(() => _focusedDay = normalizeCalendarDay(focusedDay));
               },
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: context.scaled(18)),
             FlatCard(
-              radius: 26,
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+              radius: context.scaled(26),
+              padding: EdgeInsets.fromLTRB(
+                context.scaled(18),
+                context.scaled(18),
+                context.scaled(18),
+                context.scaled(16),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     _calendarHeadline(_selectedDay),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 18,
+                      fontSize: context.scaled(17),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: context.scaled(6)),
                   Text(
                     formatLongDate(_selectedDay),
                     style: const TextStyle(
@@ -99,7 +103,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: context.scaled(16)),
                   Row(
                     children: [
                       Expanded(
@@ -109,7 +113,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           color: AppColors.success,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: context.scaled(10)),
                       Expanded(
                         child: _MetricPill(
                           label: 'Chi',
@@ -122,12 +126,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: context.scaled(18)),
             if (dailyTransactions.isEmpty)
-              const FlatCard(
-                radius: 26,
+              FlatCard(
+                radius: context.scaled(26),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
+                  padding: EdgeInsets.symmetric(vertical: context.scaled(10)),
                   child: Center(
                     child: Text(
                       'Ngày này chưa có giao dịch nào',
@@ -142,7 +146,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             else
               for (final transaction in dailyTransactions)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                  padding: EdgeInsets.only(bottom: context.scaled(12)),
                   child: TransactionRow(transaction: transaction),
                 ),
           ],
@@ -180,10 +184,13 @@ class _MetricPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.scaled(14),
+        vertical: context.scaled(12),
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(context.scaled(18)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,16 +199,16 @@ class _MetricPill extends StatelessWidget {
             label,
             style: TextStyle(
               color: color,
-              fontSize: 12,
+              fontSize: context.scaled(11),
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: context.scaled(6)),
           Text(
             formatCurrency(amount),
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 16,
+              fontSize: context.scaled(15),
               fontWeight: FontWeight.w700,
             ),
           ),

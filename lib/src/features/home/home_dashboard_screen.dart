@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/adaptive.dart';
 import '../../models/auth_user.dart';
 import '../../models/transaction.dart';
 import '../../providers/auth_provider.dart';
@@ -31,6 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scale = context.adaptiveScale;
     final authUser = ref.watch(authProvider);
     final allTransactions = ref.watch(transactionsProvider);
     final monthTransactions = [
@@ -54,7 +56,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: CustomScrollView(
         slivers: [
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(32, 28, 32, 0),
+            padding: EdgeInsets.fromLTRB(
+              context.scaled(24),
+              context.scaled(22),
+              context.scaled(24),
+              0,
+            ),
             sliver: SliverToBoxAdapter(
               child:
                   Row(
@@ -82,9 +89,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       .headlineSmall
                                       ?.copyWith(
                                         color: colors.onSurface,
-                                        fontSize: 30,
+                                        fontSize: context.scaled(27),
                                         fontWeight: FontWeight.w700,
-                                        letterSpacing: -1.2,
+                                        letterSpacing: -1.0 * scale,
                                       ),
                                 ),
                               ],
@@ -107,7 +114,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(32, 30, 32, 0),
+            padding: EdgeInsets.fromLTRB(
+              context.scaled(24),
+              context.scaled(24),
+              context.scaled(24),
+              0,
+            ),
             sliver: SliverToBoxAdapter(
               child:
                   SummaryCard(
@@ -131,7 +143,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(32, 18, 32, 106),
+            padding: EdgeInsets.fromLTRB(
+              context.scaled(24),
+              context.scaled(16),
+              context.scaled(24),
+              context.scaled(100),
+            ),
             sliver: SliverToBoxAdapter(
               child: RecentTransactions(transactions: transactions)
                   .animate(delay: 150.ms)
@@ -197,22 +214,24 @@ class _ProfileAvatarButton extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final avatarLabel = _avatarLabel(authUser);
+    final size = context.scaled(60);
+    final innerPadding = context.scaled(6);
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(context.scaled(18)),
       child: Container(
-        width: 66,
-        height: 66,
-        padding: const EdgeInsets.all(7),
+        width: size,
+        height: size,
+        padding: EdgeInsets.all(innerPadding),
         decoration: BoxDecoration(
           color: colors.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(context.scaled(18)),
           boxShadow: [
             BoxShadow(
               color: colors.shadow.withValues(alpha: isDark ? 0.3 : 0.08),
-              blurRadius: isDark ? 10 : 22,
-              offset: const Offset(0, 10),
+              blurRadius: context.scaled(isDark ? 10 : 18),
+              offset: Offset(0, context.scaled(8)),
             ),
           ],
         ),
@@ -221,22 +240,23 @@ class _ProfileAvatarButton extends StatelessWidget {
             color: authUser == null
                 ? AppColors.primary.withValues(alpha: 0.12)
                 : const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(context.scaled(14)),
           ),
-          child: _buildAvatarContent(avatarLabel),
+          child: _buildAvatarContent(context, avatarLabel),
         ),
       ),
     );
   }
 
-  Widget _buildAvatarContent(String avatarLabel) {
+  Widget _buildAvatarContent(BuildContext context, String avatarLabel) {
+    final radius = context.scaled(14);
     final photoUrl = authUser?.photoUrl;
     if (photoUrl == null || photoUrl.isEmpty) {
       return _AvatarFallback(label: avatarLabel);
     }
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(radius),
       child: Image.network(
         photoUrl,
         fit: BoxFit.cover,
@@ -267,9 +287,9 @@ class _AvatarFallback extends StatelessWidget {
     return Center(
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.primary,
-          fontSize: 24,
+          fontSize: context.scaled(22),
           fontWeight: FontWeight.w700,
           letterSpacing: -0.5,
         ),

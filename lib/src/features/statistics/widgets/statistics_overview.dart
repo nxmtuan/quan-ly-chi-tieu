@@ -12,8 +12,8 @@ class _ExpenseOverviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlatCard(
-      radius: 24,
-      padding: const EdgeInsets.all(22),
+      radius: context.scaled(24),
+      padding: EdgeInsets.all(context.scaled(20)),
       child: Column(
         children: [
           Row(
@@ -32,9 +32,9 @@ class _ExpenseOverviewCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: context.scaled(18)),
           SizedBox(
-            height: 220,
+            height: context.scaled(208),
             child: totalExpense == 0
                 ? const Center(
                     child: Text(
@@ -48,18 +48,18 @@ class _ExpenseOverviewCard extends StatelessWidget {
                 : PieChart(
                     PieChartData(
                       sectionsSpace: 4,
-                      centerSpaceRadius: 58,
+                      centerSpaceRadius: context.scaled(54),
                       startDegreeOffset: -90,
                       sections: [
                         for (final item in breakdown)
                           PieChartSectionData(
                             value: item.amount,
                             color: item.category.color,
-                            radius: 38,
+                            radius: context.scaled(35),
                             title: '${item.percentage.toStringAsFixed(0)}%',
-                            titleStyle: const TextStyle(
+                            titleStyle: TextStyle(
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: context.scaled(11),
                               fontWeight: FontWeight.w700,
                             ),
                           ),

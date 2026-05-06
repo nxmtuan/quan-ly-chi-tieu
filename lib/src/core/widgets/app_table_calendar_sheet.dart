@@ -55,28 +55,28 @@ class _CalendarBottomSheetState extends State<_CalendarBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return AppSheetContainer(
-      radius: 32,
+      radius: context.scaled(30),
       boxShadow: [
         BoxShadow(
           color: AppColors.shadow.withValues(alpha: 0.12),
-          blurRadius: 18,
-          offset: const Offset(0, -6),
+          blurRadius: context.scaled(16),
+          offset: Offset(0, -context.scaled(6)),
         ),
       ],
       child: SafeArea(
         top: false,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            16,
+            context.scaled(16),
             0,
-            16,
+            context.scaled(16),
             appSheetBottomPadding(context),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               AppSheetHeader(title: widget.title, subtitle: widget.subtitle),
-              const SizedBox(height: 8),
+              SizedBox(height: context.scaled(8)),
               AppTableCalendar(
                 focusedDay: _focusedDay,
                 selectedDay: _selectedDay,
@@ -88,12 +88,12 @@ class _CalendarBottomSheetState extends State<_CalendarBottomSheet> {
                   setState(() => _focusedDay = _normalizeDate(focusedDay));
                 },
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: context.scaled(14)),
               AppPrimaryButton(
                 label: 'Áp dụng ngày này',
                 color: Theme.of(context).colorScheme.primary,
-                height: 52,
-                radius: 18,
+                height: context.scaled(50),
+                radius: context.scaled(17),
                 onTap: () => Navigator.of(context).pop(_selectedDay),
               ),
             ],

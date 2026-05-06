@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/adaptive.dart';
+
 class GradientButton extends StatelessWidget {
   const GradientButton({
     super.key,
@@ -21,18 +23,18 @@ class GradientButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(context.scaled(22)),
         child: Ink(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 18),
+          padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
           decoration: BoxDecoration(
             color: colors.primary,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(context.scaled(22)),
             boxShadow: [
               BoxShadow(
                 color: colors.shadow.withValues(alpha: isDark ? 0.35 : 0.08),
-                blurRadius: isDark ? 12 : 24,
-                offset: const Offset(0, 8),
+                blurRadius: context.scaled(isDark ? 12 : 20),
+                offset: Offset(0, context.scaled(7)),
               ),
             ],
           ),
@@ -40,14 +42,14 @@ class GradientButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (icon != null) ...[
-                Icon(icon, color: Colors.white),
-                const SizedBox(width: 10),
+                Icon(icon, color: Colors.white, size: context.scaled(20)),
+                SizedBox(width: context.scaled(10)),
               ],
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: context.scaled(15),
                   fontWeight: FontWeight.w800,
                 ),
               ),

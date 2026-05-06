@@ -8,19 +8,26 @@ class _CategoryRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FlatCard(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.scaled(16),
+        vertical: context.scaled(14),
+      ),
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: context.scaled(44),
+            height: context.scaled(44),
             decoration: BoxDecoration(
               color: category.color.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(context.scaled(15)),
             ),
-            child: Icon(category.iconData, color: category.color),
+            child: Icon(
+              category.iconData,
+              color: category.color,
+              size: context.scaled(22),
+            ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: context.scaled(14)),
           Expanded(
             child: Text(
               category.name,
@@ -33,11 +40,15 @@ class _CategoryRow extends ConsumerWidget {
           IconButton(
             onPressed: () =>
                 showCategoryDialog(context, ref, category: category),
-            icon: const Icon(Icons.edit_rounded),
+            icon: Icon(Icons.edit_rounded, size: context.scaled(21)),
           ),
           IconButton(
             onPressed: () => _deleteCategory(context, ref),
-            icon: const Icon(Icons.delete_rounded, color: AppColors.danger),
+            icon: Icon(
+              Icons.delete_rounded,
+              color: AppColors.danger,
+              size: context.scaled(21),
+            ),
           ),
         ],
       ),

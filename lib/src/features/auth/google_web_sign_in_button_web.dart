@@ -18,10 +18,10 @@ class GoogleWebSignInButton extends StatelessWidget {
         type: GSIButtonType.standard,
         theme: GSIButtonTheme.outline,
         size: GSIButtonSize.large,
-        text: GSIButtonText.signinWith,
+        text: GSIButtonText.signin,
         shape: GSIButtonShape.pill,
         logoAlignment: GSIButtonLogoAlignment.left,
-        minimumWidth: 220,
+        minimumWidth: 180,
       ),
     );
   }

@@ -53,9 +53,9 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
         top: false,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            16,
+            context.scaled(16),
             0,
-            16,
+            context.scaled(16),
             appSheetBottomPadding(context),
           ),
           child: Column(
@@ -65,16 +65,17 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
                 title: 'Chọn danh mục',
                 subtitle: 'Hiển thị toàn bộ danh mục của nhóm hiện tại.',
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: context.scaled(14)),
               Flexible(
                 child: SingleChildScrollView(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final itemWidth = (constraints.maxWidth - 24) / 4;
+                      final itemWidth =
+                          (constraints.maxWidth - context.scaled(24)) / 4;
 
                       return Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: context.scaled(8),
+                        runSpacing: context.scaled(8),
                         children: [
                           for (final category in widget.categories)
                             SizedBox(
@@ -96,7 +97,7 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: context.scaled(16)),
               AppPrimaryButton(
                 label: 'Chọn',
                 color: widget.actionColor,

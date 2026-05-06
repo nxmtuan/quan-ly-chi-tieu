@@ -56,9 +56,9 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
         top: false,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            16,
+            context.scaled(16),
             0,
-            16,
+            context.scaled(16),
             appSheetBottomPadding(context),
           ),
           child: Column(
@@ -67,24 +67,27 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
               const AppSheetHeader(
                 title: 'Chọn tháng',
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: context.scaled(18)),
               Row(
                 children: [
                   InkWell(
                     onTap: () => setState(() => _displayedYear -= 1),
                     borderRadius: BorderRadius.circular(999),
-                    child: const Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Icon(Icons.chevron_left_rounded, size: 28),
+                    child: Padding(
+                      padding: EdgeInsets.all(context.scaled(8)),
+                      child: Icon(
+                        Icons.chevron_left_rounded,
+                        size: context.scaled(26),
+                      ),
                     ),
                   ),
                   Expanded(
                     child: Text(
                       '$_displayedYear',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 20,
+                        fontSize: context.scaled(18),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -95,10 +98,10 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                         : null,
                     borderRadius: BorderRadius.circular(999),
                     child: Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: EdgeInsets.all(context.scaled(8)),
                       child: Icon(
                         Icons.chevron_right_rounded,
-                        size: 28,
+                        size: context.scaled(26),
                         color: canGoNextYear
                             ? AppColors.textPrimary
                             : AppColors.textSecondary.withValues(alpha: 0.3),
@@ -107,15 +110,15 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: context.scaled(16)),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: 12,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
+                  crossAxisSpacing: context.scaled(10),
+                  mainAxisSpacing: context.scaled(10),
                   childAspectRatio: 2.2,
                 ),
                 itemBuilder: (context, index) {
@@ -130,7 +133,7 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                     onTap: isDisabled
                         ? null
                         : () => setState(() => _selectedMonth = candidateMonth),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(context.scaled(16)),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
                       decoration: BoxDecoration(
@@ -139,7 +142,7 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                             : isDisabled
                             ? const Color(0xFFF8FAFC)
                             : Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(context.scaled(16)),
                         border: Border.all(
                           color: isSelected
                               ? AppColors.primary
@@ -157,7 +160,7 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                               : isDisabled
                               ? AppColors.textSecondary.withValues(alpha: 0.4)
                               : AppColors.textPrimary,
-                          fontSize: 13,
+                          fontSize: context.scaled(12),
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -165,7 +168,7 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                   );
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: context.scaled(16)),
               AppPrimaryButton(
                 label: 'Chọn tháng',
                 color: AppColors.primary,

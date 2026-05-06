@@ -60,16 +60,16 @@ class _TypeToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50,
+      height: context.scaled(48),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(context.scaled(14)),
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow.withValues(alpha: 0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            blurRadius: context.scaled(9),
+            offset: Offset(0, context.scaled(3)),
           ),
         ],
       ),
@@ -118,14 +118,14 @@ class _TypeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(context.scaled(14)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         height: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: EdgeInsets.symmetric(horizontal: context.scaled(8)),
         decoration: BoxDecoration(
           color: selected ? color.withValues(alpha: 0.06) : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(context.scaled(14)),
           border: selected
               ? Border.all(color: color.withValues(alpha: 0.24))
               : null,
@@ -134,8 +134,8 @@ class _TypeButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 28,
-              height: 28,
+              width: context.scaled(26),
+              height: context.scaled(26),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(999),
@@ -143,10 +143,10 @@ class _TypeButton extends StatelessWidget {
               child: Icon(
                 icon,
                 color: selected ? color : const Color(0xFF4B5563),
-                size: 18,
+                size: context.scaled(16),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: context.scaled(8)),
             Flexible(
               child: Text(
                 label,
@@ -154,7 +154,7 @@ class _TypeButton extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: selected ? color : const Color(0xFF4B5563),
-                  fontSize: 12,
+                  fontSize: context.scaledFont(12, min: 12),
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.3,
                 ),
@@ -177,16 +177,17 @@ class _FormCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: padding ?? const EdgeInsets.all(14),
+      padding: padding ??
+          EdgeInsets.all(context.scaled(14)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(context.scaled(14)),
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow.withValues(alpha: 0.025),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            blurRadius: context.scaled(6),
+            offset: Offset(0, context.scaled(2)),
           ),
         ],
       ),
@@ -231,12 +232,17 @@ class _AmountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _FormCard(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      padding: EdgeInsets.fromLTRB(
+        context.scaled(14),
+        context.scaled(12),
+        context.scaled(14),
+        context.scaled(12),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _RequiredLabel(label: 'Số tiền', color: actionColor),
-          const SizedBox(height: 6),
+          SizedBox(height: context.scaled(6)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -245,17 +251,17 @@ class _AmountCard extends StatelessWidget {
                   controller: controller,
                   keyboardType: TextInputType.number,
                   inputFormatters: const [_AmountInputFormatter()],
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 30,
+                    fontSize: context.scaled(28),
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.7,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: '0',
                     hintStyle: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 30,
+                      fontSize: context.scaled(28),
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.7,
                     ),
@@ -269,14 +275,14 @@ class _AmountCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 3),
+              SizedBox(width: context.scaled(8)),
+              Padding(
+                padding: EdgeInsets.only(bottom: context.scaled(3)),
                 child: Text(
                   'đ',
                   style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 30,
+                    fontSize: context.scaled(28),
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.7,
                   ),
@@ -304,13 +310,13 @@ class _LeadingIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 40,
-      height: 40,
+      width: context.scaled(38),
+      height: context.scaled(38),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(context.scaled(15)),
       ),
-      child: Icon(icon, color: color, size: 21),
+      child: Icon(icon, color: color, size: context.scaled(20)),
     );
   }
 }
@@ -323,7 +329,10 @@ class _NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _FormCard(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.scaled(14),
+        vertical: context.scaled(10),
+      ),
       child: Row(
         children: [
           _LeadingIcon(
@@ -331,34 +340,34 @@ class _NoteCard extends StatelessWidget {
             color: AppColors.primary,
             backgroundColor: AppColors.primary.withValues(alpha: 0.1),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: context.scaled(10)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
+                Text(
                   'Ghi chú',
                   style: TextStyle(
                     color: Color(0xFF4B5563),
-                    fontSize: 12,
+                    fontSize: context.scaledFont(12, min: 12),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: context.scaled(4)),
                 TextField(
                   controller: controller,
                   textCapitalization: TextCapitalization.sentences,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 14,
+                    fontSize: context.scaled(13),
                     fontWeight: FontWeight.w800,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Nhập mô tả giao dịch',
                     hintStyle: TextStyle(
                       color: Color(0xFFB3BAC8),
-                      fontSize: 14,
+                      fontSize: context.scaled(13),
                       fontWeight: FontWeight.w700,
                     ),
                     filled: false,
@@ -389,9 +398,12 @@ class _SourceTrigger extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(context.scaled(14)),
       child: _FormCard(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.scaled(14),
+          vertical: context.scaled(10),
+        ),
         child: Row(
           children: [
             _LeadingIcon(
@@ -399,28 +411,28 @@ class _SourceTrigger extends StatelessWidget {
               color: AppColors.primary,
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: context.scaled(10)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const _RequiredStaticLabel('Nguồn tiền'),
-                  const SizedBox(height: 6),
+                  SizedBox(height: context.scaled(6)),
                   Text(
                     source,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 15,
+                      fontSize: context.scaledFont(15, min: 14),
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
               color: Color(0xFF4B5563),
-              size: 18,
+              size: context.scaled(18),
             ),
           ],
         ),
@@ -439,9 +451,12 @@ class _DateTrigger extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(context.scaled(14)),
       child: _FormCard(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.scaled(14),
+          vertical: context.scaled(10),
+        ),
         child: Row(
           children: [
             _LeadingIcon(
@@ -449,28 +464,28 @@ class _DateTrigger extends StatelessWidget {
               color: AppColors.primary,
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: context.scaled(10)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const _RequiredStaticLabel('Ngày giao dịch'),
-                  const SizedBox(height: 6),
+                  SizedBox(height: context.scaled(6)),
                   Text(
                     _dateLabel(date),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 15,
+                      fontSize: context.scaledFont(15, min: 14),
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
               color: Color(0xFF4B5563),
-              size: 18,
+              size: context.scaled(18),
             ),
           ],
         ),

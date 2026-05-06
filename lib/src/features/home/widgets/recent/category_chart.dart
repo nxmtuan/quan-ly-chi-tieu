@@ -23,22 +23,24 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
     final chartItems = _chartItems;
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(context.scaled(16)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(context.scaled(26)),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF1B2338).withValues(alpha: 0.16),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            blurRadius: context.scaled(15),
+            offset: Offset(0, context.scaled(7)),
           ),
         ],
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.maxWidth;
-          final chartSize = width < 360 ? 210.0 : 232.0;
+          final chartSize = width < 360
+              ? context.scaled(188)
+              : context.scaled(212);
           final isPieChart = _selectedChartView == _CategoryChartView.pie;
 
           return Column(
@@ -51,7 +53,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                       'Cơ cấu chi tiêu',
                       style: TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 17,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.2,
                       ),
@@ -63,7 +65,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: context.scaled(12)),
               Expanded(
                 child: Center(
                   child: SizedBox(
@@ -336,7 +338,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
       badgePositionPercentageOffset: 0.98,
       titleStyle: TextStyle(
         color: Colors.white,
-        fontSize: isTouched ? 16 : 14,
+        fontSize: context.scaled(isTouched ? 14 : 12),
         fontWeight: FontWeight.w700,
         shadows: const [
           Shadow(color: Colors.black38, blurRadius: 4, offset: Offset(0, 1)),
@@ -354,6 +356,8 @@ class _CategoryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scale = context.adaptiveScale;
+
     return Tooltip(
       message: '${item.category.name}: ${formatCurrency(item.amount)}',
       child: AnimatedScale(
@@ -361,22 +365,25 @@ class _CategoryBadge extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
         child: Container(
-          width: selected ? 42 : 36,
-          height: selected ? 42 : 36,
+          width: context.scaled(selected ? 38 : 33),
+          height: context.scaled(selected ? 38 : 33),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: const Color(0xFF111827), width: 2),
+            border: Border.all(
+              color: const Color(0xFF111827),
+              width: 1.6 * scale,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: selected ? 0.26 : 0.18),
-                blurRadius: selected ? 10 : 7,
-                offset: const Offset(0, 3),
+                blurRadius: context.scaled(selected ? 9 : 6),
+                offset: Offset(0, context.scaled(3)),
               ),
             ],
           ),
           child: Container(
-            margin: const EdgeInsets.all(5),
+            margin: EdgeInsets.all(context.scaled(4.5)),
             decoration: BoxDecoration(
               color: item.color.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(999),
@@ -384,7 +391,7 @@ class _CategoryBadge extends StatelessWidget {
             child: Icon(
               item.category.iconData,
               color: item.color,
-              size: selected ? 20 : 17,
+              size: context.scaled(selected ? 18 : 15),
             ),
           ),
         ),
@@ -403,8 +410,8 @@ class _BarCategoryIcon extends StatelessWidget {
     return Tooltip(
       message: '${item.category.name}: ${formatCurrency(item.amount)}',
       child: Container(
-        width: 36,
-        height: 36,
+        width: context.scaled(33),
+        height: context.scaled(33),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(999),
@@ -412,18 +419,22 @@ class _BarCategoryIcon extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: item.color.withValues(alpha: 0.12),
-              blurRadius: 7,
-              offset: const Offset(0, 3),
+              blurRadius: context.scaled(6),
+              offset: Offset(0, context.scaled(3)),
             ),
           ],
         ),
         child: Container(
-          margin: const EdgeInsets.all(5),
+          margin: EdgeInsets.all(context.scaled(4.5)),
           decoration: BoxDecoration(
             color: item.color.withValues(alpha: 0.14),
             borderRadius: BorderRadius.circular(999),
           ),
-          child: Icon(item.category.iconData, color: item.color, size: 17),
+          child: Icon(
+            item.category.iconData,
+            color: item.color,
+            size: context.scaled(15),
+          ),
         ),
       ),
     );
@@ -442,10 +453,10 @@ class _ChartViewSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(3),
+      padding: EdgeInsets.all(context.scaled(3)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(context.scaled(13)),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.28)),
       ),
       child: Row(
@@ -482,21 +493,21 @@ class _ChartViewButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(11),
+      borderRadius: BorderRadius.circular(context.scaled(10)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
-        width: 42,
-        height: 32,
+        width: context.scaled(38),
+        height: context.scaled(29),
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.14)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(context.scaled(10)),
         ),
         child: Icon(
           icon,
-          size: 22,
+          size: context.scaled(20),
           color: isSelected ? AppColors.primary : AppColors.textSecondary,
         ),
       ),

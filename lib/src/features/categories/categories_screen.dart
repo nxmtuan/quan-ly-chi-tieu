@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/adaptive.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../models/category.dart';
 import '../../models/transaction.dart';
@@ -29,7 +30,12 @@ class CategoriesScreen extends ConsumerWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+        padding: EdgeInsets.fromLTRB(
+          context.scaled(24),
+          context.scaled(16),
+          context.scaled(24),
+          context.scaled(32),
+        ),
         children: [
           for (final type in TransactionType.values) ...[
             Text(
@@ -39,15 +45,15 @@ class CategoriesScreen extends ConsumerWidget {
                 letterSpacing: -0.4,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: context.scaled(12)),
             for (final category in categories.where(
               (item) => item.type == type,
             ))
               Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: EdgeInsets.only(bottom: context.scaled(12)),
                 child: _CategoryRow(category: category),
               ),
-            const SizedBox(height: 12),
+            SizedBox(height: context.scaled(12)),
           ],
         ],
       ),

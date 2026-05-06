@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/adaptive.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../models/auth_user.dart';
@@ -23,7 +24,12 @@ class SettingsScreen extends ConsumerWidget {
     final authUser = ref.watch(authProvider);
 
     return ListView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
+          padding: EdgeInsets.fromLTRB(
+            context.scaled(24),
+            context.scaled(16),
+            context.scaled(24),
+            context.scaled(120),
+          ),
           children: [
             Text(
               'Cài đặt',
@@ -32,18 +38,19 @@ class SettingsScreen extends ConsumerWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 5),
+            SizedBox(height: context.scaled(5)),
             Text(
               'Tuỳ chỉnh ứng dụng',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: -1.0,
+                fontSize: context.scaled(27),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: context.scaled(24)),
             FlatCard(
-              radius: 24,
-              padding: const EdgeInsets.all(10),
+              radius: context.scaled(24),
+              padding: EdgeInsets.all(context.scaled(10)),
               child: Column(
                 children: [
                   _ThemeSettingsRow(themeMode: themeMode),
@@ -54,7 +61,7 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: context.scaled(24)),
             const _SettingsTipCard(),
           ],
         )

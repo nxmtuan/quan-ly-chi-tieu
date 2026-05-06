@@ -8,20 +8,24 @@ class _BreakdownRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlatCard(
-      radius: 24,
-      padding: const EdgeInsets.all(16),
+      radius: context.scaled(24),
+      padding: EdgeInsets.all(context.scaled(16)),
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: context.scaled(44),
+            height: context.scaled(44),
             decoration: BoxDecoration(
               color: item.category.color.withValues(alpha: 0.13),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(context.scaled(16)),
             ),
-            child: Icon(item.category.iconData, color: item.category.color),
+            child: Icon(
+              item.category.iconData,
+              color: item.category.color,
+              size: context.scaled(22),
+            ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: context.scaled(14)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +37,7 @@ class _BreakdownRow extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: context.scaled(8)),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(99),
                   child: LinearProgressIndicator(
@@ -48,7 +52,7 @@ class _BreakdownRow extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: context.scaled(14)),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -59,12 +63,12 @@ class _BreakdownRow extends StatelessWidget {
                   color: AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 5),
+              SizedBox(height: context.scaled(5)),
               Text(
                 formatCurrency(item.amount),
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textSecondary,
-                  fontSize: 12,
+                  fontSize: context.scaled(11),
                   fontWeight: FontWeight.w700,
                 ),
               ),

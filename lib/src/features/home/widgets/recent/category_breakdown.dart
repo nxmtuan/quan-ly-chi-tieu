@@ -54,7 +54,10 @@ class _CategoryTab extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.only(top: 10, bottom: 12),
+        padding: EdgeInsets.only(
+          top: context.scaled(8),
+          bottom: context.scaled(10),
+        ),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
@@ -68,7 +71,7 @@ class _CategoryTab extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: isSelected ? color : AppColors.textSecondary,
-            fontSize: 14,
+            fontSize: context.scaled(13),
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -95,23 +98,26 @@ class _CategoryAmountRow extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.scaled(12),
+            vertical: context.scaled(10),
+          ),
           child: Row(
             children: [
               Container(
-                width: 38,
-                height: 38,
+                width: context.scaled(34),
+                height: context.scaled(34),
                 decoration: BoxDecoration(
                   color: item.color.withValues(alpha: 0.13),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(context.scaled(12)),
                 ),
                 child: Icon(
                   item.category.iconData,
                   color: item.color,
-                  size: 20,
+                  size: context.scaled(18),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: context.scaled(10)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,17 +126,18 @@ class _CategoryAmountRow extends StatelessWidget {
                       item.category.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
+                        fontSize: context.scaled(15),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: context.scaled(3)),
                     Text(
                       '$percent%',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textSecondary,
-                        fontSize: 12,
+                        fontSize: context.scaled(11),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -139,23 +146,24 @@ class _CategoryAmountRow extends StatelessWidget {
               ),
               Text(
                 formatCurrency(item.amount),
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 14,
+                  fontSize: context.scaled(13),
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(width: 6),
-              const Icon(
+              SizedBox(width: context.scaled(4)),
+              Icon(
                 Icons.chevron_right_rounded,
                 color: AppColors.textSecondary,
+                size: context.scaled(18),
               ),
             ],
           ),
         ),
         if (showDivider)
-          const Padding(
-            padding: EdgeInsets.only(left: 64),
+          Padding(
+            padding: EdgeInsets.only(left: context.scaled(56)),
             child: Divider(height: 1, color: AppColors.border),
           ),
       ],

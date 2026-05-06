@@ -19,18 +19,19 @@ class _MonthSelectorBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scale = context.adaptiveScale;
 
     return Container(
-      height: 82,
-      padding: const EdgeInsets.symmetric(horizontal: 22),
+      height: context.scaled(72),
+      padding: EdgeInsets.symmetric(horizontal: context.scaled(18)),
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(context.scaled(20)),
         boxShadow: [
           BoxShadow(
             color: colors.shadow.withValues(alpha: isDark ? 0.3 : 0.06),
-            blurRadius: isDark ? 12 : 24,
-            offset: const Offset(0, 12),
+            blurRadius: context.scaled(isDark ? 12 : 18),
+            offset: Offset(0, context.scaled(9)),
           ),
         ],
       ),
@@ -42,36 +43,37 @@ class _MonthSelectorBar extends StatelessWidget {
             child: Icon(
               Icons.chevron_left_rounded,
               color: colors.onSurface,
-              size: 31,
+              size: context.scaled(28),
             ),
           ),
           Expanded(
             child: InkWell(
               onTap: onPickMonth,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(context.scaled(16)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    width: 28,
-                    height: 28,
+                    width: context.scaled(26),
+                    height: context.scaled(26),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(context.scaled(7)),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.calendar_month_rounded,
                       color: Colors.white,
-                      size: 18,
+                      size: context.scaled(16),
                     ),
                   ),
-                  const SizedBox(width: 13),
+                  SizedBox(width: context.scaled(11)),
                   Text(
                     formatMonthYear(displayedMonth),
                     style: TextStyle(
                       color: colors.onSurface,
-                      fontSize: 17,
+                      fontSize: context.scaled(16),
                       fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2 * scale,
                     ),
                   ),
                 ],
@@ -86,7 +88,7 @@ class _MonthSelectorBar extends StatelessWidget {
               color: canGoNext
                   ? colors.onSurface
                   : colors.onSurface.withValues(alpha: 0.24),
-              size: 31,
+              size: context.scaled(28),
             ),
           ),
         ],
@@ -106,7 +108,10 @@ class _BalanceBanner extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.scaled(18),
+        vertical: context.scaled(14),
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -114,15 +119,15 @@ class _BalanceBanner extends StatelessWidget {
             AppColors.primaryLight.withValues(alpha: isDark ? 0.16 : 0.5),
           ],
         ),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(context.scaled(16)),
         border: Border.all(color: Colors.white.withValues(alpha: 0.8)),
       ),
       child: Text(
         'Dư: ${formatCurrency(balance)}',
         textAlign: TextAlign.center,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.primary,
-          fontSize: 18,
+          fontSize: context.scaled(17),
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -150,21 +155,26 @@ class _SummaryMetricCard extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return Container(
-      height: 138,
-      padding: const EdgeInsets.fromLTRB(20, 20, 16, 18),
+      height: context.scaled(120),
+      padding: EdgeInsets.fromLTRB(
+        context.scaled(16),
+        context.scaled(16),
+        context.scaled(14),
+        context.scaled(14),
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [backgroundColor, colors.surface],
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(context.scaled(21)),
         border: Border.all(color: Colors.white, width: 2),
         boxShadow: [
           BoxShadow(
             color: color.withValues(alpha: 0.08),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            blurRadius: context.scaled(15),
+            offset: Offset(0, context.scaled(7)),
           ),
         ],
       ),
@@ -174,15 +184,15 @@ class _SummaryMetricCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 45,
-                height: 45,
+                width: context.scaled(40),
+                height: context.scaled(40),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Icon(icon, size: 27, color: color),
+                child: Icon(icon, size: context.scaled(23), color: color),
               ),
-              const SizedBox(width: 13),
+              SizedBox(width: context.scaled(10)),
               Expanded(
                 child: Text(
                   label,
@@ -190,7 +200,7 @@ class _SummaryMetricCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: color,
-                    fontSize: 16,
+                    fontSize: context.scaled(15),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -204,7 +214,7 @@ class _SummaryMetricCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: colors.onSurface,
-              fontSize: 25,
+              fontSize: context.scaled(22),
               fontWeight: FontWeight.w700,
               letterSpacing: -0.8,
             ),

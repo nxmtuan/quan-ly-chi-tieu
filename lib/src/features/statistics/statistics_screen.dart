@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/adaptive.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../models/category.dart';
@@ -37,16 +38,22 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     );
 
     return ListView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
+          padding: EdgeInsets.fromLTRB(
+            context.scaled(24),
+            context.scaled(16),
+            context.scaled(24),
+            context.scaled(120),
+          ),
           children: [
             Text(
               'Statistics',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 letterSpacing: -0.7,
+                fontSize: context.scaled(27),
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: context.scaled(8)),
             const Text(
               'Track where your money goes',
               style: TextStyle(
@@ -54,17 +61,17 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 22),
+            SizedBox(height: context.scaled(22)),
             _RangeSelector(
               selectedRange: _selectedRange,
               onChanged: (range) => setState(() => _selectedRange = range),
             ),
-            const SizedBox(height: 22),
+            SizedBox(height: context.scaled(22)),
             _ExpenseOverviewCard(
               totalExpense: totalExpense,
               breakdown: breakdown,
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: context.scaled(24)),
             Text(
               'Breakdown',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -72,7 +79,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: context.scaled(16)),
             if (breakdown.isEmpty)
               const FlatCard(
                 child: Center(child: Text('No breakdown available')),
@@ -80,7 +87,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             else
               for (final item in breakdown)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                  padding: EdgeInsets.only(bottom: context.scaled(12)),
                   child: _BreakdownRow(item: item),
                 ),
           ],

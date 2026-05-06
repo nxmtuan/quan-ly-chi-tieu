@@ -8,24 +8,31 @@ class _SheetHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-      decoration: const BoxDecoration(
+      padding: EdgeInsets.fromLTRB(
+        context.scaled(16),
+        context.scaled(10),
+        context.scaled(16),
+        context.scaled(10),
+      ),
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(context.scaled(28)),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const AppSheetHandle(),
-          const SizedBox(height: 10),
+          SizedBox(height: context.scaled(10)),
           Row(
             children: [
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 22,
+                    fontSize: context.scaled(20),
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.5,
                   ),
@@ -35,8 +42,8 @@ class _SheetHeader extends StatelessWidget {
                 onTap: () => Navigator.of(context).pop(),
                 borderRadius: BorderRadius.circular(999),
                 child: Container(
-                  width: 40,
-                  height: 40,
+                  width: context.scaled(38),
+                  height: context.scaled(38),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(999),
@@ -44,15 +51,15 @@ class _SheetHeader extends StatelessWidget {
                     boxShadow: [
                       BoxShadow(
                         color: AppColors.shadow.withValues(alpha: 0.08),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+                        blurRadius: context.scaled(7),
+                        offset: Offset(0, context.scaled(3)),
                       ),
                     ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.close_rounded,
                     color: Color(0xFF374151),
-                    size: 18,
+                    size: context.scaled(17),
                   ),
                 ),
               ),

@@ -11,10 +11,10 @@ class _RangeSelector extends StatelessWidget {
     const ranges = ['Week', 'Month', 'Year'];
 
     return Container(
-      padding: const EdgeInsets.all(6),
+      padding: EdgeInsets.all(context.scaled(6)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(context.scaled(24)),
       ),
       child: Row(
         children: [
@@ -22,15 +22,15 @@ class _RangeSelector extends StatelessWidget {
             Expanded(
               child: InkWell(
                 onTap: () => onChanged(range),
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(context.scaled(18)),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
-                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  padding: EdgeInsets.symmetric(vertical: context.scaled(12)),
                   decoration: BoxDecoration(
                     color: selectedRange == range
                         ? AppColors.primary
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(context.scaled(18)),
                   ),
                   child: Text(
                     range,
@@ -39,6 +39,7 @@ class _RangeSelector extends StatelessWidget {
                       color: selectedRange == range
                           ? Colors.white
                           : AppColors.textSecondary,
+                      fontSize: context.scaled(13),
                       fontWeight: FontWeight.w700,
                     ),
                   ),

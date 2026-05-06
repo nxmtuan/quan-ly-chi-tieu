@@ -58,6 +58,8 @@ class AppTheme {
       useMaterial3: false,
       brightness: brightness,
       fontFamily: 'BeVietnamPro',
+      visualDensity: const VisualDensity(horizontal: -0.6, vertical: -0.6),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       primaryColor: primary,
       scaffoldBackgroundColor: background,
       colorScheme: ColorScheme(

@@ -26,9 +26,9 @@ class _SourcePickerSheet extends StatelessWidget {
         top: false,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            16,
+            context.scaled(16),
             0,
-            16,
+            context.scaled(16),
             appSheetBottomPadding(context),
           ),
           child: Column(
@@ -38,7 +38,7 @@ class _SourcePickerSheet extends StatelessWidget {
                 title: 'Chọn nguồn tiền',
                 showCloseButton: false,
               ),
-              const SizedBox(height: 54),
+              SizedBox(height: context.scaled(54)),
               Row(
                 children: [
                   for (final entry in ['Tiền mặt', 'Chuyển khoản', 'Khác'].indexed) ...[
@@ -50,11 +50,11 @@ class _SourcePickerSheet extends StatelessWidget {
                         onTap: () => Navigator.of(context).pop(entry.$2),
                       ),
                     ),
-                    if (entry.$1 != 2) const SizedBox(width: 10),
+                    if (entry.$1 != 2) SizedBox(width: context.scaled(10)),
                   ],
                 ],
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: context.scaled(18)),
               AppPrimaryButton(
                 label: 'Đóng',
                 color: AppColors.primary,
@@ -87,15 +87,18 @@ class _SourceSheetOption extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(context.scaled(18)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.scaled(10),
+          vertical: context.scaled(14),
+        ),
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primary.withValues(alpha: 0.1)
               : Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
             color: selected
                 ? AppColors.primary.withValues(alpha: 0.55)
@@ -107,15 +110,15 @@ class _SourceSheetOption extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 42,
-              height: 42,
+              width: context.scaled(40),
+              height: context.scaled(40),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(context.scaled(13)),
               ),
-              child: Icon(icon, color: color, size: 22),
+              child: Icon(icon, color: color, size: context.scaled(20)),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: context.scaled(10)),
             Text(
               source,
               textAlign: TextAlign.center,
@@ -123,7 +126,7 @@ class _SourceSheetOption extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: color,
-                fontSize: 13,
+                fontSize: context.scaledFont(13, min: 12),
                 fontWeight: FontWeight.w800,
               ),
             ),

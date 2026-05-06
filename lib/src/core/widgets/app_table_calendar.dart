@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../theme/app_colors.dart';
+import '../utils/adaptive.dart';
 import 'app_sheet.dart';
 import 'flat_card.dart';
 
@@ -33,16 +34,21 @@ class AppTableCalendar extends StatelessWidget {
     final markerColor = colors.primary;
     final baseCellDecoration = BoxDecoration(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(context.scaled(16)),
     );
     final outsideCellDecoration = BoxDecoration(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(context.scaled(16)),
     );
 
     return FlatCard(
-      radius: 28,
-      padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+      radius: context.scaled(26),
+      padding: EdgeInsets.fromLTRB(
+        context.scaled(16),
+        context.scaled(18),
+        context.scaled(16),
+        context.scaled(16),
+      ),
       child: TableCalendar<Object>(
         locale: 'vi_VN',
         firstDay: DateTime(2020),
@@ -56,23 +62,23 @@ class AppTableCalendar extends StatelessWidget {
           leftChevronIcon: Icon(
             Icons.chevron_left_rounded,
             color: colors.onSurface,
-            size: 28,
+            size: context.scaled(26),
           ),
           rightChevronIcon: Icon(
             Icons.chevron_right_rounded,
             color: colors.onSurface,
-            size: 28,
+            size: context.scaled(26),
           ),
           titleTextStyle: TextStyle(
             color: colors.onSurface,
-            fontSize: 20,
+            fontSize: context.scaled(18),
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
           ),
-          headerPadding: const EdgeInsets.only(bottom: 14),
+          headerPadding: EdgeInsets.only(bottom: context.scaled(14)),
         ),
-        daysOfWeekHeight: 28,
-        rowHeight: 50,
+        daysOfWeekHeight: context.scaled(28),
+        rowHeight: context.scaled(46),
         startingDayOfWeek: StartingDayOfWeek.monday,
         selectedDayPredicate: (day) => isSameDay(day, selectedDay),
         eventLoader: eventLoader == null ? null : (day) => eventLoader!(day),
@@ -108,17 +114,17 @@ class AppTableCalendar extends StatelessWidget {
           ),
           todayDecoration: BoxDecoration(
             color: colors.primary.withValues(alpha: isDark ? 0.26 : 0.12),
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(context.scaled(16)),
             border: Border.all(color: colors.primary.withValues(alpha: 0.22)),
           ),
           selectedDecoration: BoxDecoration(
             color: colors.primary,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(context.scaled(16)),
             boxShadow: [
               BoxShadow(
                 color: colors.primary.withValues(alpha: isDark ? 0.28 : 0.18),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
+                blurRadius: context.scaled(12),
+                offset: Offset(0, context.scaled(5)),
               ),
             ],
           ),
@@ -127,20 +133,20 @@ class AppTableCalendar extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
           ),
           markersMaxCount: 3,
-          markerMargin: const EdgeInsets.symmetric(horizontal: 1.2),
+          markerMargin: EdgeInsets.symmetric(horizontal: context.scaled(1.2)),
           markersAlignment: Alignment.bottomCenter,
-          cellMargin: const EdgeInsets.all(4),
+          cellMargin: EdgeInsets.all(context.scaled(4)),
           cellPadding: EdgeInsets.zero,
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
           weekdayStyle: TextStyle(
             color: colors.onSurface.withValues(alpha: 0.58),
-            fontSize: 12,
+            fontSize: context.scaledFont(12, min: 11),
             fontWeight: FontWeight.w800,
           ),
           weekendStyle: TextStyle(
             color: colors.onSurface.withValues(alpha: 0.42),
-            fontSize: 12,
+            fontSize: context.scaledFont(12, min: 11),
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -154,15 +160,17 @@ class AppTableCalendar extends StatelessWidget {
             return Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 5),
+                padding: EdgeInsets.only(bottom: context.scaled(5)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: List.generate(markerCount, (index) {
                     final opacity = 1 - (index * 0.18);
                     return Container(
-                      width: 5,
-                      height: 5,
-                      margin: const EdgeInsets.symmetric(horizontal: 1.4),
+                      width: context.scaled(4.5),
+                      height: context.scaled(4.5),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: context.scaled(1.3),
+                      ),
                       decoration: BoxDecoration(
                         color: markerColor.withValues(alpha: opacity),
                         borderRadius: BorderRadius.circular(999),
@@ -185,7 +193,7 @@ class AppTableCalendar extends StatelessWidget {
                   color: isWeekend
                       ? colors.onSurface.withValues(alpha: 0.42)
                       : colors.onSurface.withValues(alpha: 0.58),
-                  fontSize: 12,
+                  fontSize: context.scaledFont(12, min: 11),
                   fontWeight: FontWeight.w800,
                 ),
               ),

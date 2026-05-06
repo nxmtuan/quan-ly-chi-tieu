@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/adaptive.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/flat_card.dart';
 import '../../../models/category.dart';
@@ -44,24 +45,25 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
     final categories = ref.watch(categoriesProvider);
     final items = _buildCategoryItems(categories);
     final total = items.fold<double>(0, (sum, item) => sum + item.amount);
+    final chartHeight = context.scaled(312);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 340,
+          height: chartHeight,
           child: total == 0
               ? const FlatCard(child: Center(child: Text('Chưa có dữ liệu')))
               : _CategoryDonutChart(items: items, total: total),
         ),
-        const SizedBox(height: 18),
+        SizedBox(height: context.scaled(16)),
         FlatCard(
           padding: EdgeInsets.zero,
-          radius: 24,
+          radius: context.scaled(22),
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(horizontal: context.scaled(18)),
                 child: _CategoryTabs(
                   selectedType: _selectedType,
                   onSelected: (type) {
@@ -73,7 +75,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
               ),
               if (items.isEmpty)
                 Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(context.scaled(20)),
                   child: Text(
                     _selectedType == TransactionType.expense
                         ? 'Chưa có khoản chi nào'

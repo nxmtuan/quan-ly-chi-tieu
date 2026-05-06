@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../utils/adaptive.dart';
 
 double appSheetBottomPadding(BuildContext context, {double extra = 0}) {
   return MediaQuery.of(context).padding.bottom + 32 + extra;
@@ -41,8 +42,8 @@ class AppSheetHandle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 40,
-      height: 4,
+      width: context.scaled(40),
+      height: context.scaled(4),
       decoration: BoxDecoration(
         color: color ?? const Color(0xFFB8BCC8),
         borderRadius: BorderRadius.circular(999),
@@ -77,7 +78,7 @@ class AppSheetHeader extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const AppSheetHandle(),
-          const SizedBox(height: 16),
+          SizedBox(height: context.scaled(16)),
           Row(
             children: [
               Expanded(
@@ -88,20 +89,20 @@ class AppSheetHeader extends StatelessWidget {
                       title,
                       style:
                           titleStyle ??
-                          const TextStyle(
+                          TextStyle(
                             color: AppColors.textPrimary,
-                            fontSize: 22,
+                            fontSize: context.scaled(20),
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.5,
                           ),
                     ),
                     if (subtitle != null) ...[
-                      const SizedBox(height: 6),
+                      SizedBox(height: context.scaled(6)),
                       Text(
                         subtitle!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textSecondary,
-                          fontSize: 13,
+                          fontSize: context.scaledFont(13, min: 12),
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -114,8 +115,8 @@ class AppSheetHeader extends StatelessWidget {
                   onTap: onClose ?? () => Navigator.of(context).pop(),
                   borderRadius: BorderRadius.circular(999),
                   child: Container(
-                    width: 40,
-                    height: 40,
+                    width: context.scaled(38),
+                    height: context.scaled(38),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(999),
@@ -123,15 +124,15 @@ class AppSheetHeader extends StatelessWidget {
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.shadow.withValues(alpha: 0.08),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
+                          blurRadius: context.scaled(7),
+                          offset: Offset(0, context.scaled(3)),
                         ),
                       ],
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.close_rounded,
                       color: Color(0xFF374151),
-                      size: 18,
+                      size: context.scaled(17),
                     ),
                   ),
                 ),
@@ -152,9 +153,9 @@ class AppSheetFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        16,
-        8,
-        16,
+        context.scaled(16),
+        context.scaled(8),
+        context.scaled(16),
         appSheetBottomPadding(context),
       ),
       decoration: BoxDecoration(
@@ -162,8 +163,8 @@ class AppSheetFooter extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow.withValues(alpha: 0.06),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+            blurRadius: context.scaled(9),
+            offset: Offset(0, -context.scaled(5)),
           ),
         ],
       ),
@@ -202,13 +203,13 @@ class AppPrimaryButton extends StatelessWidget {
           disabledForegroundColor: Colors.white.withValues(alpha: 0.9),
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(radius),
+            borderRadius: BorderRadius.circular(context.scaled(radius)),
           ),
         ),
         child: Text(
           label,
-          style: const TextStyle(
-            fontSize: 16,
+          style: TextStyle(
+            fontSize: context.scaledFont(16, min: 14),
             fontWeight: FontWeight.w700,
             letterSpacing: -0.4,
           ),
