@@ -48,19 +48,7 @@ class ExpenseManagerApp extends ConsumerWidget {
 }
 
 TextScaler _compactTextScalerForWidth(MediaQueryData mediaQuery) {
-  final width = mediaQuery.size.width;
   final systemScale = mediaQuery.textScaler.scale(1);
-
-  final layoutScale = switch (width) {
-    >= 430 => 0.98,
-    >= 400 => 0.97,
-    >= 380 => 0.96,
-    _ => 0.95,
-  };
-
-  final targetScale = systemScale > 1
-      ? systemScale.clamp(layoutScale, 1.0)
-      : layoutScale;
-
+  final targetScale = systemScale > 1 ? systemScale : 1.0;
   return TextScaler.linear(targetScale);
 }
