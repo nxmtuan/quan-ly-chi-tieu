@@ -33,6 +33,28 @@
 - Text Secondary: `#64748B` (Xám nhạt - Dùng cho phụ đề)
 - Borders/Dividers: `#E2E8F0` (Đường kẻ siêu mờ)
 
+### 2.2 Dark Theme Palette 🌙
+
+**Background & Surface (Nền & Thẻ):**
+- App Background: `#0F172A` (Xám xanh siêu đậm - Slate 900)
+- Surface / Cards: `#1E293B` (Xám xanh sáng hơn một chút để nổi khối - Slate 800)
+
+**Text & Icons (Chữ & Biểu tượng):**
+- Text Primary: `#F8FAFC` (Trắng xám nhạt - Dịu mắt khi đọc đêm)
+- Text Secondary: `#94A3B8` (Xám trung tính - Slate 400)
+- Borders/Dividers: `#334155` (Đường kẻ siêu chìm - Slate 700)
+
+**Brand & Semantic (Màu chủ đạo & Thu/Chi):**
+*Lưu ý: Các màu này vẫn giữ Solid, màu Thu/Chi giữ nguyên vì màu sáng tự nổi bật trên nền tối.*
+- Primary: `#8B5CF6` (Tím - được đẩy sáng lên một chút so với Light mode để rõ hơn trên nền đen)
+- Primary Light (Cho nút phụ/trạng thái Active): `#2E1065` (Tím cực đậm) hoặc dùng `#334155`
+- Success (Thu): `#10B981` (Giữ nguyên)
+- Danger (Chi): `#EF4444` (Giữ nguyên)
+
+**Shadows & Elevation (Bóng đổ trong Dark Mode):**
+- Trọng tâm của Flat Design Dark Mode là **hạn chế bóng đổ**. Các khối (Card) đã tự tách biệt với nền nhờ màu `#1E293B` nổi trên nền `#0F172A`.
+- Nếu bắt buộc dùng bóng, dùng mã `#000000` (Đen tuyền) với opacity khoảng `30-40%` và blur nhỏ hơn Light Mode.
+
 ## 3. Spacing & Layout
 Base unit: `8px`
 
