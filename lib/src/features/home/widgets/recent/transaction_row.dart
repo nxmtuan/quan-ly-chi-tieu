@@ -55,7 +55,7 @@ class _TransactionRow extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -80,7 +80,7 @@ class _TransactionRow extends ConsumerWidget {
                 style: TextStyle(
                   color: color,
                   fontSize: 14,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               PopupMenuButton<String>(

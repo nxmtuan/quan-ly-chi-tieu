@@ -52,7 +52,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                       style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 17,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: -0.2,
                       ),
                     ),
@@ -275,7 +275,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
             text: '$percent%',
             style: TextStyle(
               color: item.color,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w700,
               fontSize: 16,
               shadows: const [
                 Shadow(
@@ -337,7 +337,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
       titleStyle: TextStyle(
         color: Colors.white,
         fontSize: isTouched ? 16 : 14,
-        fontWeight: FontWeight.w900,
+        fontWeight: FontWeight.w700,
         shadows: const [
           Shadow(color: Colors.black38, blurRadius: 4, offset: Offset(0, 1)),
         ],

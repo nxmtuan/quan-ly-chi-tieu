@@ -34,7 +34,7 @@ class ComingSoonScreen extends StatelessWidget {
                   style: TextStyle(
                     color: colors.onSurface,
                     fontSize: 24,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 8),

@@ -21,13 +21,13 @@ class _ExpenseOverviewCard extends StatelessWidget {
             children: [
               const Text(
                 'Expense Overview',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
               ),
               Text(
                 formatCurrency(totalExpense),
                 style: const TextStyle(
                   color: AppColors.danger,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -60,7 +60,7 @@ class _ExpenseOverviewCard extends StatelessWidget {
                             titleStyle: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                       ],

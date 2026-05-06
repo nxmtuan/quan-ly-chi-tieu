@@ -48,7 +48,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             Text(
               'Lịch giao dịch',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
                 letterSpacing: -0.7,
               ),
             ),
@@ -86,7 +86,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 18,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -201,7 +201,7 @@ class _MetricPill extends StatelessWidget {
             style: TextStyle(
               color: color,
               fontSize: 12,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
@@ -210,7 +210,7 @@ class _MetricPill extends StatelessWidget {
             style: const TextStyle(
               color: AppColors.textPrimary,
               fontSize: 16,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

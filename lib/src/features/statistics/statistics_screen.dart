@@ -42,7 +42,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             Text(
               'Statistics',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
                 letterSpacing: -0.7,
               ),
             ),
@@ -68,7 +68,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             Text(
               'Breakdown',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
                 letterSpacing: -0.5,
               ),
             ),

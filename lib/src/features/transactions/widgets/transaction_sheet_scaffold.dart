@@ -26,7 +26,7 @@ class _SheetHeader extends StatelessWidget {
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 22,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w700,
                     letterSpacing: -0.5,
                   ),
                 ),

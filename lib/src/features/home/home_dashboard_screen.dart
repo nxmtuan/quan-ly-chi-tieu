@@ -83,7 +83,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       ?.copyWith(
                                         color: colors.onSurface,
                                         fontSize: 30,
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.w700,
                                         letterSpacing: -1.2,
                                       ),
                                 ),
@@ -270,7 +270,7 @@ class _AvatarFallback extends StatelessWidget {
         style: const TextStyle(
           color: AppColors.primary,
           fontSize: 24,
-          fontWeight: FontWeight.w900,
+          fontWeight: FontWeight.w700,
           letterSpacing: -0.5,
         ),
       ),

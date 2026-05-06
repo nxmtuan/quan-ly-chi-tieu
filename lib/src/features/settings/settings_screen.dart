@@ -27,7 +27,7 @@ class SettingsScreen extends ConsumerWidget {
             Text(
               'Settings',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
                 letterSpacing: -0.7,
               ),
             ),

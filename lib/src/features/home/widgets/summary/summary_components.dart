@@ -71,7 +71,7 @@ class _MonthSelectorBar extends StatelessWidget {
                     style: TextStyle(
                       color: colors.onSurface,
                       fontSize: 17,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
@@ -123,7 +123,7 @@ class _BalanceBanner extends StatelessWidget {
         style: const TextStyle(
           color: AppColors.primary,
           fontSize: 18,
-          fontWeight: FontWeight.w900,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -191,7 +191,7 @@ class _SummaryMetricCard extends StatelessWidget {
                   style: TextStyle(
                     color: color,
                     fontSize: 16,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -205,7 +205,7 @@ class _SummaryMetricCard extends StatelessWidget {
             style: TextStyle(
               color: colors.onSurface,
               fontSize: 25,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w700,
               letterSpacing: -0.8,
             ),
           ),

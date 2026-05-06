@@ -86,7 +86,7 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                       style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 20,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),

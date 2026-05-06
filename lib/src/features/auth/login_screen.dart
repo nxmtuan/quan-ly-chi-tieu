@@ -50,7 +50,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         'Quản lý chi tiêu',
                         style: Theme.of(context).textTheme.headlineMedium
                             ?.copyWith(
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               letterSpacing: -0.8,
                             ),
                       ),

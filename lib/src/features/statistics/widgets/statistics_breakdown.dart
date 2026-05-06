@@ -29,7 +29,7 @@ class _BreakdownRow extends StatelessWidget {
                 Text(
                   item.category.name,
                   style: const TextStyle(
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -55,7 +55,7 @@ class _BreakdownRow extends StatelessWidget {
               Text(
                 '${item.percentage.toStringAsFixed(0)}%',
                 style: const TextStyle(
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
               ),

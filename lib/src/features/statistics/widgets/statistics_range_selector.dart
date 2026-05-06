@@ -39,7 +39,7 @@ class _RangeSelector extends StatelessWidget {
                       color: selectedRange == range
                           ? Colors.white
                           : AppColors.textSecondary,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),

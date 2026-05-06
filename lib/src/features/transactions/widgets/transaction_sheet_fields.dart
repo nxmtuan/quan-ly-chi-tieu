@@ -104,7 +104,7 @@ class _TypeButton extends StatelessWidget {
                 style: TextStyle(
                   color: selected ? color : const Color(0xFF4B5563),
                   fontSize: 12,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w700,
                   letterSpacing: -0.3,
                 ),
               ),
@@ -195,7 +195,7 @@ class _AmountCard extends StatelessWidget {
             style: const TextStyle(
               color: AppColors.textPrimary,
               fontSize: 30,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w700,
               letterSpacing: -0.7,
             ),
             decoration: const InputDecoration(
@@ -203,7 +203,7 @@ class _AmountCard extends StatelessWidget {
               hintStyle: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 30,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
                 letterSpacing: -0.7,
               ),
               filled: false,

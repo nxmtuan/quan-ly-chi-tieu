@@ -85,7 +85,7 @@ class AppSheetHeader extends StatelessWidget {
                           const TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 22,
-                            fontWeight: FontWeight.w900,
+                            fontWeight: FontWeight.w700,
                             letterSpacing: -0.5,
                           ),
                     ),
@@ -181,7 +181,7 @@ class AppPrimaryButton extends StatelessWidget {
           label,
           style: const TextStyle(
             fontSize: 16,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w700,
             letterSpacing: -0.4,
           ),
         ),

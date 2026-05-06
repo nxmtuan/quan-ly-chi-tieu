@@ -66,7 +66,7 @@ class AppTableCalendar extends StatelessWidget {
           titleTextStyle: TextStyle(
             color: colors.onSurface,
             fontSize: 20,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
           ),
           headerPadding: const EdgeInsets.only(bottom: 14),
@@ -100,11 +100,11 @@ class AppTableCalendar extends StatelessWidget {
           ),
           todayTextStyle: TextStyle(
             color: colors.primary,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w700,
           ),
           selectedTextStyle: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w700,
           ),
           todayDecoration: BoxDecoration(
             color: colors.primary.withValues(alpha: isDark ? 0.26 : 0.12),

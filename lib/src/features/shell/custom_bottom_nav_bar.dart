@@ -139,7 +139,7 @@ class _NavButton extends StatelessWidget {
                   style: TextStyle(
                     color: colors.primary,
                     fontSize: 12,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -183,7 +183,7 @@ class _NavButton extends StatelessWidget {
               style: TextStyle(
                 color: selected ? colors.primary : inactiveColor,
                 fontSize: 10.5,
-                fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w700,
               ),
             ),
           ],

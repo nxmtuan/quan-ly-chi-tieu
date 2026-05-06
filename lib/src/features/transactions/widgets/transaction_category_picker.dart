@@ -146,7 +146,7 @@ class _CategoryTile extends StatelessWidget {
                 style: TextStyle(
                   color: selected ? actionColor : AppColors.textPrimary,
                   fontSize: 12,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -188,7 +188,7 @@ class _MoreCategoriesTile extends StatelessWidget {
               style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 12,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ],

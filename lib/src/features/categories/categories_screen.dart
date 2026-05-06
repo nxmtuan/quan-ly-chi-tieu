@@ -35,7 +35,7 @@ class CategoriesScreen extends ConsumerWidget {
             Text(
               type == TransactionType.income ? 'Income' : 'Expense',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w700,
                 letterSpacing: -0.4,
               ),
             ),
