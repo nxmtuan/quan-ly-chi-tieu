@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../auth/google_web_sign_in_button.dart';
 import '../categories/categories_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -14,6 +16,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final authUser = ref.watch(authProvider);
 
     return ListView(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
@@ -90,14 +93,48 @@ class SettingsScreen extends ConsumerWidget {
                     },
                   ),
                   const _DividerIndent(),
-                  _SettingsRow(
-                    icon: Icons.logout_rounded,
-                    iconColor: AppColors.danger,
-                    title: 'Sign out',
-                    subtitle: 'Disconnect Google account',
-                    trailing: const Icon(Icons.logout_rounded),
-                    onTap: () => ref.read(authProvider.notifier).signOut(),
-                  ),
+                  if (authUser == null)
+                    _SettingsRow(
+                      icon: Icons.login_rounded,
+                      iconColor: AppColors.primary,
+                      title: kIsWeb ? 'Google account' : 'Sign in with Google',
+                      subtitle: 'Connect Google account',
+                      trailing: kIsWeb
+                          ? const SizedBox(
+                              width: 220,
+                              height: 44,
+                              child: GoogleWebSignInButton(),
+                            )
+                          : const Icon(Icons.login_rounded),
+                      onTap: kIsWeb
+                          ? null
+                          : () async {
+                              try {
+                                await ref
+                                    .read(authProvider.notifier)
+                                    .signInWithGoogle();
+                              } catch (_) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Không thể đăng nhập Google. Vui lòng kiểm tra cấu hình OAuth.',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                    )
+                  else
+                    _SettingsRow(
+                      icon: Icons.logout_rounded,
+                      iconColor: AppColors.danger,
+                      title: 'Sign out',
+                      subtitle: authUser.email,
+                      trailing: const Icon(Icons.logout_rounded),
+                      onTap: () => ref.read(authProvider.notifier).signOut(),
+                    ),
                 ],
               ),
             ),
