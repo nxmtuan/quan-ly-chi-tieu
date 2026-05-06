@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -55,143 +56,165 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         right: 14,
         bottom: MediaQuery.of(context).viewInsets.bottom + 14,
       ),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 44,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: AppColors.border,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
+      child:
+          Container(
+                padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
                 ),
-              ),
-              const SizedBox(height: 22),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Add Transaction',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () => Navigator.of(context).pop(),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(16),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 44,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: AppColors.border,
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                        ),
                       ),
-                      child: const Icon(Icons.close_rounded, size: 20),
-                    ),
+                      const SizedBox(height: 22),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Add Transaction',
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -0.5,
+                                ),
+                          ),
+                          InkWell(
+                            onTap: () => Navigator.of(context).pop(),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(Icons.close_rounded, size: 20),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      _TypeToggle(
+                        type: _type,
+                        onChanged: (type) {
+                          setState(() {
+                            _type = type;
+                            _categoryId = null;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      TextField(
+                        controller: _amountController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                        ],
+                        style: const TextStyle(
+                          fontSize: 42,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -1.6,
+                          color: AppColors.textPrimary,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: '0',
+                          prefixText: '₫ ',
+                          prefixStyle: TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _noteController,
+                        textCapitalization: TextCapitalization.sentences,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                        decoration: InputDecoration(
+                          hintText: 'Note',
+                          filled: true,
+                          fillColor: AppColors.background,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 16,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      const _SectionTitle('Category'),
+                      const SizedBox(height: 12),
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: categories.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 4,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 0.82,
+                            ),
+                        itemBuilder: (context, index) {
+                          final category = categories[index];
+                          return _CategoryButton(
+                                category: category,
+                                selected: _categoryId == category.id,
+                                onTap: () =>
+                                    setState(() => _categoryId = category.id),
+                              )
+                              .animate(
+                                delay: Duration(milliseconds: 24 * index),
+                              )
+                              .fadeIn(duration: 220.ms)
+                              .scale(
+                                begin: const Offset(0.9, 0.9),
+                                end: const Offset(1, 1),
+                                duration: 280.ms,
+                                curve: Curves.easeOutBack,
+                              );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      const _SectionTitle('Date'),
+                      const SizedBox(height: 10),
+                      _DateTrigger(date: _date, onTap: _pickDate),
+                      const SizedBox(height: 24),
+                      GradientButton(
+                        label: 'Save Transaction',
+                        icon: Icons.check_rounded,
+                        onTap: _saveTransaction,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _TypeToggle(
-                type: _type,
-                onChanged: (type) {
-                  setState(() {
-                    _type = type;
-                    _categoryId = null;
-                  });
-                },
-              ),
-              const SizedBox(height: 18),
-              TextField(
-                controller: _amountController,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
                 ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                ],
-                style: const TextStyle(
-                  fontSize: 42,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -1.6,
-                  color: AppColors.textPrimary,
-                ),
-                decoration: const InputDecoration(
-                  hintText: '0',
-                  prefixText: '₫ ',
-                  prefixStyle: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
+              )
+              .animate()
+              .fadeIn(duration: 220.ms)
+              .slideY(
+                begin: 0.14,
+                end: 0,
+                duration: 360.ms,
+                curve: Curves.easeOutCubic,
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _noteController,
-                textCapitalization: TextCapitalization.sentences,
-                style: const TextStyle(fontWeight: FontWeight.w700),
-                decoration: InputDecoration(
-                  hintText: 'Note',
-                  filled: true,
-                  fillColor: AppColors.background,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 16,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 22),
-              const _SectionTitle('Category'),
-              const SizedBox(height: 12),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: categories.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 0.82,
-                ),
-                itemBuilder: (context, index) {
-                  final category = categories[index];
-                  return _CategoryButton(
-                    category: category,
-                    selected: _categoryId == category.id,
-                    onTap: () => setState(() => _categoryId = category.id),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              const _SectionTitle('Date'),
-              const SizedBox(height: 10),
-              _DateTrigger(date: _date, onTap: _pickDate),
-              const SizedBox(height: 24),
-              GradientButton(
-                label: 'Save Transaction',
-                icon: Icons.check_rounded,
-                onTap: _saveTransaction,
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 

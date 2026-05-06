@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../core/theme/app_colors.dart';
 
@@ -38,11 +39,20 @@ class CustomBottomNavBar extends StatelessWidget {
         children: [
           for (var index = 0; index < items.length; index++)
             Expanded(
-              child: _NavButton(
-                item: items[index],
-                selected: currentIndex == index,
-                onTap: () => onTap(index),
-              ),
+              child:
+                  _NavButton(
+                        item: items[index],
+                        selected: currentIndex == index,
+                        onTap: () => onTap(index),
+                      )
+                      .animate(delay: Duration(milliseconds: 50 * index))
+                      .fadeIn(duration: 220.ms)
+                      .slideY(
+                        begin: 0.16,
+                        end: 0,
+                        duration: 280.ms,
+                        curve: Curves.easeOutCubic,
+                      ),
             ),
         ],
       ),

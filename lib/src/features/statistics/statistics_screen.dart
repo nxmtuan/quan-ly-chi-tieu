@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -32,107 +33,121 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     );
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
-      children: [
-        Text(
-          'Statistics',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.7,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Track where your money goes',
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 22),
-        _RangeSelector(
-          selectedRange: _selectedRange,
-          onChanged: (range) => setState(() => _selectedRange = range),
-        ),
-        const SizedBox(height: 22),
-        FlatCard(
-          radius: 30,
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
+          children: [
+            Text(
+              'Statistics',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.7,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Track where your money goes',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 22),
+            _RangeSelector(
+              selectedRange: _selectedRange,
+              onChanged: (range) => setState(() => _selectedRange = range),
+            ),
+            const SizedBox(height: 22),
+            FlatCard(
+              radius: 30,
+              padding: const EdgeInsets.all(22),
+              child: Column(
                 children: [
-                  const Text(
-                    'Expense Overview',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Expense Overview',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      Text(
+                        formatCurrency(totalExpense),
+                        style: const TextStyle(
+                          color: AppColors.coral,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    formatCurrency(totalExpense),
-                    style: const TextStyle(
-                      color: AppColors.coral,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 220,
+                    child: totalExpense == 0
+                        ? const Center(
+                            child: Text(
+                              'No expense data yet',
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          )
+                        : PieChart(
+                            PieChartData(
+                              sectionsSpace: 4,
+                              centerSpaceRadius: 58,
+                              startDegreeOffset: -90,
+                              sections: [
+                                for (final item in breakdown)
+                                  PieChartSectionData(
+                                    value: item.amount,
+                                    color: item.category.color,
+                                    radius: 38,
+                                    title:
+                                        '${item.percentage.toStringAsFixed(0)}%',
+                                    titleStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 220,
-                child: totalExpense == 0
-                    ? const Center(
-                        child: Text(
-                          'No expense data yet',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      )
-                    : PieChart(
-                        PieChartData(
-                          sectionsSpace: 4,
-                          centerSpaceRadius: 58,
-                          startDegreeOffset: -90,
-                          sections: [
-                            for (final item in breakdown)
-                              PieChartSectionData(
-                                value: item.amount,
-                                color: item.category.color,
-                                radius: 38,
-                                title: '${item.percentage.toStringAsFixed(0)}%',
-                                titleStyle: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-        Text(
-          'Breakdown',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.5,
-          ),
-        ),
-        const SizedBox(height: 16),
-        if (breakdown.isEmpty)
-          const FlatCard(child: Center(child: Text('No breakdown available')))
-        else
-          for (final item in breakdown)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _BreakdownRow(item: item),
             ),
-      ],
-    );
+            const SizedBox(height: 24),
+            Text(
+              'Breakdown',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (breakdown.isEmpty)
+              const FlatCard(
+                child: Center(child: Text('No breakdown available')),
+              )
+            else
+              for (final item in breakdown)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _BreakdownRow(item: item),
+                ),
+          ],
+        )
+        .animate()
+        .fadeIn(duration: 260.ms)
+        .slideY(
+          begin: 0.04,
+          end: 0,
+          duration: 340.ms,
+          curve: Curves.easeOutCubic,
+        );
   }
 
   List<_BreakdownItem> _buildBreakdown(

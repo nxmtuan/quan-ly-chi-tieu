@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -19,62 +20,92 @@ class HomeScreen extends ConsumerWidget {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
           sliver: SliverToBoxAdapter(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Welcome back',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w600,
+            child:
+                Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome back',
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: AppColors.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Your Money Flow',
+                                style: Theme.of(context).textTheme.headlineSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: -0.7,
+                                    ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Your Money Flow',
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -0.7,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF64748B).withValues(alpha: 0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.notifications_none_rounded,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFF64748B,
+                                ).withValues(alpha: 0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.notifications_none_rounded,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    )
+                    .animate()
+                    .fadeIn(duration: 260.ms)
+                    .slideY(
+                      begin: -0.08,
+                      end: 0,
+                      duration: 320.ms,
+                      curve: Curves.easeOutCubic,
+                    ),
           ),
         ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-          sliver: SliverToBoxAdapter(child: SummaryCard(summary: summary)),
+          sliver: SliverToBoxAdapter(
+            child: SummaryCard(summary: summary)
+                .animate(delay: 80.ms)
+                .fadeIn(duration: 320.ms)
+                .slideY(
+                  begin: 0.08,
+                  end: 0,
+                  duration: 360.ms,
+                  curve: Curves.easeOutCubic,
+                ),
+          ),
         ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(24, 28, 24, 120),
           sliver: SliverToBoxAdapter(
-            child: RecentTransactions(transactions: transactions),
+            child: RecentTransactions(transactions: transactions)
+                .animate(delay: 150.ms)
+                .fadeIn(duration: 320.ms)
+                .slideY(
+                  begin: 0.06,
+                  end: 0,
+                  duration: 360.ms,
+                  curve: Curves.easeOutCubic,
+                ),
           ),
         ),
       ],

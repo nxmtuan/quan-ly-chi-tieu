@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -41,16 +42,24 @@ class RecentTransactions extends ConsumerWidget {
         if (transactions.isEmpty)
           const FlatCard(child: Center(child: Text('No transactions yet')))
         else
-          for (final transaction in transactions)
+          for (final entry in transactions.indexed)
             Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _TransactionRow(
-                transaction: transaction,
-                category: ref.watch(
-                  categoryByIdProvider(transaction.categoryId),
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _TransactionRow(
+                    transaction: entry.$2,
+                    category: ref.watch(
+                      categoryByIdProvider(entry.$2.categoryId),
+                    ),
+                  ),
+                )
+                .animate(delay: Duration(milliseconds: 45 * entry.$1))
+                .fadeIn(duration: 260.ms)
+                .slideX(
+                  begin: 0.06,
+                  end: 0,
+                  duration: 320.ms,
+                  curve: Curves.easeOutCubic,
                 ),
-              ),
-            ),
       ],
     );
   }

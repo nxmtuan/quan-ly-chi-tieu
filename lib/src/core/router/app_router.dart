@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/home/home_dashboard_screen.dart';
@@ -16,22 +17,55 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/',
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: HomeScreen());
+            return _buildPage(state: state, child: const HomeScreen());
           },
         ),
         GoRoute(
           path: '/statistics',
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: StatisticsScreen());
+            return _buildPage(state: state, child: const StatisticsScreen());
           },
         ),
         GoRoute(
           path: '/settings',
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: SettingsScreen());
+            return _buildPage(state: state, child: const SettingsScreen());
           },
         ),
       ],
     ),
   ],
 );
+
+CustomTransitionPage<void> _buildPage({
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    transitionDuration: const Duration(milliseconds: 360),
+    reverseTransitionDuration: const Duration(milliseconds: 240),
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      );
+
+      return FadeTransition(
+        opacity: curvedAnimation,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.04, 0),
+            end: Offset.zero,
+          ).animate(curvedAnimation),
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.985, end: 1).animate(curvedAnimation),
+            child: child,
+          ),
+        ),
+      );
+    },
+  );
+}

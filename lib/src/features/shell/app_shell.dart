@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -19,14 +20,30 @@ class AppShell extends StatelessWidget {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 86),
-        child: _AddTransactionButton(
-          onTap: () => showAddTransactionSheet(context),
-        ),
+        child:
+            _AddTransactionButton(onTap: () => showAddTransactionSheet(context))
+                .animate(delay: 180.ms)
+                .fadeIn(duration: 260.ms)
+                .scale(
+                  begin: const Offset(0.72, 0.72),
+                  end: const Offset(1, 1),
+                  duration: 360.ms,
+                  curve: Curves.easeOutBack,
+                ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: currentIndex,
-        onTap: (index) => _goToIndex(context, index),
-      ),
+      bottomNavigationBar:
+          CustomBottomNavBar(
+                currentIndex: currentIndex,
+                onTap: (index) => _goToIndex(context, index),
+              )
+              .animate()
+              .fadeIn(duration: 260.ms)
+              .slideY(
+                begin: 0.35,
+                end: 0,
+                duration: 360.ms,
+                curve: Curves.easeOutCubic,
+              ),
     );
   }
 
