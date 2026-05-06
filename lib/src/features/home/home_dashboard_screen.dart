@@ -29,7 +29,7 @@ class HomeScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Welcome back',
+                                'Tổng quan',
                                 style: Theme.of(context).textTheme.bodyMedium
                                     ?.copyWith(
                                       color: colors.onSurface.withValues(
@@ -40,7 +40,7 @@ class HomeScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'Your Money Flow',
+                                'Quản lý chi tiêu',
                                 style: Theme.of(context).textTheme.headlineSmall
                                     ?.copyWith(
                                       fontWeight: FontWeight.w900,

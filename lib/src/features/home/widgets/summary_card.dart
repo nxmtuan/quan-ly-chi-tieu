@@ -11,61 +11,113 @@ class SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      padding: const EdgeInsets.all(26),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
+            color: colors.shadow.withValues(alpha: isDark ? 0.3 : 0.05),
+            blurRadius: isDark ? 8 : 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Total Balance',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.chevron_left_rounded,
+                  color: colors.onSurface.withValues(alpha: 0.62),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.calendar_month_rounded,
+                        size: 16,
+                        color: colors.onSurface.withValues(alpha: 0.72),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Tháng ${DateTime.now().month}/${DateTime.now().year}',
+                        style: TextStyle(
+                          color: colors.onSurface,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colors.onSurface.withValues(alpha: 0.62),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            formatCurrency(summary.balance),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -1,
-            ),
-          ),
-          const SizedBox(height: 26),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
-                child: _MetricPill(
-                  icon: Icons.arrow_downward_rounded,
-                  label: 'Income',
-                  amount: summary.income,
-                  color: AppColors.success,
+                child: _SummaryMetricCard(
+                  label: 'Chi tiêu',
+                  amount: summary.expense,
+                  icon: Icons.arrow_upward_rounded,
+                  color: AppColors.danger,
+                  isHighlighted: true,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
-                child: _MetricPill(
-                  icon: Icons.arrow_upward_rounded,
-                  label: 'Expense',
-                  amount: summary.expense,
-                  color: AppColors.danger,
+                child: _SummaryMetricCard(
+                  label: 'Thu nhập',
+                  amount: summary.income,
+                  icon: Icons.arrow_downward_rounded,
+                  color: AppColors.success,
+                  isHighlighted: false,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight.withValues(
+                alpha: isDark ? 0.18 : 1,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.visibility_outlined,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Thu - Chi = ${formatCurrency(summary.balance)}',
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -73,63 +125,74 @@ class SummaryCard extends StatelessWidget {
   }
 }
 
-class _MetricPill extends StatelessWidget {
-  const _MetricPill({
-    required this.icon,
+class _SummaryMetricCard extends StatelessWidget {
+  const _SummaryMetricCard({
     required this.label,
     required this.amount,
+    required this.icon,
     required this.color,
+    required this.isHighlighted,
   });
 
-  final IconData icon;
   final String label;
   final double amount;
+  final IconData icon;
   final Color color;
+  final bool isHighlighted;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isHighlighted ? color : colors.outlineVariant,
+          width: isHighlighted ? 1.4 : 1,
+        ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.22),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, size: 18, color: Colors.white),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+          Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.13),
+                  borderRadius: BorderRadius.circular(999),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  formatCurrency(amount),
+                child: Icon(icon, size: 16, color: color),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w900,
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            formatCurrency(amount),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: colors.onSurface,
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.4,
             ),
           ),
         ],
