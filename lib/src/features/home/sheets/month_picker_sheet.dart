@@ -66,7 +66,6 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
             children: [
               const AppSheetHeader(
                 title: 'Chọn tháng',
-                subtitle: 'Chỉ chọn theo tháng, không chọn ngày.',
               ),
               const SizedBox(height: 18),
               Row(

@@ -166,18 +166,17 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   }
 
   Future<void> _pickDate() async {
+    final transactions = ref.read(transactionsProvider);
+    final eventsByDay = buildCalendarEventIndex(
+      transactions,
+      (transaction) => transaction.date,
+    );
+
     final selectedDate = await showAppCalendarSheet(
       context,
       initialDate: _date,
       title: 'Chọn ngày giao dịch',
-      subtitle: 'Tất cả thao tác chọn ngày hiện dùng Table Calendar.',
-      eventLoader: (day) {
-        final transactions = ref.read(transactionsProvider);
-        return [
-          for (final transaction in transactions)
-            if (DateUtils.isSameDay(transaction.date, day)) transaction,
-        ];
-      },
+      eventLoader: (day) => eventsByDay[normalizeCalendarDay(day)] ?? const [],
     );
 
     if (selectedDate != null) {

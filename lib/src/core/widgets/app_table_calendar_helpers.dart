@@ -1,5 +1,19 @@
 part of 'app_table_calendar.dart';
 
+Map<DateTime, List<T>> buildCalendarEventIndex<T>(
+  Iterable<T> items,
+  DateTime Function(T item) dateOf,
+) {
+  final eventsByDay = <DateTime, List<T>>{};
+
+  for (final item in items) {
+    final day = normalizeCalendarDay(dateOf(item));
+    (eventsByDay[day] ??= <T>[]).add(item);
+  }
+
+  return eventsByDay;
+}
+
 DateTime normalizeCalendarDay(DateTime day) => _normalizeDate(day);
 
 DateTime _normalizeDate(DateTime day) {

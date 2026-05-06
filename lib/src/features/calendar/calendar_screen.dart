@@ -31,10 +31,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     final transactions = ref.watch(transactionsProvider);
-    final dailyTransactions = [
-      for (final transaction in transactions)
-        if (DateUtils.isSameDay(transaction.date, _selectedDay)) transaction,
-    ];
+    final eventsByDay = buildCalendarEventIndex(
+      transactions,
+      (transaction) => transaction.date,
+    );
+    final dailyTransactions = eventsByDay[_selectedDay] ?? const <Transaction>[];
     final income = dailyTransactions
         .where((transaction) => transaction.type == TransactionType.income)
         .fold<double>(0, (total, transaction) => total + transaction.amount);
@@ -64,7 +65,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             AppTableCalendar(
               focusedDay: _focusedDay,
               selectedDay: _selectedDay,
-              eventLoader: (day) => _transactionsForDay(transactions, day),
+              eventLoader: (day) =>
+                  eventsByDay[normalizeCalendarDay(day)] ?? const [],
               onDaySelected: (selectedDay) {
                 setState(
                   () => _selectedDay = normalizeCalendarDay(selectedDay),
@@ -153,16 +155,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           duration: 340.ms,
           curve: Curves.easeOutCubic,
         );
-  }
-
-  List<Object> _transactionsForDay(
-    List<Transaction> transactions,
-    DateTime day,
-  ) {
-    return [
-      for (final transaction in transactions)
-        if (DateUtils.isSameDay(transaction.date, day)) transaction,
-    ];
   }
 
   String _calendarHeadline(DateTime day) {

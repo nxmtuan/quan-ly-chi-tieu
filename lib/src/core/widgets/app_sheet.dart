@@ -110,9 +110,30 @@ class AppSheetHeader extends StatelessWidget {
                 ),
               ),
               if (showCloseButton)
-                IconButton(
-                  onPressed: onClose ?? () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close_rounded),
+                InkWell(
+                  onTap: onClose ?? () => Navigator.of(context).pop(),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: AppColors.border),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.shadow.withValues(alpha: 0.08),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.close_rounded,
+                      color: Color(0xFF374151),
+                      size: 18,
+                    ),
+                  ),
                 ),
             ],
           ),
