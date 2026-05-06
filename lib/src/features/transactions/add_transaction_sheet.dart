@@ -38,6 +38,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   DateTime _date = DateTime.now();
   String _source = 'Tiền mặt';
   String? _categoryId;
+  String? _promotedCategoryId;
 
   @override
   void initState() {
@@ -103,6 +104,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                                   setState(() {
                                     _type = type;
                                     _categoryId = null;
+                                    _promotedCategoryId = null;
                                   });
                                 },
                               ),
@@ -119,6 +121,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                                 onSelected: (category) {
                                   setState(() => _categoryId = category.id);
                                 },
+                                onShowAll: () => _showAllCategories(categories),
+                                promotedCategoryId: _promotedCategoryId,
                               ),
                               const SizedBox(height: 10),
                               _DateTrigger(date: _date, onTap: _pickDate),
@@ -228,6 +232,31 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
 
     if (selectedSource != null) {
       setState(() => _source = selectedSource);
+    }
+  }
+
+  Future<void> _showAllCategories(List<Category> categories) async {
+    final selectedCategory = await showModalBottomSheet<Category>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return _AllCategoriesSheet(
+          categories: categories,
+          initialSelectedCategoryId: _categoryId,
+          actionColor: _type == TransactionType.expense
+              ? const Color(0xFFFF1493)
+              : AppColors.success,
+        );
+      },
+    );
+
+    if (selectedCategory != null && mounted) {
+      setState(() {
+        _categoryId = selectedCategory.id;
+        _promotedCategoryId = selectedCategory.id;
+      });
     }
   }
 
@@ -589,15 +618,23 @@ class _CategoryPicker extends StatelessWidget {
     required this.selectedCategoryId,
     required this.actionColor,
     required this.onSelected,
+    required this.onShowAll,
+    required this.promotedCategoryId,
   });
 
   final List<Category> categories;
   final String? selectedCategoryId;
   final Color actionColor;
   final ValueChanged<Category> onSelected;
+  final VoidCallback onShowAll;
+  final String? promotedCategoryId;
 
   @override
   Widget build(BuildContext context) {
+    final orderedCategories = _orderedCategories();
+    final visibleCategories = orderedCategories.take(3).toList();
+    final shouldShowMoreButton = orderedCategories.length > 3;
+
     return _FormCard(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       child: Column(
@@ -616,22 +653,26 @@ class _CategoryPicker extends StatelessWidget {
           else
             LayoutBuilder(
               builder: (context, constraints) {
-                final crossAxisCount = constraints.maxWidth < 300 ? 3 : 4;
+                final itemWidth = (constraints.maxWidth - 24) / 4;
 
-                return GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.84,
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    for (final category in categories)
-                      _CategoryTile(
-                        category: category,
-                        selected: category.id == selectedCategoryId,
-                        actionColor: actionColor,
-                        onTap: () => onSelected(category),
+                    for (final category in visibleCategories)
+                      SizedBox(
+                        width: itemWidth,
+                        child: _CategoryTile(
+                          category: category,
+                          selected: category.id == selectedCategoryId,
+                          actionColor: actionColor,
+                          onTap: () => onSelected(category),
+                        ),
+                      ),
+                    if (shouldShowMoreButton)
+                      SizedBox(
+                        width: itemWidth,
+                        child: _MoreCategoriesTile(onTap: onShowAll),
                       ),
                   ],
                 );
@@ -640,6 +681,26 @@ class _CategoryPicker extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<Category> _orderedCategories() {
+    if (promotedCategoryId == null) {
+      return categories;
+    }
+
+    final selectedCategory = categories
+        .where((category) => category.id == promotedCategoryId)
+        .firstOrNull;
+
+    if (selectedCategory == null) {
+      return categories;
+    }
+
+    return [
+      selectedCategory,
+      for (final category in categories)
+        if (category.id != selectedCategory.id) category,
+    ];
   }
 }
 
@@ -661,41 +722,246 @@ class _CategoryTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.fromLTRB(6, 10, 6, 8),
-        decoration: BoxDecoration(
-          color: selected ? actionColor.withValues(alpha: 0.045) : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: selected ? actionColor : AppColors.border,
-            width: selected ? 1.2 : 1,
+      child: SizedBox(
+        height: 122,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.fromLTRB(6, 10, 6, 8),
+          decoration: BoxDecoration(
+            color: selected
+                ? actionColor.withValues(alpha: 0.045)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: selected ? actionColor : AppColors.border,
+              width: selected ? 1.2 : 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: category.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Icon(category.iconData, color: category.color, size: 21),
+              ),
+              const Spacer(),
+              Text(
+                category.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: selected ? actionColor : AppColors.textPrimary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
           ),
         ),
-        child: Column(
+      ),
+    );
+  }
+}
+
+class _MoreCategoriesTile extends StatelessWidget {
+  const _MoreCategoriesTile({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        height: 122,
+        padding: const EdgeInsets.fromLTRB(6, 10, 6, 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: const Column(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: category.color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Icon(category.iconData, color: category.color, size: 21),
-            ),
-            const Spacer(),
+            _MoreCategoriesIcon(),
+            Spacer(),
             Text(
-              category.name,
+              'Khác',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: selected ? actionColor : AppColors.textPrimary,
+                color: AppColors.textPrimary,
                 fontSize: 12,
                 fontWeight: FontWeight.w900,
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MoreCategoriesIcon extends StatelessWidget {
+  const _MoreCategoriesIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: const Icon(
+        Icons.more_horiz_rounded,
+        color: AppColors.primary,
+        size: 22,
+      ),
+    );
+  }
+}
+
+class _AllCategoriesSheet extends StatefulWidget {
+  const _AllCategoriesSheet({
+    required this.categories,
+    required this.initialSelectedCategoryId,
+    required this.actionColor,
+  });
+
+  final List<Category> categories;
+  final String? initialSelectedCategoryId;
+  final Color actionColor;
+
+  @override
+  State<_AllCategoriesSheet> createState() => _AllCategoriesSheetState();
+}
+
+class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
+  String? _selectedCategoryId;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategoryId = widget.initialSelectedCategoryId;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            12,
+            16,
+            MediaQuery.of(context).padding.bottom + 12,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFB8BCC8),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Chọn danh mục',
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'Hiển thị toàn bộ danh mục của nhóm hiện tại.',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final itemWidth = (constraints.maxWidth - 24) / 4;
+
+                      return Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final category in widget.categories)
+                            SizedBox(
+                              width: itemWidth,
+                              child: _CategoryTile(
+                                category: category,
+                                selected: category.id == _selectedCategoryId,
+                                actionColor: widget.actionColor,
+                                onTap: () {
+                                  setState(() {
+                                    _selectedCategoryId = category.id;
+                                  });
+                                },
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              _SolidSubmitButton(
+                label: 'Chọn',
+                color: widget.actionColor,
+                onTap: _selectedCategoryId == null
+                    ? () {}
+                    : () {
+                        final category = widget.categories
+                            .where((item) => item.id == _selectedCategoryId)
+                            .firstOrNull;
+                        if (category != null) {
+                          Navigator.of(context).pop(category);
+                        }
+                      },
+              ),
+            ],
+          ),
         ),
       ),
     );
