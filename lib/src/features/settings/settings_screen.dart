@@ -1,18 +1,19 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/flat_card.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../categories/categories_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeEnabled = ref.watch(themeToggleProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     return ListView(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
@@ -41,17 +42,32 @@ class SettingsScreen extends ConsumerWidget {
                   _SettingsRow(
                     icon: Icons.dark_mode_rounded,
                     iconColor: AppColors.primary,
-                    title: 'Theme Toggle',
-                    subtitle: themeEnabled
-                        ? 'Dark mode prepared'
-                        : 'Light mode active',
-                    trailing: CupertinoSwitch(
-                      value: themeEnabled,
-                      activeTrackColor: AppColors.primary,
+                    title: 'Theme',
+                    subtitle: _themeLabel(themeMode),
+                    trailing: DropdownButton<ThemeMode>(
+                      value: themeMode,
+                      underline: const SizedBox.shrink(),
+                      borderRadius: BorderRadius.circular(16),
+                      items: const [
+                        DropdownMenuItem(
+                          value: ThemeMode.system,
+                          child: Text('System'),
+                        ),
+                        DropdownMenuItem(
+                          value: ThemeMode.light,
+                          child: Text('Light'),
+                        ),
+                        DropdownMenuItem(
+                          value: ThemeMode.dark,
+                          child: Text('Dark'),
+                        ),
+                      ],
                       onChanged: (value) {
-                        ref
-                            .read(themeToggleProvider.notifier)
-                            .setEnabled(value: value);
+                        if (value != null) {
+                          ref
+                              .read(themeModeProvider.notifier)
+                              .setThemeMode(value);
+                        }
                       },
                     ),
                   ),
@@ -65,19 +81,22 @@ class SettingsScreen extends ConsumerWidget {
                       Icons.chevron_right_rounded,
                       color: AppColors.textSecondary,
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (context) => const CategoriesScreen(),
+                        ),
+                      );
+                    },
                   ),
                   const _DividerIndent(),
                   _SettingsRow(
-                    icon: Icons.ios_share_rounded,
-                    iconColor: AppColors.primary,
-                    title: 'Export Data',
-                    subtitle: 'Download your transactions',
-                    trailing: const Icon(
-                      Icons.chevron_right_rounded,
-                      color: AppColors.textSecondary,
-                    ),
-                    onTap: () {},
+                    icon: Icons.logout_rounded,
+                    iconColor: AppColors.danger,
+                    title: 'Sign out',
+                    subtitle: 'Disconnect Google account',
+                    trailing: const Icon(Icons.logout_rounded),
+                    onTap: () => ref.read(authProvider.notifier).signOut(),
                   ),
                 ],
               ),
@@ -123,6 +142,14 @@ class SettingsScreen extends ConsumerWidget {
           duration: 340.ms,
           curve: Curves.easeOutCubic,
         );
+  }
+
+  String _themeLabel(ThemeMode themeMode) {
+    return switch (themeMode) {
+      ThemeMode.light => 'Light mode active',
+      ThemeMode.dark => 'Dark mode active',
+      ThemeMode.system => 'Follow system setting',
+    };
   }
 }
 

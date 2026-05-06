@@ -11,18 +11,20 @@ import '../../models/transaction.dart';
 import '../../providers/category_provider.dart';
 import '../../providers/transaction_provider.dart';
 
-void showAddTransactionSheet(BuildContext context) {
+void showAddTransactionSheet(BuildContext context, {Transaction? transaction}) {
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => const AddTransactionSheet(),
+    builder: (context) => AddTransactionSheet(transaction: transaction),
   );
 }
 
 class AddTransactionSheet extends ConsumerStatefulWidget {
-  const AddTransactionSheet({super.key});
+  const AddTransactionSheet({super.key, this.transaction});
+
+  final Transaction? transaction;
 
   @override
   ConsumerState<AddTransactionSheet> createState() =>
@@ -35,6 +37,20 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   TransactionType _type = TransactionType.expense;
   DateTime _date = DateTime.now();
   String? _categoryId;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final transaction = widget.transaction;
+    if (transaction != null) {
+      _amountController.text = transaction.amount.toStringAsFixed(0);
+      _noteController.text = transaction.note;
+      _type = transaction.type;
+      _date = transaction.date;
+      _categoryId = transaction.categoryId;
+    }
+  }
 
   @override
   void dispose() {
@@ -83,7 +99,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Add Transaction',
+                            widget.transaction == null
+                                ? 'Add Transaction'
+                                : 'Edit Transaction',
                             style: Theme.of(context).textTheme.titleLarge
                                 ?.copyWith(
                                   fontWeight: FontWeight.w900,
@@ -199,7 +217,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                       _DateTrigger(date: _date, onTap: _pickDate),
                       const SizedBox(height: 24),
                       GradientButton(
-                        label: 'Save Transaction',
+                        label: widget.transaction == null
+                            ? 'Save Transaction'
+                            : 'Update Transaction',
                         icon: Icons.check_rounded,
                         onTap: _saveTransaction,
                       ),
@@ -238,7 +258,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     }
 
     final transaction = Transaction(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      id:
+          widget.transaction?.id ??
+          DateTime.now().microsecondsSinceEpoch.toString(),
       amount: amount,
       type: _type,
       categoryId: _categoryId!,
@@ -246,7 +268,13 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       note: _noteController.text.trim(),
     );
 
-    await ref.read(transactionsProvider.notifier).addTransaction(transaction);
+    if (widget.transaction == null) {
+      await ref.read(transactionsProvider.notifier).addTransaction(transaction);
+    } else {
+      await ref
+          .read(transactionsProvider.notifier)
+          .updateTransaction(transaction);
+    }
 
     if (mounted) {
       Navigator.of(context).pop();

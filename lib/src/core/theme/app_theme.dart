@@ -7,44 +7,97 @@ class AppTheme {
   const AppTheme._();
 
   static ThemeData light() {
+    return _build(
+      brightness: Brightness.light,
+      primary: AppColors.primary,
+      primaryLight: AppColors.primaryLight,
+      background: AppColors.background,
+      surface: AppColors.surface,
+      inputBackground: AppColors.inputBackground,
+      textPrimary: AppColors.textPrimary,
+      textSecondary: AppColors.textSecondary,
+      border: AppColors.border,
+      shadow: AppColors.shadow,
+    );
+  }
+
+  static ThemeData dark() {
+    return _build(
+      brightness: Brightness.dark,
+      primary: AppColors.darkPrimary,
+      primaryLight: AppColors.darkPrimaryLight,
+      background: AppColors.darkBackground,
+      surface: AppColors.darkSurface,
+      inputBackground: AppColors.darkInputBackground,
+      textPrimary: AppColors.darkTextPrimary,
+      textSecondary: AppColors.darkTextSecondary,
+      border: AppColors.darkBorder,
+      shadow: AppColors.darkShadow,
+    );
+  }
+
+  static ThemeData _build({
+    required Brightness brightness,
+    required Color primary,
+    required Color primaryLight,
+    required Color background,
+    required Color surface,
+    required Color inputBackground,
+    required Color textPrimary,
+    required Color textSecondary,
+    required Color border,
+    required Color shadow,
+  }) {
     final textTheme = GoogleFonts.plusJakartaSansTextTheme().apply(
-      bodyColor: AppColors.textPrimary,
-      displayColor: AppColors.textPrimary,
+      bodyColor: textPrimary,
+      displayColor: textPrimary,
     );
 
     return ThemeData(
       useMaterial3: false,
-      brightness: Brightness.light,
-      primaryColor: AppColors.primary,
-      scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.light(
-        primary: AppColors.primary,
+      brightness: brightness,
+      primaryColor: primary,
+      scaffoldBackgroundColor: background,
+      colorScheme: ColorScheme(
+        brightness: brightness,
+        primary: primary,
+        onPrimary: Colors.white,
         secondary: AppColors.success,
-        surface: AppColors.surface,
+        onSecondary: Colors.white,
         error: AppColors.danger,
+        onError: Colors.white,
+        surface: surface,
+        onSurface: textPrimary,
+        tertiary: primaryLight,
+        onTertiary: textPrimary,
+        outline: border,
+        shadow: shadow,
+        inverseSurface: textPrimary,
+        onInverseSurface: surface,
+        inversePrimary: primary,
       ),
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
         elevation: 0,
         centerTitle: false,
-        backgroundColor: AppColors.background,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: background,
+        foregroundColor: textPrimary,
         titleTextStyle: textTheme.titleLarge?.copyWith(
           fontSize: 22,
           fontWeight: FontWeight.w800,
         ),
       ),
-      splashColor: AppColors.primary.withValues(alpha: 0.08),
-      highlightColor: AppColors.primary.withValues(alpha: 0.04),
+      splashColor: primary.withValues(alpha: 0.08),
+      highlightColor: primary.withValues(alpha: 0.04),
       cardTheme: CardThemeData(
-        color: AppColors.surface,
+        color: surface,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.inputBackground,
+        fillColor: inputBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
@@ -59,7 +112,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: BorderSide(color: primary, width: 1.5),
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(

@@ -31,7 +31,33 @@ class TransactionsNotifier extends Notifier<List<Transaction>> {
       ..sort((a, b) => b.date.compareTo(a.date));
 
     state = updatedTransactions;
-    await ref.read(transactionStorageProvider).saveTransactions(state);
+    await _save();
+  }
+
+  Future<void> updateTransaction(Transaction transaction) async {
+    final updatedTransactions = [
+      for (final item in state)
+        if (item.id == transaction.id) transaction else item,
+    ]..sort((a, b) => b.date.compareTo(a.date));
+
+    state = updatedTransactions;
+    await _save();
+  }
+
+  Future<void> deleteTransaction(String id) async {
+    state = state.where((transaction) => transaction.id != id).toList();
+    await _save();
+  }
+
+  Future<void> deleteTransactionsByCategory(String categoryId) async {
+    state = state
+        .where((transaction) => transaction.categoryId != categoryId)
+        .toList();
+    await _save();
+  }
+
+  Future<void> _save() {
+    return ref.read(transactionStorageProvider).saveTransactions(state);
   }
 
   static List<Transaction> _initialTransactions() {

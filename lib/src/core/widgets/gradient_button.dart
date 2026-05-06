@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
-
 class GradientButton extends StatelessWidget {
   const GradientButton({
     super.key,
@@ -16,6 +14,9 @@ class GradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -25,12 +26,12 @@ class GradientButton extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 18),
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: colors.primary,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: AppColors.shadow.withValues(alpha: 0.08),
-                blurRadius: 24,
+                color: colors.shadow.withValues(alpha: isDark ? 0.35 : 0.08),
+                blurRadius: isDark ? 12 : 24,
                 offset: const Offset(0, 8),
               ),
             ],

@@ -8,6 +8,8 @@ import '../../../core/widgets/flat_card.dart';
 import '../../../models/category.dart';
 import '../../../models/transaction.dart';
 import '../../../providers/category_provider.dart';
+import '../../../providers/transaction_provider.dart';
+import '../../transactions/add_transaction_sheet.dart';
 
 class RecentTransactions extends ConsumerWidget {
   const RecentTransactions({super.key, required this.transactions});
@@ -65,14 +67,14 @@ class RecentTransactions extends ConsumerWidget {
   }
 }
 
-class _TransactionRow extends StatelessWidget {
+class _TransactionRow extends ConsumerWidget {
   const _TransactionRow({required this.transaction, required this.category});
 
   final Transaction transaction;
   final Category? category;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = transaction.isExpense ? AppColors.danger : AppColors.success;
     final sign = transaction.isExpense ? '-' : '+';
 
@@ -123,13 +125,39 @@ class _TransactionRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Text(
-            '$sign${formatCurrency(transaction.amount)}',
-            style: TextStyle(
-              color: color,
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '$sign${formatCurrency(transaction.amount)}',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    showAddTransactionSheet(context, transaction: transaction);
+                  }
+                  if (value == 'delete') {
+                    ref
+                        .read(transactionsProvider.notifier)
+                        .deleteTransaction(transaction.id);
+                  }
+                },
+                itemBuilder: (context) => const [
+                  PopupMenuItem(value: 'edit', child: Text('Edit')),
+                  PopupMenuItem(value: 'delete', child: Text('Delete')),
+                ],
+                child: const Icon(
+                  Icons.more_horiz_rounded,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
           ),
         ],
       ),

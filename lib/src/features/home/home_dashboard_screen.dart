@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/app_colors.dart';
 import '../../providers/transaction_provider.dart';
 import 'widgets/recent_transactions.dart';
 import 'widgets/summary_card.dart';
@@ -12,6 +11,8 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final summary = ref.watch(transactionSummaryProvider);
     final transactions = ref.watch(recentTransactionsProvider);
 
@@ -31,7 +32,9 @@ class HomeScreen extends ConsumerWidget {
                                 'Welcome back',
                                 style: Theme.of(context).textTheme.bodyMedium
                                     ?.copyWith(
-                                      color: AppColors.textSecondary,
+                                      color: colors.onSurface.withValues(
+                                        alpha: 0.64,
+                                      ),
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
@@ -51,19 +54,21 @@ class HomeScreen extends ConsumerWidget {
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: colors.surface,
                             borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.shadow.withValues(alpha: 0.05),
-                                blurRadius: 12,
+                                color: colors.shadow.withValues(
+                                  alpha: isDark ? 0.3 : 0.05,
+                                ),
+                                blurRadius: isDark ? 8 : 12,
                                 offset: const Offset(0, 4),
                               ),
                             ],
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.notifications_none_rounded,
-                            color: AppColors.textPrimary,
+                            color: colors.onSurface,
                           ),
                         ),
                       ],

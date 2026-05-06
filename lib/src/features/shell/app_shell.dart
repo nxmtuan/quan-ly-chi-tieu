@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/theme/app_colors.dart';
 import '../transactions/add_transaction_sheet.dart';
 import 'custom_bottom_nav_bar.dart';
 
@@ -74,6 +73,9 @@ class _AddTransactionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -83,12 +85,12 @@ class _AddTransactionButton extends StatelessWidget {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: colors.primary,
             borderRadius: BorderRadius.circular(999),
             boxShadow: [
               BoxShadow(
-                color: AppColors.shadow.withValues(alpha: 0.08),
-                blurRadius: 24,
+                color: colors.shadow.withValues(alpha: isDark ? 0.35 : 0.08),
+                blurRadius: isDark ? 12 : 24,
                 offset: const Offset(0, 8),
               ),
             ],

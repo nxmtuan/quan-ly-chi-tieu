@@ -16,6 +16,10 @@ void main() {
   testWidgets('Expense manager home screen renders', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setString(
+      'authUser',
+      '{"id":"test","email":"test@example.com","name":"Test User","photoUrl":null}',
+    );
 
     await tester.pumpWidget(
       ProviderScope(

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../../core/theme/app_colors.dart';
-
 class CustomBottomNavBar extends StatelessWidget {
   const CustomBottomNavBar({
     super.key,
@@ -15,6 +13,8 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final items = [
       const _NavItem(Icons.home_rounded, 'Home'),
       const _NavItem(Icons.bar_chart_rounded, 'Stats'),
@@ -25,12 +25,12 @@ class CustomBottomNavBar extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.04),
-            blurRadius: 16,
+            color: colors.shadow.withValues(alpha: isDark ? 0.3 : 0.04),
+            blurRadius: isDark ? 8 : 16,
             offset: const Offset(0, -4),
           ),
         ],
@@ -73,6 +73,8 @@ class _NavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
@@ -80,7 +82,7 @@ class _NavButton extends StatelessWidget {
         duration: const Duration(milliseconds: 220),
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primaryLight : Colors.transparent,
+          color: selected ? colors.primaryContainer : Colors.transparent,
           borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
@@ -88,7 +90,9 @@ class _NavButton extends StatelessWidget {
           children: [
             Icon(
               item.icon,
-              color: selected ? AppColors.primary : AppColors.textSecondary,
+              color: selected
+                  ? colors.primary
+                  : colors.onSurface.withValues(alpha: 0.64),
               size: 22,
             ),
             if (selected) ...[
@@ -97,8 +101,8 @@ class _NavButton extends StatelessWidget {
                 child: Text(
                   item.label,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: colors.primary,
                     fontWeight: FontWeight.w800,
                   ),
                 ),

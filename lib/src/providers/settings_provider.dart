@@ -1,14 +1,26 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ThemeToggleNotifier extends Notifier<bool> {
-  @override
-  bool build() => false;
+import 'storage_provider.dart';
 
-  void setEnabled({required bool value}) {
+class ThemeModeNotifier extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() {
+    final storedValue = ref.read(settingsStorageProvider).readThemeMode();
+
+    return switch (storedValue) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.system,
+    };
+  }
+
+  Future<void> setThemeMode(ThemeMode value) async {
     state = value;
+    await ref.read(settingsStorageProvider).saveThemeMode(value.name);
   }
 }
 
-final themeToggleProvider = NotifierProvider<ThemeToggleNotifier, bool>(
-  ThemeToggleNotifier.new,
+final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
+  ThemeModeNotifier.new,
 );
