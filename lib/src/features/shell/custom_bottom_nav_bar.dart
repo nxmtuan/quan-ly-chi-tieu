@@ -27,17 +27,17 @@ class CustomBottomNavBar extends StatelessWidget {
     ];
 
     return Container(
-      height: 102,
-      margin: const EdgeInsets.fromLTRB(18, 0, 18, 16),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      height: 74,
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
       decoration: BoxDecoration(
         color: barColor,
-        borderRadius: BorderRadius.circular(42),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: colors.primary.withValues(alpha: isDark ? 0.18 : 0.08),
-            blurRadius: isDark ? 18 : 28,
-            offset: const Offset(0, 12),
+            blurRadius: isDark ? 12 : 18,
+            offset: const Offset(0, 7),
           ),
         ],
       ),
@@ -88,32 +88,22 @@ class _NavButton extends StatelessWidget {
         ? colors.primary
         : colors.onSurface.withValues(alpha: isAction ? 0.92 : 0.54);
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(isAction ? 999 : 30),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        height: 78,
-        padding: EdgeInsets.only(
-          top: isAction ? 0 : 10,
-          bottom: isAction ? 0 : 9,
-        ),
-        decoration: BoxDecoration(
-          color: selected && !isAction
-              ? colors.primary.withValues(alpha: 0.09)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isAction)
-              Transform.translate(
-                offset: const Offset(0, -35),
+    if (isAction) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: SizedBox(
+          height: 58,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                top: -23,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 220),
-                  width: 84,
-                  height: 84,
+                  width: 58,
+                  height: 58,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -124,51 +114,76 @@ class _NavButton extends StatelessWidget {
                       ],
                     ),
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: Colors.white, width: 4),
+                    border: Border.all(color: Colors.white, width: 2.5),
                     boxShadow: [
                       BoxShadow(
                         color: colors.primary.withValues(alpha: 0.34),
-                        blurRadius: 26,
-                        offset: const Offset(0, 14),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
                       ),
                     ],
                   ),
                   child: const Icon(
                     Icons.add_rounded,
                     color: Colors.white,
-                    size: 46,
+                    size: 32,
                   ),
                 ),
-              )
-            else
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                height: 34,
-                alignment: Alignment.center,
-                child: Icon(
-                  item.icon,
-                  color: foreground,
-                  size: selected ? 25 : 29,
+              ),
+              Positioned(
+                bottom: 0,
+                child: Text(
+                  item.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colors.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
-            SizedBox(height: isAction ? 0 : 7),
-            Transform.translate(
-              offset: Offset(0, isAction ? -33 : 0),
-              child: Text(
-                item.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: isAction
-                      ? colors.primary
-                      : selected
-                      ? colors.primary
-                      : inactiveColor,
-                  fontSize: isAction ? 15 : 13.5,
-                  fontWeight: selected || isAction
-                      ? FontWeight.w900
-                      : FontWeight.w700,
-                ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(30),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        height: 58,
+        padding: const EdgeInsets.only(top: 6, bottom: 6),
+        decoration: BoxDecoration(
+          color: selected
+              ? colors.primary.withValues(alpha: 0.09)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(23),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              height: 24,
+              alignment: Alignment.center,
+              child: Icon(
+                item.icon,
+                color: foreground,
+                size: selected ? 20 : 22,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              item.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: selected ? colors.primary : inactiveColor,
+                fontSize: 10.5,
+                fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
               ),
             ),
           ],
