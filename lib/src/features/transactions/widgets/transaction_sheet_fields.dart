@@ -360,49 +360,6 @@ class _SourceTrigger extends StatelessWidget {
   }
 }
 
-class _SourceOptionTile extends StatelessWidget {
-  const _SourceOptionTile({
-    required this.source,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String source;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: const Icon(
-          Icons.account_balance_wallet_rounded,
-          color: AppColors.primary,
-          size: 21,
-        ),
-      ),
-      title: Text(
-        source,
-        style: const TextStyle(
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-      trailing: selected
-          ? const Icon(Icons.check_rounded, color: AppColors.primary)
-          : null,
-      onTap: onTap,
-    );
-  }
-}
-
 class _DateTrigger extends StatelessWidget {
   const _DateTrigger({required this.date, required this.onTap});
 
