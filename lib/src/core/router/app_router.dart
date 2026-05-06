@@ -78,16 +78,21 @@ CustomTransitionPage<void> _buildPage({
         reverseCurve: Curves.easeInCubic,
       );
 
-      return FadeTransition(
-        opacity: curvedAnimation,
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0.04, 0),
-            end: Offset.zero,
-          ).animate(curvedAnimation),
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.985, end: 1).animate(curvedAnimation),
-            child: child,
+      return Material(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: ClipRect(
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.04, 0),
+              end: Offset.zero,
+            ).animate(curvedAnimation),
+            child: ScaleTransition(
+              scale: Tween<double>(
+                begin: 0.985,
+                end: 1,
+              ).animate(curvedAnimation),
+              child: child,
+            ),
           ),
         ),
       );
