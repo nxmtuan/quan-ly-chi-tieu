@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+double appSheetBottomPadding(BuildContext context, {double extra = 0}) {
+  return MediaQuery.of(context).padding.bottom + 32 + extra;
+}
+
 class AppSheetContainer extends StatelessWidget {
   const AppSheetContainer({
     super.key,
@@ -53,6 +57,7 @@ class AppSheetHeader extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.onClose,
+    this.showCloseButton = true,
     this.padding = const EdgeInsets.fromLTRB(16, 12, 16, 0),
     this.titleStyle,
   });
@@ -60,6 +65,7 @@ class AppSheetHeader extends StatelessWidget {
   final String title;
   final String? subtitle;
   final VoidCallback? onClose;
+  final bool showCloseButton;
   final EdgeInsetsGeometry padding;
   final TextStyle? titleStyle;
 
@@ -103,10 +109,11 @@ class AppSheetHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: onClose ?? () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.close_rounded),
-              ),
+              if (showCloseButton)
+                IconButton(
+                  onPressed: onClose ?? () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close_rounded),
+                ),
             ],
           ),
         ],
@@ -127,7 +134,7 @@ class AppSheetFooter extends StatelessWidget {
         16,
         8,
         16,
-        MediaQuery.of(context).padding.bottom + 10,
+        appSheetBottomPadding(context),
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,

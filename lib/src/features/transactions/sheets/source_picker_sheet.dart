@@ -27,7 +27,7 @@ class _SourcePickerSheet extends StatelessWidget {
           20,
           12,
           20,
-          MediaQuery.of(context).padding.bottom + 24,
+          appSheetBottomPadding(context),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

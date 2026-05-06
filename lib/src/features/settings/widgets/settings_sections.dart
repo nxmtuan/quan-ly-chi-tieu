@@ -10,23 +10,35 @@ class _ThemeSettingsRow extends ConsumerWidget {
     return _SettingsRow(
       icon: Icons.dark_mode_rounded,
       iconColor: AppColors.primary,
-      title: 'Theme',
+      title: 'Giao diện',
       subtitle: _themeLabel(themeMode),
-      trailing: DropdownButton<ThemeMode>(
-        value: themeMode,
-        underline: const SizedBox.shrink(),
-        borderRadius: BorderRadius.circular(16),
-        items: const [
-          DropdownMenuItem(value: ThemeMode.system, child: Text('System')),
-          DropdownMenuItem(value: ThemeMode.light, child: Text('Light')),
-          DropdownMenuItem(value: ThemeMode.dark, child: Text('Dark')),
-        ],
-        onChanged: (value) {
-          if (value != null) {
-            ref.read(themeModeProvider.notifier).setThemeMode(value);
-          }
-        },
+      trailing: const Icon(
+        Icons.chevron_right_rounded,
+        color: AppColors.textSecondary,
       ),
+      onTap: () => _showThemeSheet(context, ref),
+    );
+  }
+
+  Future<void> _showThemeSheet(BuildContext context, WidgetRef ref) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, child) {
+            return _ThemeModeSheet(
+              selectedTheme: ref.watch(themeModeProvider),
+              onSelected: (themeMode) {
+                ref.read(themeModeProvider.notifier).setThemeMode(themeMode);
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -39,8 +51,8 @@ class _ManageCategoriesRow extends StatelessWidget {
     return _SettingsRow(
       icon: Icons.category_rounded,
       iconColor: AppColors.success,
-      title: 'Manage Categories',
-      subtitle: 'Edit income and expense groups',
+      title: 'Quản lý danh mục',
+      subtitle: 'Chỉnh sửa nhóm thu nhập và chi tiêu',
       trailing: const Icon(
         Icons.chevron_right_rounded,
         color: AppColors.textSecondary,
@@ -67,8 +79,8 @@ class _AuthSettingsRow extends ConsumerWidget {
       return _SettingsRow(
         icon: Icons.login_rounded,
         iconColor: AppColors.primary,
-        title: kIsWeb ? 'Google account' : 'Sign in with Google',
-        subtitle: 'Connect Google account',
+        title: kIsWeb ? 'Tài khoản' : 'Đăng nhập',
+        subtitle: 'Kết nối tài khoản Google',
         trailing: kIsWeb
             ? const SizedBox(
                 width: 220,
@@ -83,7 +95,7 @@ class _AuthSettingsRow extends ConsumerWidget {
     return _SettingsRow(
       icon: Icons.logout_rounded,
       iconColor: AppColors.danger,
-      title: 'Sign out',
+      title: 'Đăng xuất',
       subtitle: authUser!.email,
       trailing: const Icon(Icons.logout_rounded),
       onTap: () => ref.read(authProvider.notifier).signOut(),
@@ -132,7 +144,7 @@ class _SettingsTipCard extends StatelessWidget {
           const SizedBox(width: 14),
           const Expanded(
             child: Text(
-              'Keep logging small expenses daily for clearer insights.',
+              'Ghi lại các khoản chi nhỏ mỗi ngày để có bức tranh tài chính rõ hơn.',
               style: TextStyle(
                 fontWeight: FontWeight.w800,
                 color: AppColors.textPrimary,
@@ -147,9 +159,9 @@ class _SettingsTipCard extends StatelessWidget {
 
 String _themeLabel(ThemeMode themeMode) {
   return switch (themeMode) {
-    ThemeMode.light => 'Light mode active',
-    ThemeMode.dark => 'Dark mode active',
-    ThemeMode.system => 'Follow system setting',
+    ThemeMode.light => 'Đang dùng giao diện sáng',
+    ThemeMode.dark => 'Đang dùng giao diện tối',
+    ThemeMode.system => 'Theo cài đặt của thiết bị',
   };
 }
 
@@ -229,6 +241,144 @@ class _DividerIndent extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.only(left: 72),
       child: Divider(height: 1, color: AppColors.border),
+    );
+  }
+}
+
+class _ThemeModeSheet extends StatelessWidget {
+  const _ThemeModeSheet({
+    required this.selectedTheme,
+    required this.onSelected,
+  });
+
+  final ThemeMode selectedTheme;
+  final ValueChanged<ThemeMode> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSheetContainer(
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            0,
+            16,
+            appSheetBottomPadding(context),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const AppSheetHeader(
+                title: 'Chọn giao diện',
+                subtitle: 'Áp dụng cho toàn bộ ứng dụng.',
+                showCloseButton: false,
+              ),
+              const SizedBox(height: 54),
+              Row(
+                children: [
+                  Expanded(
+                    child: _ThemeModeOption(
+                      icon: Icons.settings_suggest_rounded,
+                      label: 'Theo máy',
+                      isActive: selectedTheme == ThemeMode.system,
+                      onTap: () => onSelected(ThemeMode.system),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _ThemeModeOption(
+                      icon: Icons.light_mode_rounded,
+                      label: 'Sáng',
+                      isActive: selectedTheme == ThemeMode.light,
+                      onTap: () => onSelected(ThemeMode.light),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _ThemeModeOption(
+                      icon: Icons.dark_mode_rounded,
+                      label: 'Tối',
+                      isActive: selectedTheme == ThemeMode.dark,
+                      onTap: () => onSelected(ThemeMode.dark),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              AppPrimaryButton(
+                label: 'Đóng',
+                color: AppColors.primary,
+                onTap: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeModeOption extends StatelessWidget {
+  const _ThemeModeOption({
+    required this.icon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isActive ? AppColors.primary : AppColors.textSecondary;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+        decoration: BoxDecoration(
+          color: isActive
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isActive
+                ? AppColors.primary.withValues(alpha: 0.55)
+                : AppColors.border,
+            width: isActive ? 1.4 : 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: color, size: 22),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: color,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

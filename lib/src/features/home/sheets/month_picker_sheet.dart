@@ -59,7 +59,7 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
             16,
             0,
             16,
-            MediaQuery.of(context).padding.bottom + 14,
+            appSheetBottomPadding(context),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

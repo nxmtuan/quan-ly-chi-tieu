@@ -56,7 +56,7 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
             16,
             0,
             16,
-            MediaQuery.of(context).padding.bottom + 12,
+            appSheetBottomPadding(context),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
