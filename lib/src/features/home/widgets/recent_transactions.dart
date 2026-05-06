@@ -250,19 +250,10 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
     });
   }
 
-  Widget _buildChartTransition(
-    Widget child,
-    Animation<double> animation,
-  ) {
+  Widget _buildChartTransition(Widget child, Animation<double> animation) {
     final isIncoming = child.key == ValueKey(_selectedChartView);
-    final incomingOffset = Offset(
-      _isForwardChartTransition ? 0.18 : -0.18,
-      0,
-    );
-    final outgoingOffset = Offset(
-      _isForwardChartTransition ? -0.18 : 0.18,
-      0,
-    );
+    final incomingOffset = Offset(_isForwardChartTransition ? 0.18 : -0.18, 0);
+    final outgoingOffset = Offset(_isForwardChartTransition ? -0.18 : 0.18, 0);
     final curvedAnimation = CurvedAnimation(
       parent: animation,
       curve: Curves.easeOutCubic,
@@ -279,14 +270,8 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
             end: outgoingOffset,
           ).animate(outgoingAnimation);
     final scale = isIncoming
-        ? Tween<double>(
-            begin: 0.96,
-            end: 1,
-          ).animate(curvedAnimation)
-        : Tween<double>(
-            begin: 1,
-            end: 0.96,
-          ).animate(outgoingAnimation);
+        ? Tween<double>(begin: 0.96, end: 1).animate(curvedAnimation)
+        : Tween<double>(begin: 1, end: 0.96).animate(outgoingAnimation);
 
     return ClipRect(
       child: SlideTransition(
@@ -420,10 +405,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
           toY: item.amount,
           width: isTouched ? 30 : 24,
           gradient: LinearGradient(
-            colors: [
-              item.color.withValues(alpha: 0.62),
-              item.color,
-            ],
+            colors: [item.color.withValues(alpha: 0.62), item.color],
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
           ),
@@ -580,11 +562,7 @@ class _BarCategoryIcon extends StatelessWidget {
             color: item.color.withValues(alpha: 0.14),
             borderRadius: BorderRadius.circular(999),
           ),
-          child: Icon(
-            item.category.iconData,
-            color: item.color,
-            size: 17,
-          ),
+          child: Icon(item.category.iconData, color: item.color, size: 17),
         ),
       ),
     );
@@ -719,7 +697,7 @@ class _CategoryTab extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.only(top: 10, bottom: 12),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
