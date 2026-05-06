@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/app_table_calendar.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/category.dart';
 import '../../models/transaction.dart';
@@ -159,11 +160,18 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   }
 
   Future<void> _pickDate() async {
-    final selectedDate = await showDatePicker(
-      context: context,
+    final selectedDate = await showAppCalendarSheet(
+      context,
       initialDate: _date,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2035),
+      title: 'Chọn ngày giao dịch',
+      subtitle: 'Tất cả thao tác chọn ngày hiện dùng Table Calendar.',
+      eventLoader: (day) {
+        final transactions = ref.read(transactionsProvider);
+        return [
+          for (final transaction in transactions)
+            if (DateUtils.isSameDay(transaction.date, day)) transaction,
+        ];
+      },
     );
 
     if (selectedDate != null) {
@@ -904,7 +912,7 @@ class _DateTrigger extends StatelessWidget {
                   const _RequiredStaticLabel('Ngày giao dịch'),
                   const SizedBox(height: 6),
                   Text(
-                    'Hôm nay, ${formatShortDate(date)}',
+                    _dateLabel(date),
                     style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 15,
@@ -923,6 +931,14 @@ class _DateTrigger extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _dateLabel(DateTime date) {
+    if (DateUtils.isSameDay(date, DateTime.now())) {
+      return 'Hôm nay, ${formatShortDate(date)}';
+    }
+
+    return 'Đã chọn, ${formatShortDate(date)}';
   }
 }
 

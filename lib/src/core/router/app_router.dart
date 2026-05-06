@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/calendar/calendar_screen.dart';
 import '../../features/home/home_dashboard_screen.dart';
 import '../../features/placeholder/coming_soon_screen.dart';
 import '../../features/settings/settings_screen.dart';
@@ -24,13 +25,7 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/calendar',
           pageBuilder: (context, state) {
-            return _buildPage(
-              state: state,
-              child: const ComingSoonScreen(
-                title: 'Trang lịch',
-                icon: Icons.calendar_month_rounded,
-              ),
-            );
+            return _buildPage(state: state, child: const CalendarScreen());
           },
         ),
         GoRoute(

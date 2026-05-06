@@ -10,15 +10,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:quan_ly_chi_tieu/src/app.dart';
+import 'package:quan_ly_chi_tieu/src/features/home/widgets/recent_transactions.dart';
+import 'package:quan_ly_chi_tieu/src/features/home/widgets/summary_card.dart';
 import 'package:quan_ly_chi_tieu/src/providers/storage_provider.dart';
 
 void main() {
-  testWidgets('Expense manager home screen renders', (tester) async {
+  testWidgets('Expense manager home screen renders current dashboard', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
     final sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString(
       'authUser',
-      '{"id":"test","email":"test@example.com","name":"Test User","photoUrl":null}',
+      '{"id":"test","email":"test@example.com","name":"Test User","lastLoginAt":"2026-05-06T10:00:00.000","photoUrl":null}',
     );
 
     await tester.pumpWidget(
@@ -31,9 +35,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Welcome back'), findsOneWidget);
-    expect(find.text('Your Money Flow'), findsOneWidget);
-    expect(find.text('Total Balance'), findsOneWidget);
-    expect(find.text('Recent Transactions'), findsOneWidget);
+    expect(find.text('Tổng quan'), findsWidgets);
+    expect(find.text('Quản lý chi tiêu'), findsOneWidget);
+    expect(find.byType(SummaryCard), findsOneWidget);
+    expect(find.byType(RecentTransactions), findsOneWidget);
   });
 }

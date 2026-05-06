@@ -28,3 +28,19 @@ String formatMonthDay(DateTime date) {
 
   return '$day/$month';
 }
+
+String formatLongDate(DateTime date) {
+  const weekdayNames = [
+    'Thứ Hai',
+    'Thứ Ba',
+    'Thứ Tư',
+    'Thứ Năm',
+    'Thứ Sáu',
+    'Thứ Bảy',
+    'Chủ Nhật',
+  ];
+
+  final weekday = weekdayNames[date.weekday - 1];
+
+  return '$weekday, ${formatShortDate(date)}';
+}
