@@ -162,6 +162,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
   int _touchedIndex = -1;
   int? _touchedBarIndex;
   _CategoryChartView _selectedChartView = _CategoryChartView.pie;
+  bool _isForwardChartTransition = true;
 
   @override
   Widget build(BuildContext context) {
@@ -204,11 +205,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                   ),
                   _ChartViewSwitch(
                     selectedView: _selectedChartView,
-                    onSelected: (view) {
-                      setState(() {
-                        _selectedChartView = view;
-                      });
-                    },
+                    onSelected: _selectChartView,
                   ),
                 ],
               ),
@@ -219,9 +216,13 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                     width: isPieChart ? chartSize : width,
                     height: chartSize,
                     child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 220),
+                      duration: const Duration(milliseconds: 360),
                       switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: _buildChartTransition,
+                      layoutBuilder: (currentChild, previousChildren) {
+                        return currentChild ?? const SizedBox.shrink();
+                      },
                       child: isPieChart
                           ? _buildPieChart(chartItems, chartSize)
                           : _buildBarChart(chartItems),
@@ -232,6 +233,65 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  void _selectChartView(_CategoryChartView view) {
+    if (view == _selectedChartView) {
+      return;
+    }
+
+    setState(() {
+      _isForwardChartTransition = view.index > _selectedChartView.index;
+      _selectedChartView = view;
+      _touchedIndex = -1;
+      _touchedBarIndex = null;
+    });
+  }
+
+  Widget _buildChartTransition(
+    Widget child,
+    Animation<double> animation,
+  ) {
+    final isIncoming = child.key == ValueKey(_selectedChartView);
+    final incomingOffset = Offset(
+      _isForwardChartTransition ? 0.18 : -0.18,
+      0,
+    );
+    final outgoingOffset = Offset(
+      _isForwardChartTransition ? -0.18 : 0.18,
+      0,
+    );
+    final curvedAnimation = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+    final outgoingAnimation = ReverseAnimation(curvedAnimation);
+    final position = isIncoming
+        ? Tween<Offset>(
+            begin: incomingOffset,
+            end: Offset.zero,
+          ).animate(curvedAnimation)
+        : Tween<Offset>(
+            begin: Offset.zero,
+            end: outgoingOffset,
+          ).animate(outgoingAnimation);
+    final scale = isIncoming
+        ? Tween<double>(
+            begin: 0.96,
+            end: 1,
+          ).animate(curvedAnimation)
+        : Tween<double>(
+            begin: 1,
+            end: 0.96,
+          ).animate(outgoingAnimation);
+
+    return ClipRect(
+      child: SlideTransition(
+        position: position,
+        child: ScaleTransition(scale: scale, child: child),
       ),
     );
   }
@@ -304,12 +364,11 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                 }
 
                 final item = chartItems[index];
-                final isTouched = index == _touchedBarIndex;
 
                 return SideTitleWidget(
                   meta: meta,
                   space: 8,
-                  child: _BarCategoryIcon(item: item, selected: isTouched),
+                  child: _BarCategoryIcon(item: item),
                 );
               },
             ),
@@ -374,7 +433,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
             style: TextStyle(
               color: item.color,
               fontWeight: FontWeight.w900,
-              fontSize: isTouched ? 28 : 16,
+              fontSize: 16,
               shadows: const [
                 Shadow(
                   color: Colors.white,
@@ -492,45 +551,39 @@ class _CategoryBadge extends StatelessWidget {
 }
 
 class _BarCategoryIcon extends StatelessWidget {
-  const _BarCategoryIcon({required this.item, required this.selected});
+  const _BarCategoryIcon({required this.item});
 
   final _CategoryAmountItem item;
-  final bool selected;
 
   @override
   Widget build(BuildContext context) {
     return Tooltip(
       message: '${item.category.name}: ${formatCurrency(item.amount)}',
-      child: AnimatedScale(
-        scale: selected ? 1.14 : 1,
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutCubic,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: item.color.withValues(alpha: 0.24)),
+          boxShadow: [
+            BoxShadow(
+              color: item.color.withValues(alpha: 0.12),
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
         child: Container(
-          width: selected ? 42 : 36,
-          height: selected ? 42 : 36,
+          margin: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: item.color.withValues(alpha: 0.14),
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: item.color.withValues(alpha: 0.24)),
-            boxShadow: [
-              BoxShadow(
-                color: item.color.withValues(alpha: selected ? 0.22 : 0.12),
-                blurRadius: selected ? 10 : 7,
-                offset: const Offset(0, 3),
-              ),
-            ],
           ),
-          child: Container(
-            margin: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              color: item.color.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Icon(
-              item.category.iconData,
-              color: item.color,
-              size: selected ? 20 : 17,
-            ),
+          child: Icon(
+            item.category.iconData,
+            color: item.color,
+            size: 17,
           ),
         ),
       ),
