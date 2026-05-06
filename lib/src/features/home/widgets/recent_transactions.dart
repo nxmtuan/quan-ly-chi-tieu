@@ -51,34 +51,36 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
               : _CategoryDonutChart(items: items, total: total),
         ),
         const SizedBox(height: 18),
-        _CategoryTabs(
-          selectedType: _selectedType,
-          onSelected: (type) {
-            setState(() {
-              _selectedType = type;
-            });
-          },
-        ),
-        const SizedBox(height: 12),
-        if (items.isEmpty)
-          FlatCard(
-            child: Center(
-              child: Text(
-                _selectedType == TransactionType.expense
-                    ? 'Chưa có khoản chi nào'
-                    : 'Chưa có khoản thu nào',
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w700,
+        FlatCard(
+          padding: EdgeInsets.zero,
+          radius: 24,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: _CategoryTabs(
+                  selectedType: _selectedType,
+                  onSelected: (type) {
+                    setState(() {
+                      _selectedType = type;
+                    });
+                  },
                 ),
               ),
-            ),
-          )
-        else
-          FlatCard(
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: [
+              if (items.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    _selectedType == TransactionType.expense
+                        ? 'Chưa có khoản chi nào'
+                        : 'Chưa có khoản thu nào',
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                )
+              else
                 for (final entry in items.indexed)
                   _CategoryAmountRow(
                         item: entry.$2,
@@ -93,9 +95,9 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
                         duration: 280.ms,
                         curve: Curves.easeOutCubic,
                       ),
-              ],
-            ),
+            ],
           ),
+        ),
       ],
     );
   }
@@ -162,64 +164,195 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
     final chartItems = _chartItems;
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.fromLTRB(24, 22, 24, 18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1B2338),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1B2338).withValues(alpha: 0.16),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: AppColors.shadow.withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
-          final chartSize = width < 360 ? 218.0 : 238.0;
-
-          return Center(
-            child: SizedBox(
-              width: chartSize,
-              height: chartSize,
-              child: PieChart(
-                duration: const Duration(milliseconds: 320),
-                curve: Curves.easeOutCubic,
-                PieChartData(
-                  centerSpaceRadius: 0,
-                  sectionsSpace: 4,
-                  startDegreeOffset: -90,
-                  pieTouchData: PieTouchData(
-                    touchCallback: (event, response) {
-                      final touchedSection = response?.touchedSection;
-                      final index = touchedSection?.touchedSectionIndex ?? -1;
-
-                      if (!event.isInterestedForInteractions ||
-                          index < 0 ||
-                          index >= chartItems.length) {
-                        if (_touchedIndex != -1) {
-                          setState(() => _touchedIndex = -1);
-                        }
-                        return;
-                      }
-
-                      if (_touchedIndex != index) {
-                        setState(() => _touchedIndex = index);
-                      }
-                    },
-                  ),
-                  sections: [
-                    for (final entry in chartItems.indexed)
-                      _buildSection(entry.$1, entry.$2, chartSize),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Cơ cấu chi tiêu',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'Theo danh mục',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
               ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: const Row(
+                  children: [
+                    Text(
+                      'Tháng này',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: AppColors.textSecondary,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final chartSize = width < 360 ? 170.0 : 190.0;
+
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: _ChartConnectorPainter(items: chartItems),
+                      ),
+                    ),
+                    Align(
+                      alignment: const Alignment(0, 0.08),
+                      child: SizedBox(
+                        width: chartSize,
+                        height: chartSize,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            PieChart(
+                              duration: const Duration(milliseconds: 320),
+                              curve: Curves.easeOutCubic,
+                              PieChartData(
+                                centerSpaceRadius: chartSize * 0.26,
+                                sectionsSpace: 4,
+                                startDegreeOffset: -90,
+                                pieTouchData: PieTouchData(
+                                  touchCallback: (event, response) {
+                                    final touchedSection =
+                                        response?.touchedSection;
+                                    final index =
+                                        touchedSection?.touchedSectionIndex ??
+                                        -1;
+
+                                    if (!event.isInterestedForInteractions ||
+                                        index < 0 ||
+                                        index >= chartItems.length) {
+                                      if (_touchedIndex != -1) {
+                                        setState(() => _touchedIndex = -1);
+                                      }
+                                      return;
+                                    }
+
+                                    if (_touchedIndex != index) {
+                                      setState(() => _touchedIndex = index);
+                                    }
+                                  },
+                                ),
+                                sections: [
+                                  for (final entry in chartItems.indexed)
+                                    _buildSection(
+                                      entry.$1,
+                                      entry.$2,
+                                      chartSize,
+                                    ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: chartSize * 0.43,
+                              height: chartSize * 0.43,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Icon(
+                                Icons.bar_chart_rounded,
+                                color: AppColors.primaryLight.withValues(
+                                  alpha: 0.9,
+                                ),
+                                size: 34,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (chartItems.length > 1)
+                      Positioned(
+                        left: 0,
+                        top: 68,
+                        child: _ChartLabel(
+                          item: chartItems[1],
+                          percent: _percent(chartItems[1]),
+                          selected: _touchedIndex == 1,
+                          onTap: () => setState(() => _touchedIndex = 1),
+                        ),
+                      ),
+                    if (chartItems.isNotEmpty)
+                      Positioned(
+                        right: 0,
+                        top: 168,
+                        child: _ChartLabel(
+                          item: chartItems[0],
+                          percent: _percent(chartItems[0]),
+                          selected: _touchedIndex == 0,
+                          onTap: () => setState(() => _touchedIndex = 0),
+                        ),
+                      ),
+                    const Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: _ChartDotIndicator(),
+                    ),
+                  ],
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
+  }
+
+  int _percent(_CategoryAmountItem item) {
+    return ((item.amount / widget.total) * 100).round();
   }
 
   List<_CategoryAmountItem> get _chartItems {
@@ -254,73 +387,193 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
     double chartSize,
   ) {
     final isTouched = index == _touchedIndex;
-    final percent = ((item.amount / widget.total) * 100).round();
+    final percent = _percent(item);
 
     return PieChartSectionData(
       value: item.amount,
       color: item.color,
-      radius: isTouched ? chartSize * 0.39 : chartSize * 0.35,
-      cornerRadius: 10,
+      radius: isTouched ? chartSize * 0.31 : chartSize * 0.29,
+      cornerRadius: 12,
       title: percent >= 5 || isTouched ? '$percent%' : '',
-      titlePositionPercentageOffset: 0.55,
-      badgeWidget: _CategoryBadge(item: item, selected: isTouched),
-      badgePositionPercentageOffset: 0.98,
+      titlePositionPercentageOffset: 0.64,
       titleStyle: TextStyle(
         color: Colors.white,
-        fontSize: isTouched ? 16 : 14,
+        fontSize: isTouched ? 17 : 16,
         fontWeight: FontWeight.w900,
-        shadows: const [
-          Shadow(color: Colors.black38, blurRadius: 4, offset: Offset(0, 1)),
-        ],
       ),
     );
   }
 }
 
-class _CategoryBadge extends StatelessWidget {
-  const _CategoryBadge({required this.item, required this.selected});
+class _ChartLabel extends StatelessWidget {
+  const _ChartLabel({
+    required this.item,
+    required this.percent,
+    required this.selected,
+    required this.onTap,
+  });
 
   final _CategoryAmountItem item;
+  final int percent;
   final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: '${item.category.name}: ${formatCurrency(item.amount)}',
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
       child: AnimatedScale(
-        scale: selected ? 1.16 : 1,
+        scale: selected ? 1.06 : 1,
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
         child: Container(
-          width: selected ? 42 : 36,
-          height: selected ? 42 : 36,
+          width: 112,
+          padding: const EdgeInsets.all(9),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: const Color(0xFF111827), width: 2),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: selected ? 0.26 : 0.18),
-                blurRadius: selected ? 10 : 7,
-                offset: const Offset(0, 3),
+                color: item.color.withValues(alpha: selected ? 0.16 : 0.06),
+                blurRadius: selected ? 14 : 8,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Container(
-            margin: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              color: item.color.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Icon(
-              item.category.iconData,
-              color: item.color,
-              size: selected ? 20 : 17,
-            ),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: item.color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(item.category.iconData, color: item.color),
+              ),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.category.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$percent%',
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+}
+
+class _ChartDotIndicator extends StatelessWidget {
+  const _ChartDotIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(999),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            color: AppColors.border,
+            borderRadius: BorderRadius.circular(999),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ChartConnectorPainter extends CustomPainter {
+  const _ChartConnectorPainter({required this.items});
+
+  final List<_CategoryAmountItem> items;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2 + 13);
+    if (items.length > 1) {
+      _drawDashedLine(
+        canvas,
+        const Offset(104, 98),
+        Offset(center.dx - 68, center.dy - 48),
+        items[1].color,
+      );
+    }
+    if (items.isNotEmpty) {
+      _drawDashedLine(
+        canvas,
+        Offset(center.dx + 72, center.dy + 56),
+        Offset(size.width - 112, 193),
+        items[0].color,
+      );
+      final paint = Paint()
+        ..color = items[0].color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2;
+      canvas.drawCircle(Offset(center.dx + 72, center.dy + 56), 4, paint);
+    }
+  }
+
+  void _drawDashedLine(Canvas canvas, Offset start, Offset end, Color color) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.7
+      ..style = PaintingStyle.stroke;
+    const dashWidth = 5.0;
+    const dashSpace = 5.0;
+    final distance = (end - start).distance;
+    if (distance <= 0) {
+      return;
+    }
+
+    final direction = (end - start) / distance;
+    var progress = 0.0;
+    while (progress < distance) {
+      final dashStart = start + direction * progress;
+      final dashEnd =
+          start + direction * (progress + dashWidth).clamp(0, distance);
+      canvas.drawLine(dashStart, dashEnd, paint);
+      progress += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ChartConnectorPainter oldDelegate) {
+    return oldDelegate.items != items;
   }
 }
 
@@ -392,6 +645,7 @@ class _CategoryTab extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: isSelected ? color : AppColors.textSecondary,
+            fontSize: 14,
             fontWeight: FontWeight.w900,
           ),
         ),
@@ -418,7 +672,7 @@ class _CategoryAmountRow extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: Row(
             children: [
               Container(
@@ -464,6 +718,7 @@ class _CategoryAmountRow extends StatelessWidget {
                 formatCurrency(item.amount),
                 style: const TextStyle(
                   color: AppColors.textPrimary,
+                  fontSize: 14,
                   fontWeight: FontWeight.w900,
                 ),
               ),
