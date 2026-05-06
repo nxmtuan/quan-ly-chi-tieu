@@ -16,24 +16,11 @@ class AppShell extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(child: child),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 86),
-        child:
-            _AddTransactionButton(onTap: () => showAddTransactionSheet(context))
-                .animate(delay: 180.ms)
-                .fadeIn(duration: 260.ms)
-                .scale(
-                  begin: const Offset(0.72, 0.72),
-                  end: const Offset(1, 1),
-                  duration: 360.ms,
-                  curve: Curves.easeOutBack,
-                ),
-      ),
       bottomNavigationBar:
           CustomBottomNavBar(
                 currentIndex: currentIndex,
                 onTap: (index) => _goToIndex(context, index),
+                onAddTransaction: () => showAddTransactionSheet(context),
               )
               .animate()
               .fadeIn(duration: 260.ms)
@@ -48,8 +35,9 @@ class AppShell extends StatelessWidget {
 
   int _indexForPath(String path) {
     return switch (path) {
-      '/statistics' => 1,
-      '/settings' => 2,
+      '/calendar' => 1,
+      '/recurring' => 3,
+      '/settings' => 4,
       _ => 0,
     };
   }
@@ -59,45 +47,13 @@ class AppShell extends StatelessWidget {
       case 0:
         context.go('/');
       case 1:
-        context.go('/statistics');
+        context.go('/calendar');
       case 2:
+        showAddTransactionSheet(context);
+      case 3:
+        context.go('/recurring');
+      case 4:
         context.go('/settings');
     }
-  }
-}
-
-class _AddTransactionButton extends StatelessWidget {
-  const _AddTransactionButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Ink(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: colors.primary,
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadow.withValues(alpha: isDark ? 0.35 : 0.08),
-                blurRadius: isDark ? 12 : 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: const Icon(Icons.add_rounded, color: Colors.white, size: 34),
-        ),
-      ),
-    );
   }
 }

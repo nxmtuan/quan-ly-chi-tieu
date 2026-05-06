@@ -6,32 +6,38 @@ class CustomBottomNavBar extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onTap,
+    required this.onAddTransaction,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final VoidCallback onAddTransaction;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final barColor = isDark ? colors.surface : Colors.white;
     final items = [
-      const _NavItem(Icons.home_rounded, 'Home'),
-      const _NavItem(Icons.bar_chart_rounded, 'Stats'),
-      const _NavItem(Icons.settings_rounded, 'Settings'),
+      const _NavItem(Icons.grid_view_rounded, 'Tổng quan'),
+      const _NavItem(Icons.calendar_month_rounded, 'Lịch'),
+      const _NavItem(Icons.add_rounded, 'Nhập', isAction: true),
+      const _NavItem(Icons.repeat_rounded, 'Định kỳ'),
+      const _NavItem(Icons.settings_rounded, 'Cài đặt'),
     ];
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-      padding: const EdgeInsets.all(8),
+      height: 102,
+      margin: const EdgeInsets.fromLTRB(18, 0, 18, 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(32),
+        color: barColor,
+        borderRadius: BorderRadius.circular(42),
         boxShadow: [
           BoxShadow(
-            color: colors.shadow.withValues(alpha: isDark ? 0.3 : 0.04),
-            blurRadius: isDark ? 8 : 16,
-            offset: const Offset(0, -4),
+            color: colors.primary.withValues(alpha: isDark ? 0.18 : 0.08),
+            blurRadius: isDark ? 18 : 28,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -43,7 +49,9 @@ class CustomBottomNavBar extends StatelessWidget {
                   _NavButton(
                         item: items[index],
                         selected: currentIndex == index,
-                        onTap: () => onTap(index),
+                        onTap: items[index].isAction
+                            ? onAddTransaction
+                            : () => onTap(index),
                       )
                       .animate(delay: Duration(milliseconds: 50 * index))
                       .fadeIn(duration: 220.ms)
@@ -74,40 +82,95 @@ class _NavButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final isAction = item.isAction;
+    final inactiveColor = colors.onSurface.withValues(alpha: 0.54);
+    final foreground = selected
+        ? colors.primary
+        : colors.onSurface.withValues(alpha: isAction ? 0.92 : 0.54);
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(isAction ? 999 : 30),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: selected ? colors.primaryContainer : Colors.transparent,
-          borderRadius: BorderRadius.circular(999),
+        height: 78,
+        padding: EdgeInsets.only(
+          top: isAction ? 0 : 10,
+          bottom: isAction ? 0 : 9,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        decoration: BoxDecoration(
+          color: selected && !isAction
+              ? colors.primary.withValues(alpha: 0.09)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              item.icon,
-              color: selected
-                  ? colors.primary
-                  : colors.onSurface.withValues(alpha: 0.64),
-              size: 22,
-            ),
-            if (selected) ...[
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  item.label,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: colors.primary,
-                    fontWeight: FontWeight.w800,
+            if (isAction)
+              Transform.translate(
+                offset: const Offset(0, -35),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  width: 84,
+                  height: 84,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        colors.primary.withValues(alpha: 0.72),
+                        colors.primary,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: Colors.white, width: 4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.primary.withValues(alpha: 0.34),
+                        blurRadius: 26,
+                        offset: const Offset(0, 14),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.add_rounded,
+                    color: Colors.white,
+                    size: 46,
                   ),
                 ),
+              )
+            else
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                height: 34,
+                alignment: Alignment.center,
+                child: Icon(
+                  item.icon,
+                  color: foreground,
+                  size: selected ? 25 : 29,
+                ),
               ),
-            ],
+            SizedBox(height: isAction ? 0 : 7),
+            Transform.translate(
+              offset: Offset(0, isAction ? -33 : 0),
+              child: Text(
+                item.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: isAction
+                      ? colors.primary
+                      : selected
+                      ? colors.primary
+                      : inactiveColor,
+                  fontSize: isAction ? 15 : 13.5,
+                  fontWeight: selected || isAction
+                      ? FontWeight.w900
+                      : FontWeight.w700,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -116,8 +179,9 @@ class _NavButton extends StatelessWidget {
 }
 
 class _NavItem {
-  const _NavItem(this.icon, this.label);
+  const _NavItem(this.icon, this.label, {this.isAction = false});
 
   final IconData icon;
   final String label;
+  final bool isAction;
 }
