@@ -3,19 +3,47 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../models/transaction.dart';
 import '../../providers/transaction_provider.dart';
 import 'widgets/recent_transactions.dart';
 import 'widgets/summary_card.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  late DateTime _selectedMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedMonth = _monthStart(DateTime.now());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final summary = ref.watch(transactionSummaryProvider);
-    final transactions = ref.watch(recentTransactionsProvider);
+    final allTransactions = ref.watch(transactionsProvider);
+    final monthTransactions = [
+      for (final transaction in allTransactions)
+        if (_isSameMonth(transaction.date, _selectedMonth)) transaction,
+    ];
+    final summary = TransactionSummary(
+      income: monthTransactions
+          .where((transaction) => transaction.type == TransactionType.income)
+          .fold<double>(0, (total, transaction) => total + transaction.amount),
+      expense: monthTransactions
+          .where((transaction) => transaction.type == TransactionType.expense)
+          .fold<double>(0, (total, transaction) => total + transaction.amount),
+    );
+    final transactions = [...monthTransactions]
+      ..sort((a, b) => b.date.compareTo(a.date));
+    final currentMonth = _monthStart(DateTime.now());
 
     return ColoredBox(
       color: isDark ? colors.surface : const Color(0xFFFAF7FF),
@@ -112,15 +140,25 @@ class HomeScreen extends ConsumerWidget {
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(32, 30, 32, 0),
             sliver: SliverToBoxAdapter(
-              child: SummaryCard(summary: summary)
-                  .animate(delay: 80.ms)
-                  .fadeIn(duration: 320.ms)
-                  .slideY(
-                    begin: 0.08,
-                    end: 0,
-                    duration: 360.ms,
-                    curve: Curves.easeOutCubic,
-                  ),
+              child:
+                  SummaryCard(
+                        summary: summary,
+                        displayedMonth: _selectedMonth,
+                        canGoNext: _selectedMonth.isBefore(currentMonth),
+                        onPreviousMonth: _goToPreviousMonth,
+                        onNextMonth: _selectedMonth.isBefore(currentMonth)
+                            ? _goToNextMonth
+                            : null,
+                        onPickMonth: _pickMonth,
+                      )
+                      .animate(delay: 80.ms)
+                      .fadeIn(duration: 320.ms)
+                      .slideY(
+                        begin: 0.08,
+                        end: 0,
+                        duration: 360.ms,
+                        curve: Curves.easeOutCubic,
+                      ),
             ),
           ),
           SliverPadding(
@@ -141,4 +179,40 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _goToPreviousMonth() {
+    setState(() {
+      _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month - 1);
+    });
+  }
+
+  void _goToNextMonth() {
+    final currentMonth = _monthStart(DateTime.now());
+    final nextMonth = DateTime(_selectedMonth.year, _selectedMonth.month + 1);
+    if (nextMonth.isAfter(currentMonth)) {
+      return;
+    }
+
+    setState(() => _selectedMonth = nextMonth);
+  }
+
+  Future<void> _pickMonth() async {
+    final selectedMonth = await showMonthPickerSheet(
+      context,
+      initialMonth: _selectedMonth,
+      lastMonth: _monthStart(DateTime.now()),
+    );
+
+    if (selectedMonth != null && mounted) {
+      setState(() => _selectedMonth = _monthStart(selectedMonth));
+    }
+  }
+}
+
+bool _isSameMonth(DateTime a, DateTime b) {
+  return a.year == b.year && a.month == b.month;
+}
+
+DateTime _monthStart(DateTime date) {
+  return DateTime(date.year, date.month);
 }

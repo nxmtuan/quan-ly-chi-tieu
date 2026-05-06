@@ -202,6 +202,7 @@ Future<DateTime?> showAppCalendarSheet(
 }) {
   return showModalBottomSheet<DateTime>(
     context: context,
+    useRootNavigator: true,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,

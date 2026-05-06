@@ -14,6 +14,7 @@ import '../../providers/transaction_provider.dart';
 void showAddTransactionSheet(BuildContext context, {Transaction? transaction}) {
   showModalBottomSheet<void>(
     context: context,
+    useRootNavigator: true,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,
@@ -186,6 +187,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   Future<void> _pickSource() async {
     final selectedSource = await showModalBottomSheet<String>(
       context: context,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
@@ -238,6 +240,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   Future<void> _showAllCategories(List<Category> categories) async {
     final selectedCategory = await showModalBottomSheet<Category>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,

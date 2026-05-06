@@ -44,3 +44,7 @@ String formatLongDate(DateTime date) {
 
   return '$weekday, ${formatShortDate(date)}';
 }
+
+String formatMonthYear(DateTime date) {
+  return 'Tháng ${date.month}/${date.year}';
+}

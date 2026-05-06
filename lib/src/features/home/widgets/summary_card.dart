@@ -5,9 +5,22 @@ import '../../../core/utils/formatters.dart';
 import '../../../providers/transaction_provider.dart';
 
 class SummaryCard extends StatelessWidget {
-  const SummaryCard({super.key, required this.summary});
+  const SummaryCard({
+    super.key,
+    required this.summary,
+    required this.displayedMonth,
+    required this.canGoNext,
+    required this.onPreviousMonth,
+    required this.onPickMonth,
+    this.onNextMonth,
+  });
 
   final TransactionSummary summary;
+  final DateTime displayedMonth;
+  final bool canGoNext;
+  final VoidCallback onPreviousMonth;
+  final VoidCallback onPickMonth;
+  final VoidCallback? onNextMonth;
 
   @override
   Widget build(BuildContext context) {
@@ -32,44 +45,58 @@ class SummaryCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.chevron_left_rounded,
-                color: colors.onSurface,
-                size: 31,
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.calendar_month_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 13),
-                    Text(
-                      'Tháng ${DateTime.now().month}/${DateTime.now().year}',
-                      style: TextStyle(
-                        color: colors.onSurface,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
+              InkWell(
+                onTap: onPreviousMonth,
+                borderRadius: BorderRadius.circular(999),
+                child: Icon(
+                  Icons.chevron_left_rounded,
+                  color: colors.onSurface,
+                  size: 31,
                 ),
               ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: colors.onSurface,
-                size: 31,
+              Expanded(
+                child: InkWell(
+                  onTap: onPickMonth,
+                  borderRadius: BorderRadius.circular(18),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.calendar_month_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 13),
+                      Text(
+                        formatMonthYear(displayedMonth),
+                        style: TextStyle(
+                          color: colors.onSurface,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: onNextMonth,
+                borderRadius: BorderRadius.circular(999),
+                child: Icon(
+                  Icons.chevron_right_rounded,
+                  color: canGoNext
+                      ? colors.onSurface
+                      : colors.onSurface.withValues(alpha: 0.24),
+                  size: 31,
+                ),
               ),
             ],
           ),
@@ -155,6 +182,246 @@ class SummaryCard extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+Future<DateTime?> showMonthPickerSheet(
+  BuildContext context, {
+  required DateTime initialMonth,
+  required DateTime lastMonth,
+}) {
+  return showModalBottomSheet<DateTime>(
+    context: context,
+    useRootNavigator: true,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return _MonthPickerSheet(
+        initialMonth: initialMonth,
+        lastMonth: lastMonth,
+      );
+    },
+  );
+}
+
+class _MonthPickerSheet extends StatefulWidget {
+  const _MonthPickerSheet({
+    required this.initialMonth,
+    required this.lastMonth,
+  });
+
+  final DateTime initialMonth;
+  final DateTime lastMonth;
+
+  @override
+  State<_MonthPickerSheet> createState() => _MonthPickerSheetState();
+}
+
+class _MonthPickerSheetState extends State<_MonthPickerSheet> {
+  late int _displayedYear;
+  late DateTime _selectedMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedMonth = DateTime(
+      widget.initialMonth.year,
+      widget.initialMonth.month,
+    );
+    _displayedYear = _selectedMonth.year;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final canGoNextYear = _displayedYear < widget.lastMonth.year;
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            12,
+            16,
+            MediaQuery.of(context).padding.bottom + 14,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFB8BCC8),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Chọn tháng',
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'Chỉ chọn theo tháng, không chọn ngày.',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () => setState(() => _displayedYear -= 1),
+                    borderRadius: BorderRadius.circular(999),
+                    child: const Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Icon(Icons.chevron_left_rounded, size: 28),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      '$_displayedYear',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: canGoNextYear
+                        ? () => setState(() => _displayedYear += 1)
+                        : null,
+                    borderRadius: BorderRadius.circular(999),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Icons.chevron_right_rounded,
+                        size: 28,
+                        color: canGoNextYear
+                            ? AppColors.textPrimary
+                            : AppColors.textSecondary.withValues(alpha: 0.3),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 12,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 2.2,
+                ),
+                itemBuilder: (context, index) {
+                  final month = index + 1;
+                  final candidateMonth = DateTime(_displayedYear, month);
+                  final isSelected =
+                      _selectedMonth.year == _displayedYear &&
+                      _selectedMonth.month == month;
+                  final isDisabled = candidateMonth.isAfter(widget.lastMonth);
+
+                  return InkWell(
+                    onTap: isDisabled
+                        ? null
+                        : () => setState(() => _selectedMonth = candidateMonth),
+                    borderRadius: BorderRadius.circular(16),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.primary
+                            : isDisabled
+                            ? const Color(0xFFF8FAFC)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.primary
+                              : isDisabled
+                              ? AppColors.border.withValues(alpha: 0.6)
+                              : AppColors.border,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Tháng $month',
+                        style: TextStyle(
+                          color: isSelected
+                              ? Colors.white
+                              : isDisabled
+                              ? AppColors.textSecondary.withValues(alpha: 0.4)
+                              : AppColors.textPrimary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(_selectedMonth),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Chọn tháng',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.4,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
