@@ -15,13 +15,13 @@ class AppTheme {
     return ThemeData(
       useMaterial3: false,
       brightness: Brightness.light,
-      primaryColor: AppColors.lavender,
+      primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.background,
       colorScheme: const ColorScheme.light(
-        primary: AppColors.lavender,
-        secondary: AppColors.mint,
+        primary: AppColors.primary,
+        secondary: AppColors.success,
         surface: AppColors.surface,
-        error: AppColors.coral,
+        error: AppColors.danger,
       ),
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
@@ -34,18 +34,33 @@ class AppTheme {
           fontWeight: FontWeight.w800,
         ),
       ),
-      splashColor: AppColors.lavender.withValues(alpha: 0.08),
-      highlightColor: AppColors.lavender.withValues(alpha: 0.04),
+      splashColor: AppColors.primary.withValues(alpha: 0.08),
+      highlightColor: AppColors.primary.withValues(alpha: 0.04),
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
-      inputDecorationTheme: const InputDecorationTheme(
-        border: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.inputBackground,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: Colors.transparent,

@@ -148,13 +148,13 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                         decoration: InputDecoration(
                           hintText: 'Note',
                           filled: true,
-                          fillColor: AppColors.background,
+                          fillColor: AppColors.inputBackground,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 18,
                             vertical: 16,
                           ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(16),
                             borderSide: BorderSide.none,
                           ),
                         ),
@@ -265,7 +265,7 @@ class _TypeToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: AppColors.inputBackground,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
@@ -274,7 +274,7 @@ class _TypeToggle extends StatelessWidget {
             child: _TypeButton(
               label: 'Expense',
               selected: type == TransactionType.expense,
-              color: AppColors.coral,
+              color: AppColors.danger,
               onTap: () => onChanged(TransactionType.expense),
             ),
           ),
@@ -282,7 +282,7 @@ class _TypeToggle extends StatelessWidget {
             child: _TypeButton(
               label: 'Income',
               selected: type == TransactionType.income,
-              color: AppColors.mint,
+              color: AppColors.success,
               onTap: () => onChanged(TransactionType.income),
             ),
           ),
@@ -309,22 +309,13 @@ class _TypeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(19),
+      borderRadius: BorderRadius.circular(16),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: selected ? color : Colors.transparent,
-          borderRadius: BorderRadius.circular(19),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.22),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
-                  ),
-                ]
-              : null,
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Text(
           label,
@@ -372,15 +363,15 @@ class _CategoryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(16),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: selected
               ? category.color.withValues(alpha: 0.14)
-              : AppColors.background,
-          borderRadius: BorderRadius.circular(24),
+              : AppColors.inputBackground,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: selected ? category.color : Colors.transparent,
             width: 1.4,
@@ -426,12 +417,12 @@ class _DateTrigger extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(22),
+          color: AppColors.inputBackground,
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
@@ -439,12 +430,12 @@ class _DateTrigger extends StatelessWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: AppColors.blueLight,
+                color: AppColors.primaryLight,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
                 Icons.calendar_month_rounded,
-                color: AppColors.blue,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(width: 12),

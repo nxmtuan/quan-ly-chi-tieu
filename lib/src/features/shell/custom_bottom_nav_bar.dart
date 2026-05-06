@@ -25,13 +25,13 @@ class CustomBottomNavBar extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF64748B).withValues(alpha: 0.12),
-            blurRadius: 30,
-            offset: const Offset(0, 16),
+            color: AppColors.shadow.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
@@ -75,20 +75,20 @@ class _NavButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(24),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.lavenderLight : Colors.transparent,
-          borderRadius: BorderRadius.circular(22),
+          color: selected ? AppColors.primaryLight : Colors.transparent,
+          borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               item.icon,
-              color: selected ? AppColors.lavender : AppColors.textSecondary,
+              color: selected ? AppColors.primary : AppColors.textSecondary,
               size: 22,
             ),
             if (selected) ...[
@@ -98,7 +98,7 @@ class _NavButton extends StatelessWidget {
                   item.label,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: AppColors.lavender,
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w800,
                   ),
                 ),

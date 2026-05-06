@@ -14,17 +14,13 @@ class SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(26),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.lavender, Color(0xFF6D5DFB)],
-        ),
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.lavender.withValues(alpha: 0.28),
-            blurRadius: 34,
-            offset: const Offset(0, 18),
+            color: AppColors.shadow.withValues(alpha: 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -36,7 +32,7 @@ class SummaryCard extends StatelessWidget {
             style: TextStyle(
               color: Colors.white70,
               fontSize: 14,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w400,
             ),
           ),
           const SizedBox(height: 10),
@@ -44,8 +40,8 @@ class SummaryCard extends StatelessWidget {
             formatCurrency(summary.balance),
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 34,
-              fontWeight: FontWeight.w900,
+              fontSize: 32,
+              fontWeight: FontWeight.w700,
               letterSpacing: -1,
             ),
           ),
@@ -57,7 +53,7 @@ class SummaryCard extends StatelessWidget {
                   icon: Icons.arrow_downward_rounded,
                   label: 'Income',
                   amount: summary.income,
-                  color: AppColors.mint,
+                  color: AppColors.success,
                 ),
               ),
               const SizedBox(width: 12),
@@ -66,7 +62,7 @@ class SummaryCard extends StatelessWidget {
                   icon: Icons.arrow_upward_rounded,
                   label: 'Expense',
                   amount: summary.expense,
-                  color: AppColors.coral,
+                  color: AppColors.danger,
                 ),
               ),
             ],
@@ -96,7 +92,7 @@ class _MetricPill extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
       ),
       child: Row(
@@ -106,7 +102,7 @@ class _MetricPill extends StatelessWidget {
             height: 34,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.22),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(icon, size: 18, color: Colors.white),
           ),
@@ -120,7 +116,7 @@ class _MetricPill extends StatelessWidget {
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 4),

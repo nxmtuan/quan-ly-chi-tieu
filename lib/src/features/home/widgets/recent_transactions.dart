@@ -32,7 +32,7 @@ class RecentTransactions extends ConsumerWidget {
             Text(
               'See all',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.lavender,
+                color: AppColors.primary,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -73,7 +73,7 @@ class _TransactionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = transaction.isExpense ? AppColors.coral : AppColors.mint;
+    final color = transaction.isExpense ? AppColors.danger : AppColors.success;
     final sign = transaction.isExpense ? '-' : '+';
 
     return FlatCard(

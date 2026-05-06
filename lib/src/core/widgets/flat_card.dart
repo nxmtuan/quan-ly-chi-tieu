@@ -7,7 +7,7 @@ class FlatCard extends StatelessWidget {
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(20),
-    this.radius = 26,
+    this.radius = 24,
     this.color = AppColors.surface,
   });
 
@@ -25,9 +25,9 @@ class FlatCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF64748B).withValues(alpha: 0.08),
-            blurRadius: 28,
-            offset: const Offset(0, 14),
+            color: AppColors.shadow.withValues(alpha: 0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),

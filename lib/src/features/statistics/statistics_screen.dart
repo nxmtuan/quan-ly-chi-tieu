@@ -57,7 +57,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             ),
             const SizedBox(height: 22),
             FlatCard(
-              radius: 30,
+              radius: 24,
               padding: const EdgeInsets.all(22),
               child: Column(
                 children: [
@@ -74,7 +74,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                       Text(
                         formatCurrency(totalExpense),
                         style: const TextStyle(
-                          color: AppColors.coral,
+                          color: AppColors.danger,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
@@ -225,7 +225,7 @@ class _RangeSelector extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   decoration: BoxDecoration(
                     color: selectedRange == range
-                        ? AppColors.lavender
+                        ? AppColors.primary
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(18),
                   ),

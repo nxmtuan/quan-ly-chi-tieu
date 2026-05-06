@@ -34,20 +34,20 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             FlatCard(
-              radius: 30,
+              radius: 24,
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
                   _SettingsRow(
                     icon: Icons.dark_mode_rounded,
-                    iconColor: AppColors.lavender,
+                    iconColor: AppColors.primary,
                     title: 'Theme Toggle',
                     subtitle: themeEnabled
                         ? 'Dark mode prepared'
                         : 'Light mode active',
                     trailing: CupertinoSwitch(
                       value: themeEnabled,
-                      activeTrackColor: AppColors.lavender,
+                      activeTrackColor: AppColors.primary,
                       onChanged: (value) {
                         ref
                             .read(themeToggleProvider.notifier)
@@ -58,7 +58,7 @@ class SettingsScreen extends ConsumerWidget {
                   const _DividerIndent(),
                   _SettingsRow(
                     icon: Icons.category_rounded,
-                    iconColor: AppColors.mint,
+                    iconColor: AppColors.success,
                     title: 'Manage Categories',
                     subtitle: 'Edit income and expense groups',
                     trailing: const Icon(
@@ -70,7 +70,7 @@ class SettingsScreen extends ConsumerWidget {
                   const _DividerIndent(),
                   _SettingsRow(
                     icon: Icons.ios_share_rounded,
-                    iconColor: AppColors.blue,
+                    iconColor: AppColors.primary,
                     title: 'Export Data',
                     subtitle: 'Download your transactions',
                     trailing: const Icon(
@@ -84,8 +84,8 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             FlatCard(
-              radius: 28,
-              color: AppColors.lavenderLight,
+              radius: 24,
+              color: AppColors.primaryLight,
               child: Row(
                 children: [
                   Container(
@@ -93,11 +93,11 @@ class SettingsScreen extends ConsumerWidget {
                     height: 52,
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.85),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(
                       Icons.tips_and_updates_rounded,
-                      color: AppColors.lavender,
+                      color: AppColors.primary,
                     ),
                   ),
                   const SizedBox(width: 14),

@@ -55,11 +55,9 @@ class HomeScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(
-                                  0xFF64748B,
-                                ).withValues(alpha: 0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
+                                color: AppColors.shadow.withValues(alpha: 0.05),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
