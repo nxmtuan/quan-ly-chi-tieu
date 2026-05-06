@@ -2,6 +2,18 @@ import 'package:flutter/material.dart';
 
 import 'transaction.dart';
 
+const categoryIconOptions = [
+  Icons.restaurant_rounded,
+  Icons.shopping_bag_rounded,
+  Icons.home_rounded,
+  Icons.directions_car_rounded,
+  Icons.favorite_rounded,
+  Icons.flight_takeoff_rounded,
+  Icons.payments_rounded,
+  Icons.laptop_mac_rounded,
+  Icons.category_rounded,
+];
+
 class Category {
   const Category({
     required this.id,
@@ -51,13 +63,19 @@ class Category {
     return Category(
       id: json['id'] as String,
       name: json['name'] as String,
-      iconData: IconData(
-        json['iconCodePoint'] as int,
-        fontFamily: json['iconFontFamily'] as String?,
-        fontPackage: json['iconFontPackage'] as String?,
-      ),
+      iconData: _iconFromCodePoint(json['iconCodePoint'] as int),
       colorHex: json['colorHex'] as int,
       type: TransactionType.values.byName(json['type'] as String),
     );
   }
+}
+
+IconData _iconFromCodePoint(int codePoint) {
+  for (final iconData in categoryIconOptions) {
+    if (iconData.codePoint == codePoint) {
+      return iconData;
+    }
+  }
+
+  return Icons.category_rounded;
 }

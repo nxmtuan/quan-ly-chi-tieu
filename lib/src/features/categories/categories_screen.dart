@@ -140,18 +140,6 @@ Future<void> _showCategoryDialog(
   var iconData = category?.iconData ?? Icons.category_rounded;
   var colorHex = category?.colorHex ?? AppColors.primary.toARGB32();
 
-  final icons = [
-    Icons.restaurant_rounded,
-    Icons.shopping_bag_rounded,
-    Icons.home_rounded,
-    Icons.directions_car_rounded,
-    Icons.favorite_rounded,
-    Icons.flight_takeoff_rounded,
-    Icons.payments_rounded,
-    Icons.laptop_mac_rounded,
-    Icons.category_rounded,
-  ];
-
   final colors = [
     AppColors.primary,
     AppColors.success,
@@ -202,7 +190,7 @@ Future<void> _showCategoryDialog(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      for (final item in icons)
+                      for (final item in categoryIconOptions)
                         ChoiceChip(
                           selected: item == iconData,
                           label: Icon(item, size: 18),
