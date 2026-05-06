@@ -738,6 +738,7 @@ class _CategoryTile extends StatelessWidget {
             ),
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 width: 40,
@@ -748,7 +749,7 @@ class _CategoryTile extends StatelessWidget {
                 ),
                 child: Icon(category.iconData, color: category.color, size: 21),
               ),
-              const Spacer(),
+              const SizedBox(height: 10),
               Text(
                 category.name,
                 maxLines: 1,
@@ -787,9 +788,10 @@ class _MoreCategoriesTile extends StatelessWidget {
           border: Border.all(color: AppColors.border),
         ),
         child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _MoreCategoriesIcon(),
-            Spacer(),
+            SizedBox(height: 10),
             Text(
               'Khác',
               maxLines: 1,
