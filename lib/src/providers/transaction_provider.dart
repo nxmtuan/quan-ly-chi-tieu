@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/transaction.dart';
@@ -18,12 +20,17 @@ class TransactionsNotifier extends Notifier<List<Transaction>> {
     final storedTransactions = ref
         .read(transactionStorageProvider)
         .readTransactions();
+    final filteredTransactions = _removeSeedTransactions(storedTransactions);
 
-    if (storedTransactions.isNotEmpty) {
-      return storedTransactions;
+    if (filteredTransactions.length != storedTransactions.length) {
+      unawaited(
+        ref
+            .read(transactionStorageProvider)
+            .saveTransactions(filteredTransactions),
+      );
     }
 
-    return _initialTransactions();
+    return filteredTransactions;
   }
 
   Future<void> addTransaction(Transaction transaction) async {
@@ -60,43 +67,17 @@ class TransactionsNotifier extends Notifier<List<Transaction>> {
     return ref.read(transactionStorageProvider).saveTransactions(state);
   }
 
-  static List<Transaction> _initialTransactions() {
+  static List<Transaction> _removeSeedTransactions(
+    List<Transaction> transactions,
+  ) {
     return [
-      Transaction(
-        id: 'tx-1',
-        amount: 18000000,
-        type: TransactionType.income,
-        categoryId: 'salary',
-        date: DateTime(2026, 5, 5),
-        note: 'Monthly salary',
-      ),
-      Transaction(
-        id: 'tx-2',
-        amount: 650000,
-        type: TransactionType.expense,
-        categoryId: 'food',
-        date: DateTime(2026, 5, 4),
-        note: 'Groceries',
-      ),
-      Transaction(
-        id: 'tx-3',
-        amount: 4500000,
-        type: TransactionType.expense,
-        categoryId: 'home',
-        date: DateTime(2026, 5, 3),
-        note: 'Rent',
-      ),
-      Transaction(
-        id: 'tx-4',
-        amount: 3200000,
-        type: TransactionType.income,
-        categoryId: 'freelance',
-        date: DateTime(2026, 5, 1),
-        note: 'Design project',
-      ),
+      for (final transaction in transactions)
+        if (!_seedTransactionIds.contains(transaction.id)) transaction,
     ];
   }
 }
+
+const _seedTransactionIds = {'tx-1', 'tx-2', 'tx-3', 'tx-4'};
 
 final transactionsProvider =
     NotifierProvider<TransactionsNotifier, List<Transaction>>(
