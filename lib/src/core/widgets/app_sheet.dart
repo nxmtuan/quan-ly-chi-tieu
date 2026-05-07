@@ -5,7 +5,7 @@ import '../theme/app_typography.dart';
 import '../utils/adaptive.dart';
 
 double appSheetBottomPadding(BuildContext context, {double extra = 0}) {
-  return MediaQuery.of(context).padding.bottom + 32 + extra;
+  return MediaQuery.of(context).padding.bottom + context.scaled(16) + extra;
 }
 
 class AppSheetContainer extends StatelessWidget {

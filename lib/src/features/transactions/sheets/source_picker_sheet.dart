@@ -22,16 +22,14 @@ class _SourcePickerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSheetContainer(
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            context.scaled(16),
-            0,
-            context.scaled(16),
-            appSheetBottomPadding(context),
-          ),
-          child: Column(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          context.scaled(16),
+          0,
+          context.scaled(16),
+          appSheetBottomPadding(context),
+        ),
+        child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const AppSheetHeader(
@@ -63,7 +61,6 @@ class _SourcePickerSheet extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }

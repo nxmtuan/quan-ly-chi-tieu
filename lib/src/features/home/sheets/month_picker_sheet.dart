@@ -9,7 +9,7 @@ Future<DateTime?> showMonthPickerSheet(
     context: context,
     useRootNavigator: true,
     isScrollControlled: true,
-    useSafeArea: true,
+    useSafeArea: false,
     backgroundColor: Colors.transparent,
     builder: (context) {
       return _MonthPickerSheet(
@@ -52,16 +52,14 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
     final canGoNextYear = _displayedYear < widget.lastMonth.year;
 
     return AppSheetContainer(
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            context.scaled(16),
-            0,
-            context.scaled(16),
-            appSheetBottomPadding(context),
-          ),
-          child: Column(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          context.scaled(16),
+          0,
+          context.scaled(16),
+          appSheetBottomPadding(context),
+        ),
+        child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const AppSheetHeader(
@@ -176,7 +174,6 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
             ],
           ),
         ),
-      ),
     );
   }
 }

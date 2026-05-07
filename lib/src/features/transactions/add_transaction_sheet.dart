@@ -25,7 +25,7 @@ void showAddTransactionSheet(BuildContext context, {Transaction? transaction}) {
     context: context,
     useRootNavigator: true,
     isScrollControlled: true,
-    useSafeArea: true,
+    useSafeArea: false,
     backgroundColor: Colors.transparent,
     builder: (context) => AddTransactionSheet(transaction: transaction),
   );

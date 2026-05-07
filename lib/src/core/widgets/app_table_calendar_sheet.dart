@@ -11,7 +11,7 @@ Future<DateTime?> showAppCalendarSheet(
     context: context,
     useRootNavigator: true,
     isScrollControlled: true,
-    useSafeArea: true,
+    useSafeArea: false,
     backgroundColor: Colors.transparent,
     builder: (context) {
       return _CalendarBottomSheet(
@@ -63,16 +63,14 @@ class _CalendarBottomSheetState extends State<_CalendarBottomSheet> {
           offset: Offset(0, -context.scaled(6)),
         ),
       ],
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            context.scaled(16),
-            0,
-            context.scaled(16),
-            appSheetBottomPadding(context),
-          ),
-          child: Column(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          context.scaled(16),
+          0,
+          context.scaled(16),
+          appSheetBottomPadding(context),
+        ),
+        child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               AppSheetHeader(title: widget.title, subtitle: widget.subtitle),
@@ -99,7 +97,6 @@ class _CalendarBottomSheetState extends State<_CalendarBottomSheet> {
             ],
           ),
         ),
-      ),
     );
   }
 }

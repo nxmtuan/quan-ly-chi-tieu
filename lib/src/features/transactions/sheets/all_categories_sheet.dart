@@ -10,7 +10,7 @@ Future<Category?> showAllCategoriesSheet(
     context: context,
     useRootNavigator: true,
     isScrollControlled: true,
-    useSafeArea: true,
+    useSafeArea: false,
     backgroundColor: Colors.transparent,
     builder: (context) {
       return _AllCategoriesSheet(
@@ -49,16 +49,14 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
   @override
   Widget build(BuildContext context) {
     return AppSheetContainer(
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            context.scaled(16),
-            0,
-            context.scaled(16),
-            appSheetBottomPadding(context),
-          ),
-          child: Column(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          context.scaled(16),
+          0,
+          context.scaled(16),
+          appSheetBottomPadding(context),
+        ),
+        child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const AppSheetHeader(
@@ -115,7 +113,6 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
             ],
           ),
         ),
-      ),
     );
   }
 }
