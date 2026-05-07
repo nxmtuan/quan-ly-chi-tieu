@@ -55,8 +55,8 @@ class _CategoryTab extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.only(
-          top: context.scaled(8),
-          bottom: context.scaled(10),
+          top: context.scaled(12),
+          bottom: context.scaled(14),
         ),
         decoration: BoxDecoration(
           border: Border(
@@ -69,7 +69,7 @@ class _CategoryTab extends StatelessWidget {
         child: Text(
           label,
           textAlign: TextAlign.center,
-          style: context.appText.tabLabel.copyWith(
+          style: context.appText.sectionTitle.copyWith(
             color: isSelected ? color : AppColors.textSecondary,
           ),
         ),
