@@ -35,7 +35,7 @@ class CustomBottomNavBar extends StatelessWidget {
         context.scaled(10),
         0,
         context.scaled(10),
-        context.scaled(8),
+        context.scaled(8) + MediaQuery.paddingOf(context).bottom,
       ),
       padding: EdgeInsets.symmetric(
         horizontal: context.scaled(6),
