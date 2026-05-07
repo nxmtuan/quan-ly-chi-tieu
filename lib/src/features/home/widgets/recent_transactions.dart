@@ -142,11 +142,11 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
     ]..sort((a, b) => b.amount.compareTo(a.amount));
 
     return [
-      for (final entry in items.indexed)
+      for (final item in items)
         _CategoryAmountItem(
-          category: entry.$2.category,
-          amount: entry.$2.amount,
-          color: _modernChartPalette[entry.$1 % _modernChartPalette.length],
+          category: item.category,
+          amount: item.amount,
+          color: item.category.color,
         ),
     ];
   }

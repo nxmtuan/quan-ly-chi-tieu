@@ -40,7 +40,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
           final width = constraints.maxWidth;
           final chartSize = width < 360
               ? context.scaled(270)
-              : context.scaled(350);
+              : context.scaled(370);
           final isPieChart = _selectedChartView == _CategoryChartView.pie;
 
           return Column(
@@ -365,7 +365,7 @@ class _CategoryBadge extends StatelessWidget {
           width: context.scaled(selected ? 38 : 33),
           height: context.scaled(selected ? 38 : 33),
           decoration: BoxDecoration(
-            color: item.color,
+            color: Colors.white, // Keep white background to prevent transparency overlap
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
               color: Colors.white,
@@ -379,11 +379,17 @@ class _CategoryBadge extends StatelessWidget {
               ),
             ],
           ),
-          child: Center(
-            child: Icon(
-              item.category.iconData,
-              color: Colors.white,
-              size: context.scaled(selected ? 18 : 15),
+          child: Container(
+            decoration: BoxDecoration(
+              color: item.color.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Center(
+              child: Icon(
+                item.category.iconData,
+                color: item.color,
+                size: context.scaled(selected ? 18 : 15),
+              ),
             ),
           ),
         ),
@@ -405,7 +411,7 @@ class _BarCategoryIcon extends StatelessWidget {
         width: context.scaled(33),
         height: context.scaled(33),
         decoration: BoxDecoration(
-          color: item.color,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: Colors.white,
@@ -419,11 +425,17 @@ class _BarCategoryIcon extends StatelessWidget {
             ),
           ],
         ),
-        child: Center(
-          child: Icon(
-            item.category.iconData,
-            color: Colors.white,
-            size: context.scaled(15),
+        child: Container(
+          decoration: BoxDecoration(
+            color: item.color.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Center(
+            child: Icon(
+              item.category.iconData,
+              color: item.color,
+              size: context.scaled(15),
+            ),
           ),
         ),
       ),
