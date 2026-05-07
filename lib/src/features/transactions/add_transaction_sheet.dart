@@ -19,6 +19,7 @@ part 'widgets/transaction_sheet_fields.dart';
 part 'widgets/transaction_category_picker.dart';
 part 'sheets/source_picker_sheet.dart';
 part 'sheets/all_categories_sheet.dart';
+part 'sheets/transaction_confirmation_sheet.dart';
 
 void showAddTransactionSheet(BuildContext context, {Transaction? transaction}) {
   showModalBottomSheet<void>(
@@ -231,6 +232,27 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       date: _date,
       note: _noteController.text.trim(),
     );
+
+    final categories = ref.read(categoriesByTypeProvider(_type));
+    final category = categories.firstWhere(
+      (c) => c.id == _categoryId,
+      orElse: () => Category(
+        id: _categoryId!,
+        name: 'Khác',
+        iconData: Icons.category_rounded,
+        colorHex: AppColors.textSecondary.toARGB32(),
+        type: _type,
+      ),
+    );
+
+    final confirmed = await showTransactionConfirmationSheet(
+      context,
+      transaction: transaction,
+      category: category,
+      source: _source,
+    );
+
+    if (!confirmed) return;
 
     if (widget.transaction == null) {
       await ref.read(transactionsProvider.notifier).addTransaction(transaction);
