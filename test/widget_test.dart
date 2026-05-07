@@ -36,7 +36,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Tổng quan'), findsWidgets);
-    expect(find.text('Quản lý chi tiêu'), findsOneWidget);
+    expect(find.text('Quản lý tài chính'), findsOneWidget);
     expect(find.byType(SummaryCard), findsOneWidget);
     expect(find.byType(RecentTransactions), findsOneWidget);
   });

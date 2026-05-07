@@ -78,7 +78,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
-                                  'Quản lý chi tiêu',
+                                  'Quản lý tài chính',
                                   style: context.appText.pageTitle.copyWith(
                                     color: colors.onSurface,
                                     fontSize: context.scaledFont(27, min: 24),

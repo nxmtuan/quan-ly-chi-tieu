@@ -16,7 +16,7 @@ class ExpenseManagerApp extends ConsumerWidget {
     ref.watch(authProvider);
 
     return MaterialApp.router(
-      title: 'Quản lý chi tiêu',
+      title: 'Quản lý tài chính',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

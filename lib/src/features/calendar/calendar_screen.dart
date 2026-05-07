@@ -48,16 +48,28 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     return ListView(
           padding: EdgeInsets.fromLTRB(
             context.scaled(24),
-            context.scaled(16),
+            context.scaled(22),
             context.scaled(24),
             context.scaled(120) + MediaQuery.paddingOf(context).bottom,
           ),
           children: [
-            Text(
-              'Lịch giao dịch',
-              style: context.appText.pageTitle.copyWith(
-                fontSize: context.scaledFont(27, min: 24),
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Lịch',
+                  style: context.appText.pageEyebrow,
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  'Thống kê giao dịch',
+                  style: context.appText.pageTitle.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: context.scaledFont(27, min: 24),
+                    letterSpacing: -1.0 * context.adaptiveScale,
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: context.scaled(22)),
             AppTableCalendar(

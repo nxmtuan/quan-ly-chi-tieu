@@ -48,7 +48,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        'Quản lý chi tiêu',
+                        'Quản lý tài chính',
                         style: context.appText.pageTitle,
                       ),
                       const SizedBox(height: 10),
