@@ -69,10 +69,9 @@ class _MonthSelectorBar extends StatelessWidget {
                   SizedBox(width: context.scaled(11)),
                   Text(
                     formatMonthYear(displayedMonth),
-                    style: TextStyle(
+                    style: context.appText.cardTitle.copyWith(
                       color: colors.onSurface,
-                      fontSize: context.scaled(16),
-                      fontWeight: FontWeight.w700,
+                      fontSize: context.scaledFont(16, min: 15),
                       letterSpacing: -0.2 * scale,
                     ),
                   ),
@@ -125,11 +124,7 @@ class _BalanceBanner extends StatelessWidget {
       child: Text(
         'Dư: ${formatCurrency(balance)}',
         textAlign: TextAlign.center,
-        style: TextStyle(
-          color: AppColors.primary,
-          fontSize: context.scaled(17),
-          fontWeight: FontWeight.w700,
-        ),
+        style: context.appText.amountMD.copyWith(color: AppColors.primary),
       ),
     );
   }
@@ -198,11 +193,7 @@ class _SummaryMetricCard extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: context.scaled(15),
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: context.appText.cardTitle.copyWith(color: color),
                 ),
               ),
             ],
@@ -212,11 +203,9 @@ class _SummaryMetricCard extends StatelessWidget {
             formatCurrency(amount),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: context.appText.amountLG.copyWith(
               color: colors.onSurface,
-              fontSize: context.scaled(22),
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.8,
+              fontSize: context.scaledFont(22, min: 20),
             ),
           ),
         ],

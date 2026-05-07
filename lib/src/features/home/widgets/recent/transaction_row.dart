@@ -53,19 +53,15 @@ class _TransactionRow extends ConsumerWidget {
                       : transaction.note,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                  style: context.appText.fieldValue.copyWith(
                     color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   '${category?.name ?? 'Other'} • ${formatShortDate(transaction.date)}',
-                  style: const TextStyle(
+                  style: context.appText.caption.copyWith(
                     color: AppColors.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -77,10 +73,8 @@ class _TransactionRow extends ConsumerWidget {
             children: [
               Text(
                 '$sign${formatCurrency(transaction.amount)}',
-                style: TextStyle(
+                style: context.appText.bodyStrong.copyWith(
                   color: color,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
                 ),
               ),
               PopupMenuButton<String>(

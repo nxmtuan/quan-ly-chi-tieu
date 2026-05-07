@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../models/auth_user.dart';
 import '../../models/transaction.dart';
@@ -73,26 +74,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               children: [
                                 Text(
                                   'Tổng quan',
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        color: AppColors.primary.withValues(
-                                          alpha: 0.78,
-                                        ),
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                  style: context.appText.pageEyebrow,
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
                                   'Quản lý chi tiêu',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                        color: colors.onSurface,
-                                        fontSize: context.scaled(27),
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: -1.0 * scale,
-                                      ),
+                                  style: context.appText.pageTitle.copyWith(
+                                    color: colors.onSurface,
+                                    fontSize: context.scaledFont(27, min: 24),
+                                    letterSpacing: -1.0 * scale,
+                                  ),
                                 ),
                               ],
                             ),
@@ -287,10 +278,9 @@ class _AvatarFallback extends StatelessWidget {
     return Center(
       child: Text(
         label,
-        style: TextStyle(
+        style: context.appText.pageTitle.copyWith(
           color: AppColors.primary,
-          fontSize: context.scaled(22),
-          fontWeight: FontWeight.w700,
+          fontSize: context.scaledFont(22, min: 18),
           letterSpacing: -0.5,
         ),
       ),

@@ -69,10 +69,8 @@ class _CategoryTab extends StatelessWidget {
         child: Text(
           label,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: context.appText.tabLabel.copyWith(
             color: isSelected ? color : AppColors.textSecondary,
-            fontSize: context.scaled(13),
-            fontWeight: FontWeight.w700,
           ),
         ),
       ),
@@ -126,19 +124,15 @@ class _CategoryAmountRow extends StatelessWidget {
                       item.category.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: context.appText.bodyStrong.copyWith(
                         color: AppColors.textPrimary,
-                        fontSize: context.scaled(15),
-                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     SizedBox(height: context.scaled(3)),
                     Text(
                       '$percent%',
-                      style: TextStyle(
+                      style: context.appText.captionStrong.copyWith(
                         color: AppColors.textSecondary,
-                        fontSize: context.scaled(11),
-                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -146,10 +140,8 @@ class _CategoryAmountRow extends StatelessWidget {
               ),
               Text(
                 formatCurrency(item.amount),
-                style: TextStyle(
+                style: context.appText.bodyStrong.copyWith(
                   color: AppColors.textPrimary,
-                  fontSize: context.scaled(13),
-                  fontWeight: FontWeight.w700,
                 ),
               ),
               SizedBox(width: context.scaled(4)),

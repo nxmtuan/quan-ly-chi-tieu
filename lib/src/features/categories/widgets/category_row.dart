@@ -31,8 +31,7 @@ class _CategoryRow extends ConsumerWidget {
           Expanded(
             child: Text(
               category.name,
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
+              style: context.appText.bodyStrong.copyWith(
                 color: AppColors.textPrimary,
               ),
             ),

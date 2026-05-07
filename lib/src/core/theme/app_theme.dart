@@ -52,7 +52,38 @@ class AppTheme {
       bodyColor: textPrimary,
       displayColor: textPrimary,
     );
-    final textTheme = baseTextTheme;
+    final textTheme = baseTextTheme.copyWith(
+      headlineSmall: baseTextTheme.headlineSmall?.copyWith(
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.9,
+      ),
+      titleLarge: baseTextTheme.titleLarge?.copyWith(
+        fontSize: 17,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.25,
+      ),
+      titleMedium: baseTextTheme.titleMedium?.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+      ),
+      bodyMedium: baseTextTheme.bodyMedium?.copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      bodySmall: baseTextTheme.bodySmall?.copyWith(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+      ),
+      labelMedium: baseTextTheme.labelMedium?.copyWith(
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+      ),
+      labelSmall: baseTextTheme.labelSmall?.copyWith(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+      ),
+    );
 
     return ThemeData(
       useMaterial3: false,
@@ -88,8 +119,8 @@ class AppTheme {
         backgroundColor: background,
         foregroundColor: textPrimary,
         titleTextStyle: textTheme.titleLarge?.copyWith(
-          fontSize: 22,
-          fontWeight: FontWeight.w800,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
         ),
       ),
       splashColor: primary.withValues(alpha: 0.08),

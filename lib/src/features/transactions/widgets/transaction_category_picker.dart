@@ -36,11 +36,10 @@ class _CategoryPicker extends StatelessWidget {
           _RequiredLabel(label: 'Danh mục', color: actionColor),
           SizedBox(height: context.scaled(10)),
           if (categories.isEmpty)
-            const Text(
+            Text(
               'Chưa có danh mục',
-              style: TextStyle(
+              style: context.appText.bodyStrong.copyWith(
                 color: AppColors.textSecondary,
-                fontWeight: FontWeight.w700,
               ),
             )
           else

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_typography.dart';
+import '../../core/utils/adaptive.dart';
+
 class ComingSoonScreen extends StatelessWidget {
   const ComingSoonScreen({super.key, required this.title, required this.icon});
 
@@ -31,20 +34,17 @@ class ComingSoonScreen extends StatelessWidget {
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: context.appText.pageTitle.copyWith(
                     color: colors.onSurface,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
+                    fontSize: context.scaledFont(24, min: 22),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Tính năng này đang được phát triển.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: context.appText.pageSubtitle.copyWith(
                     color: colors.onSurface.withValues(alpha: 0.62),
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],

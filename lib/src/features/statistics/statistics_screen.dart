@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/flat_card.dart';
@@ -47,18 +48,15 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           children: [
             Text(
               'Statistics',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.7,
-                fontSize: context.scaled(27),
+              style: context.appText.pageTitle.copyWith(
+                fontSize: context.scaledFont(27, min: 24),
               ),
             ),
             SizedBox(height: context.scaled(8)),
-            const Text(
+            Text(
               'Track where your money goes',
-              style: TextStyle(
+              style: context.appText.pageSubtitle.copyWith(
                 color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
               ),
             ),
             SizedBox(height: context.scaled(22)),
@@ -74,10 +72,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             SizedBox(height: context.scaled(24)),
             Text(
               'Breakdown',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.5,
-              ),
+              style: context.appText.sectionTitle,
             ),
             SizedBox(height: context.scaled(16)),
             if (breakdown.isEmpty)

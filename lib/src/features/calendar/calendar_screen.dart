@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_table_calendar.dart';
@@ -54,10 +55,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           children: [
             Text(
               'Lịch giao dịch',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.7,
-                fontSize: context.scaled(27),
+              style: context.appText.pageTitle.copyWith(
+                fontSize: context.scaledFont(27, min: 24),
               ),
             ),
             SizedBox(height: context.scaled(22)),
@@ -89,18 +88,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 children: [
                   Text(
                     _calendarHeadline(_selectedDay),
-                    style: TextStyle(
+                    style: context.appText.sectionTitle.copyWith(
                       color: AppColors.textPrimary,
-                      fontSize: context.scaled(17),
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   SizedBox(height: context.scaled(6)),
                   Text(
                     formatLongDate(_selectedDay),
-                    style: const TextStyle(
+                    style: context.appText.secondaryStrong.copyWith(
                       color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   SizedBox(height: context.scaled(16)),
@@ -197,19 +193,13 @@ class _MetricPill extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: color,
-              fontSize: context.scaled(11),
-              fontWeight: FontWeight.w700,
-            ),
+            style: context.appText.captionStrong.copyWith(color: color),
           ),
           SizedBox(height: context.scaled(6)),
           Text(
             formatCurrency(amount),
-            style: TextStyle(
+            style: context.appText.amountMD.copyWith(
               color: AppColors.textPrimary,
-              fontSize: context.scaled(15),
-              fontWeight: FontWeight.w700,
             ),
           ),
         ],

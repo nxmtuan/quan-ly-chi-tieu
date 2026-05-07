@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
 import '../utils/adaptive.dart';
 
 double appSheetBottomPadding(BuildContext context, {double extra = 0}) {
@@ -89,21 +90,16 @@ class AppSheetHeader extends StatelessWidget {
                       title,
                       style:
                           titleStyle ??
-                          TextStyle(
+                          context.appText.sheetTitle.copyWith(
                             color: AppColors.textPrimary,
-                            fontSize: context.scaled(20),
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.5,
                           ),
                     ),
                     if (subtitle != null) ...[
                       SizedBox(height: context.scaled(6)),
                       Text(
                         subtitle!,
-                        style: TextStyle(
+                        style: context.appText.sheetSubtitle.copyWith(
                           color: AppColors.textSecondary,
-                          fontSize: context.scaledFont(13, min: 12),
-                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -208,11 +204,7 @@ class AppPrimaryButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: TextStyle(
-            fontSize: context.scaledFont(16, min: 14),
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.4,
-          ),
+          style: context.appText.buttonLabel,
         ),
       ),
     );

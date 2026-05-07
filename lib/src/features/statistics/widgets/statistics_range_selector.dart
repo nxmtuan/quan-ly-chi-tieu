@@ -35,12 +35,11 @@ class _RangeSelector extends StatelessWidget {
                   child: Text(
                     range,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: context.appText.bodyStrong.copyWith(
                       color: selectedRange == range
                           ? Colors.white
                           : AppColors.textSecondary,
-                      fontSize: context.scaled(13),
-                      fontWeight: FontWeight.w700,
+                      fontSize: context.scaledFont(13, min: 12),
                     ),
                   ),
                 ),

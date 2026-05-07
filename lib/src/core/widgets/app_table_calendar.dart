@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
 import '../utils/adaptive.dart';
 import 'app_sheet.dart';
 import 'flat_card.dart';
@@ -71,7 +72,7 @@ class AppTableCalendar extends StatelessWidget {
           ),
           titleTextStyle: TextStyle(
             color: colors.onSurface,
-            fontSize: context.scaled(18),
+            fontSize: context.scaledFont(18, min: 16),
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
           ),
@@ -95,22 +96,26 @@ class AppTableCalendar extends StatelessWidget {
           defaultTextStyle: TextStyle(
             color: colors.onSurface,
             fontWeight: FontWeight.w700,
+            fontSize: context.scaledFont(13, min: 12),
           ),
           weekendTextStyle: TextStyle(
             color: colors.onSurface.withValues(alpha: 0.8),
             fontWeight: FontWeight.w700,
+            fontSize: context.scaledFont(13, min: 12),
           ),
           outsideTextStyle: TextStyle(
             color: colors.onSurface.withValues(alpha: 0.28),
             fontWeight: FontWeight.w600,
+            fontSize: context.scaledFont(13, min: 12),
           ),
           todayTextStyle: TextStyle(
             color: colors.primary,
             fontWeight: FontWeight.w700,
+            fontSize: context.scaledFont(13, min: 12),
           ),
-          selectedTextStyle: const TextStyle(
+          selectedTextStyle: context.appText.bodyStrong.copyWith(
             color: Colors.white,
-            fontWeight: FontWeight.w700,
+            fontSize: context.scaledFont(13, min: 12),
           ),
           todayDecoration: BoxDecoration(
             color: colors.primary.withValues(alpha: isDark ? 0.26 : 0.12),

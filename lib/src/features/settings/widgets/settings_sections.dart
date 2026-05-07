@@ -112,8 +112,7 @@ class _AuthSettingsRow extends ConsumerWidget {
                         children: [
                           Text(
                             'Tài khoản',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
+                            style: context.appText.bodyStrong.copyWith(
                               color: AppColors.textPrimary,
                               fontSize: context.scaledFont(15, min: 14),
                             ),
@@ -121,10 +120,8 @@ class _AuthSettingsRow extends ConsumerWidget {
                           SizedBox(height: context.scaled(5)),
                           Text(
                             'Kết nối tài khoản Google',
-                            style: TextStyle(
+                            style: context.appText.caption.copyWith(
                               color: AppColors.textSecondary,
-                              fontSize: context.scaledFont(12, min: 12),
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -207,15 +204,15 @@ class _SettingsTipCard extends StatelessWidget {
             ),
           ),
           SizedBox(width: context.scaled(14)),
-          const Expanded(
-            child: Text(
-              'Ghi lại các khoản chi nhỏ mỗi ngày để có bức tranh tài chính rõ hơn.',
-              style: TextStyle(
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+          Expanded(
+              child: Text(
+                'Ghi lại các khoản chi nhỏ mỗi ngày để có bức tranh tài chính rõ hơn.',
+                style: context.appText.bodyStrong.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -275,8 +272,7 @@ class _SettingsRow extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
+                    style: context.appText.bodyStrong.copyWith(
                       color: AppColors.textPrimary,
                       fontSize: context.scaledFont(15, min: 14),
                     ),
@@ -284,10 +280,8 @@ class _SettingsRow extends StatelessWidget {
                   SizedBox(height: context.scaled(5)),
                   Text(
                     subtitle,
-                    style: TextStyle(
+                    style: context.appText.caption.copyWith(
                       color: AppColors.textSecondary,
-                      fontSize: context.scaledFont(12, min: 12),
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -442,7 +436,7 @@ class _ThemeModeOption extends StatelessWidget {
             Text(
               label,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: context.appText.bodyStrong.copyWith(
                 color: color,
                 fontSize: context.scaledFont(13, min: 12),
                 fontWeight: FontWeight.w800,

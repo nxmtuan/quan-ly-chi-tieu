@@ -214,9 +214,8 @@ class _RequiredLabel extends StatelessWidget {
           ),
         ],
       ),
-      style: const TextStyle(
-        color: Color(0xFF4B5563),
-        fontSize: 12,
+      style: context.appText.fieldLabel.copyWith(
+        color: const Color(0xFF4B5563),
         fontWeight: FontWeight.w800,
       ),
     );
@@ -251,19 +250,15 @@ class _AmountCard extends StatelessWidget {
                   controller: controller,
                   keyboardType: TextInputType.number,
                   inputFormatters: const [_AmountInputFormatter()],
-                  style: TextStyle(
+                  style: context.appText.amountXL.copyWith(
                     color: AppColors.textPrimary,
-                    fontSize: context.scaled(28),
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.7,
+                    fontSize: context.scaledFont(28, min: 24),
                   ),
                   decoration: InputDecoration(
                     hintText: '0',
-                    hintStyle: TextStyle(
+                    hintStyle: context.appText.amountXL.copyWith(
                       color: AppColors.textPrimary,
-                      fontSize: context.scaled(28),
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.7,
+                      fontSize: context.scaledFont(28, min: 24),
                     ),
                     filled: false,
                     fillColor: Colors.transparent,
@@ -280,11 +275,9 @@ class _AmountCard extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: context.scaled(3)),
                 child: Text(
                   'đ',
-                  style: TextStyle(
+                  style: context.appText.amountXL.copyWith(
                     color: AppColors.textPrimary,
-                    fontSize: context.scaled(28),
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.7,
+                    fontSize: context.scaledFont(28, min: 24),
                   ),
                 ),
               ),
@@ -348,27 +341,21 @@ class _NoteCard extends StatelessWidget {
               children: [
                 Text(
                   'Ghi chú',
-                  style: TextStyle(
-                    color: Color(0xFF4B5563),
-                    fontSize: context.scaledFont(12, min: 12),
-                    fontWeight: FontWeight.w700,
+                  style: context.appText.fieldLabel.copyWith(
+                    color: const Color(0xFF4B5563),
                   ),
                 ),
                 SizedBox(height: context.scaled(4)),
                 TextField(
                   controller: controller,
                   textCapitalization: TextCapitalization.sentences,
-                  style: TextStyle(
+                  style: context.appText.fieldValue.copyWith(
                     color: AppColors.textPrimary,
-                    fontSize: context.scaled(13),
-                    fontWeight: FontWeight.w800,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Nhập mô tả giao dịch',
-                    hintStyle: TextStyle(
-                      color: Color(0xFFB3BAC8),
-                      fontSize: context.scaled(13),
-                      fontWeight: FontWeight.w700,
+                    hintStyle: context.appText.fieldValue.copyWith(
+                      color: const Color(0xFFB3BAC8),
                     ),
                     filled: false,
                     fillColor: Colors.transparent,
@@ -420,10 +407,8 @@ class _SourceTrigger extends StatelessWidget {
                   SizedBox(height: context.scaled(6)),
                   Text(
                     source,
-                    style: TextStyle(
+                    style: context.appText.fieldValue.copyWith(
                       color: AppColors.textPrimary,
-                      fontSize: context.scaledFont(15, min: 14),
-                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
@@ -473,10 +458,8 @@ class _DateTrigger extends StatelessWidget {
                   SizedBox(height: context.scaled(6)),
                   Text(
                     _dateLabel(date),
-                    style: TextStyle(
+                    style: context.appText.fieldValue.copyWith(
                       color: AppColors.textPrimary,
-                      fontSize: context.scaledFont(15, min: 14),
-                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
@@ -519,10 +502,8 @@ class _RequiredStaticLabel extends StatelessWidget {
           ),
         ],
       ),
-      style: const TextStyle(
-        color: Color(0xFF4B5563),
-        fontSize: 12,
-        fontWeight: FontWeight.w700,
+      style: context.appText.fieldLabel.copyWith(
+        color: const Color(0xFF4B5563),
       ),
     );
   }

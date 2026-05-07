@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../models/category.dart';
@@ -40,10 +41,7 @@ class CategoriesScreen extends ConsumerWidget {
           for (final type in TransactionType.values) ...[
             Text(
               type == TransactionType.income ? 'Income' : 'Expense',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.4,
-              ),
+              style: context.appText.sectionTitle,
             ),
             SizedBox(height: context.scaled(12)),
             for (final category in categories.where(

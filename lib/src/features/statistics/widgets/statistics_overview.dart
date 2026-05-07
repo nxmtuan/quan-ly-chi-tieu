@@ -25,9 +25,8 @@ class _ExpenseOverviewCard extends StatelessWidget {
               ),
               Text(
                 formatCurrency(totalExpense),
-                style: const TextStyle(
+                style: context.appText.bodyStrong.copyWith(
                   color: AppColors.danger,
-                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -35,13 +34,12 @@ class _ExpenseOverviewCard extends StatelessWidget {
           SizedBox(height: context.scaled(18)),
           SizedBox(
             height: context.scaled(208),
-            child: totalExpense == 0
-                ? const Center(
+                child: totalExpense == 0
+                ? Center(
                     child: Text(
                       'No expense data yet',
-                      style: TextStyle(
+                      style: context.appText.bodyStrong.copyWith(
                         color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   )

@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/widgets/gradient_button.dart';
 import '../../providers/auth_provider.dart';
 import 'google_web_sign_in_button.dart';
@@ -48,19 +49,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       const SizedBox(height: 24),
                       Text(
                         'Quản lý chi tiêu',
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.8,
-                            ),
+                        style: context.appText.pageTitle,
                       ),
                       const SizedBox(height: 10),
                       Text(
                         'Đăng nhập bằng Google để lưu dữ liệu cá nhân trên thiết bị này.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        style: context.appText.pageSubtitle.copyWith(
                           color: colors.onSurface.withValues(alpha: 0.64),
-                          fontWeight: FontWeight.w600,
-                          height: 1.5,
                         ),
                       ),
                       const SizedBox(height: 28),
@@ -82,9 +77,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 14),
                         Text(
                           _errorMessage!,
-                          style: const TextStyle(
+                          style: context.appText.bodyStrong.copyWith(
                             color: AppColors.danger,
-                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],

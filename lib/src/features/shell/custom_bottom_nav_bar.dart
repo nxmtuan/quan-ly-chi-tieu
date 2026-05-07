@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
@@ -199,8 +200,8 @@ class _NavButton extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: selected ? colors.primary : inactiveColor,
-                fontSize: context.scaledFont(10.5, min: 11),
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w700,
+                fontSize: context.appText.navLabel.fontSize,
+                fontWeight: context.appText.navLabel.fontWeight,
               ),
             ),
           ],

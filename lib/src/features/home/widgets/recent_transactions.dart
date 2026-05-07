@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/adaptive.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/flat_card.dart';
@@ -80,9 +81,8 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
                     _selectedType == TransactionType.expense
                         ? 'Chưa có khoản chi nào'
                         : 'Chưa có khoản thu nào',
-                    style: const TextStyle(
+                    style: context.appText.bodyStrong.copyWith(
                       color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 )

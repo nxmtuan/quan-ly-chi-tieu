@@ -32,8 +32,7 @@ class _BreakdownRow extends StatelessWidget {
               children: [
                 Text(
                   item.category.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
+                  style: context.appText.bodyStrong.copyWith(
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -58,18 +57,15 @@ class _BreakdownRow extends StatelessWidget {
             children: [
               Text(
                 '${item.percentage.toStringAsFixed(0)}%',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
+                style: context.appText.bodyStrong.copyWith(
                   color: AppColors.textPrimary,
                 ),
               ),
               SizedBox(height: context.scaled(5)),
               Text(
                 formatCurrency(item.amount),
-                style: TextStyle(
+                style: context.appText.captionStrong.copyWith(
                   color: AppColors.textSecondary,
-                  fontSize: context.scaled(11),
-                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],

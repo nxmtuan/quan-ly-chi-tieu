@@ -48,14 +48,11 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
             children: [
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Cơ cấu chi tiêu',
-                      style: TextStyle(
+                      style: context.appText.sectionTitle.copyWith(
                         color: AppColors.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
                       ),
                     ),
                   ),
@@ -278,7 +275,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
             style: TextStyle(
               color: item.color,
               fontWeight: FontWeight.w700,
-              fontSize: 16,
+              fontSize: context.scaledFont(16, min: 13),
               shadows: const [
                 Shadow(
                   color: Colors.white,
@@ -338,7 +335,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
       badgePositionPercentageOffset: 0.98,
       titleStyle: TextStyle(
         color: Colors.white,
-        fontSize: context.scaled(isTouched ? 14 : 12),
+        fontSize: context.scaledFont(isTouched ? 14 : 12, min: 12),
         fontWeight: FontWeight.w700,
         shadows: const [
           Shadow(color: Colors.black38, blurRadius: 4, offset: Offset(0, 1)),

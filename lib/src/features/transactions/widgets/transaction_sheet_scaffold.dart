@@ -30,11 +30,8 @@ class _SheetHeader extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
+                  style: context.appText.sheetTitle.copyWith(
                     color: AppColors.textPrimary,
-                    fontSize: context.scaled(20),
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.5,
                   ),
                 ),
               ),

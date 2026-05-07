@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/flat_card.dart';
@@ -33,18 +34,15 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             Text(
               'Cài đặt',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.primary.withValues(alpha: 0.78),
-                fontWeight: FontWeight.w700,
-              ),
+              style: context.appText.pageEyebrow,
             ),
             SizedBox(height: context.scaled(5)),
             Text(
               'Tuỳ chỉnh ứng dụng',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              style: context.appText.pageTitle.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: -1.0,
-                fontSize: context.scaled(27),
+                fontSize: context.scaledFont(27, min: 24),
               ),
             ),
             SizedBox(height: context.scaled(24)),
