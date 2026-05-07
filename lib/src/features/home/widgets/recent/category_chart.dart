@@ -39,8 +39,8 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
         builder: (context, constraints) {
           final width = constraints.maxWidth;
           final chartSize = width < 360
-              ? context.scaled(188)
-              : context.scaled(212);
+              ? context.scaled(270)
+              : context.scaled(350);
           final isPieChart = _selectedChartView == _CategoryChartView.pie;
 
           return Column(
@@ -263,7 +263,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
       barRods: [
         BarChartRodData(
           toY: item.amount,
-          width: isTouched ? 30 : 24,
+          width: isTouched ? context.scaled(36) : context.scaled(30),
           gradient: LinearGradient(
             colors: [item.color.withValues(alpha: 0.62), item.color],
             begin: Alignment.bottomCenter,

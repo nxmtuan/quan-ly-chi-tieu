@@ -46,7 +46,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
     final categories = ref.watch(categoriesProvider);
     final items = _buildCategoryItems(categories);
     final total = items.fold<double>(0, (sum, item) => sum + item.amount);
-    final chartHeight = context.scaled(312);
+    final chartHeight = context.scaled(405);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
