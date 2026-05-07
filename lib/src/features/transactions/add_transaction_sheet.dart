@@ -20,6 +20,7 @@ part 'widgets/transaction_category_picker.dart';
 part 'sheets/source_picker_sheet.dart';
 part 'sheets/all_categories_sheet.dart';
 part 'sheets/transaction_confirmation_sheet.dart';
+part 'sheets/transaction_detail_sheet.dart';
 
 void showAddTransactionSheet(BuildContext context, {Transaction? transaction}) {
   showModalBottomSheet<void>(

@@ -32,8 +32,9 @@ const _modernChartPalette = [
 ];
 
 class RecentTransactions extends ConsumerStatefulWidget {
-  const RecentTransactions({super.key, required this.transactions});
+  const RecentTransactions({super.key, required this.month, required this.transactions});
 
+  final DateTime month;
   final List<Transaction> transactions;
 
   @override
@@ -93,6 +94,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
               child: _CategoryAmountRow(
                     item: entry.$2,
                     total: total,
+                    month: widget.month,
                     transactions: widget.transactions,
                     showDivider: false,
                   )

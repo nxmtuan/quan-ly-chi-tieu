@@ -141,7 +141,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               context.scaled(100) + MediaQuery.paddingOf(context).bottom,
             ),
             sliver: SliverToBoxAdapter(
-              child: RecentTransactions(transactions: transactions)
+              child: RecentTransactions(
+                month: _selectedMonth,
+                transactions: transactions,
+              )
                   .animate(delay: 150.ms)
                   .fadeIn(duration: 320.ms)
                   .slideY(

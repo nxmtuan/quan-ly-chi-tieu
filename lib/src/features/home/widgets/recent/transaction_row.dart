@@ -26,81 +26,80 @@ class _TransactionRow extends ConsumerWidget {
     final sign = transaction.isExpense ? '-' : '+';
 
     return FlatCard(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: EdgeInsets.zero,
       radius: 24,
-      child: Row(
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: (category?.color ?? color).withValues(alpha: 0.13),
-              borderRadius: BorderRadius.circular(19),
-            ),
-            child: Icon(
-              category?.iconData ?? Icons.wallet_rounded,
-              color: category?.color ?? color,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.note.isEmpty
-                      ? category?.name ?? 'Transaction'
-                      : transaction.note,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.appText.fieldValue.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '${category?.name ?? 'Other'} • ${formatShortDate(transaction.date)}',
-                  style: context.appText.caption.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+      child: InkWell(
+        onTap: () {
+          if (category != null) {
+            showTransactionDetailSheet(
+              context,
+              transaction: transaction,
+              category: category!,
+            );
+          }
+        },
+        borderRadius: BorderRadius.circular(24),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
             children: [
-              Text(
-                '$sign${formatCurrency(transaction.amount)}',
-                style: context.appText.bodyStrong.copyWith(
-                  color: color,
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: (category?.color ?? color).withValues(alpha: 0.13),
+                  borderRadius: BorderRadius.circular(19),
+                ),
+                child: Icon(
+                  category?.iconData ?? Icons.wallet_rounded,
+                  color: category?.color ?? color,
                 ),
               ),
-              PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                onSelected: (value) {
-                  if (value == 'edit') {
-                    showAddTransactionSheet(context, transaction: transaction);
-                  }
-                  if (value == 'delete') {
-                    ref
-                        .read(transactionsProvider.notifier)
-                        .deleteTransaction(transaction.id);
-                  }
-                },
-                itemBuilder: (context) => const [
-                  PopupMenuItem(value: 'edit', child: Text('Edit')),
-                  PopupMenuItem(value: 'delete', child: Text('Delete')),
-                ],
-                child: const Icon(
-                  Icons.more_horiz_rounded,
-                  color: AppColors.textSecondary,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      transaction.note.isEmpty
+                          ? category?.name ?? 'Transaction'
+                          : transaction.note,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.appText.fieldValue.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${category?.name ?? 'Other'} • ${formatShortDate(transaction.date)}',
+                      style: context.appText.caption.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '$sign${formatCurrency(transaction.amount)}',
+                    style: context.appText.bodyStrong.copyWith(
+                      color: color,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: AppColors.textSecondary,
+                    size: 20,
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

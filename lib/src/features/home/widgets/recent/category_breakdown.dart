@@ -120,12 +120,14 @@ class _CategoryAmountRow extends StatelessWidget {
     required this.item,
     required this.total,
     required this.showDivider,
+    required this.month,
     required this.transactions,
   });
 
   final _CategoryAmountItem item;
   final double total;
   final bool showDivider;
+  final DateTime month;
   final List<Transaction> transactions;
 
   @override
@@ -143,7 +145,7 @@ class _CategoryAmountRow extends StatelessWidget {
           showCategoryTransactionsSheet(
             context,
             category: item.category,
-            transactions: transactions,
+            month: month,
           );
         },
         borderRadius: BorderRadius.circular(context.scaled(24)),

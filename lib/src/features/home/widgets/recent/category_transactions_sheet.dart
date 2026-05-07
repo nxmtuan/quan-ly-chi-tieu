@@ -3,7 +3,7 @@ part of '../recent_transactions.dart';
 void showCategoryTransactionsSheet(
   BuildContext context, {
   required Category category,
-  required List<Transaction> transactions,
+  required DateTime month,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -14,25 +14,30 @@ void showCategoryTransactionsSheet(
     builder: (context) {
       return _CategoryTransactionsSheet(
         category: category,
-        transactions: transactions,
+        month: month,
       );
     },
   );
 }
 
-class _CategoryTransactionsSheet extends StatelessWidget {
+class _CategoryTransactionsSheet extends ConsumerWidget {
   const _CategoryTransactionsSheet({
     required this.category,
-    required this.transactions,
+    required this.month,
   });
 
   final Category category;
-  final List<Transaction> transactions;
+  final DateTime month;
 
   @override
-  Widget build(BuildContext context) {
-    final categoryTransactions = transactions
-        .where((t) => t.categoryId == category.id && t.type == category.type)
+  Widget build(BuildContext context, WidgetRef ref) {
+    final allTransactions = ref.watch(transactionsProvider);
+    final categoryTransactions = allTransactions
+        .where((t) =>
+            t.categoryId == category.id &&
+            t.type == category.type &&
+            t.date.year == month.year &&
+            t.date.month == month.month)
         .toList()
       ..sort((a, b) => b.date.compareTo(a.date));
 
@@ -56,7 +61,7 @@ class _CategoryTransactionsSheet extends StatelessWidget {
             children: [
               AppSheetHeader(
                 title: category.name,
-                subtitle: 'Tổng: ${formatCurrency(total)} đ',
+                subtitle: 'Tổng: ${formatCurrency(total)}',
               ),
               SizedBox(height: context.scaled(16)),
               if (categoryTransactions.isEmpty)
