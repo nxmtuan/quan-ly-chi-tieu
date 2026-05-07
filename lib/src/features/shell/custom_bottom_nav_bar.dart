@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -30,49 +32,77 @@ class CustomBottomNavBar extends StatelessWidget {
     ];
 
     return Container(
-      height: context.scaled(68),
       margin: EdgeInsets.fromLTRB(
         context.scaled(10),
         0,
         context.scaled(10),
         context.scaled(8) + MediaQuery.paddingOf(context).bottom,
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: context.scaled(6),
-        vertical: context.scaled(6),
-      ),
-      decoration: BoxDecoration(
-        color: barColor,
-        borderRadius: BorderRadius.circular(context.scaled(27)),
-        boxShadow: [
-          BoxShadow(
-            color: colors.primary.withValues(alpha: isDark ? 0.18 : 0.08),
-            blurRadius: context.scaled(isDark ? 12 : 16),
-            offset: Offset(0, context.scaled(6)),
-          ),
-        ],
-      ),
-      child: Row(
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          for (var index = 0; index < items.length; index++)
-            Expanded(
-              child:
-                  _NavButton(
-                        item: items[index],
-                        selected: currentIndex == index,
-                        onTap: items[index].isAction
-                            ? onAddTransaction
-                            : () => onTap(index),
-                      )
-                      .animate(delay: Duration(milliseconds: 50 * index))
-                      .fadeIn(duration: 220.ms)
-                      .slideY(
-                        begin: 0.16,
-                        end: 0,
-                        duration: 280.ms,
-                        curve: Curves.easeOutCubic,
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(context.scaled(27)),
+                boxShadow: [
+                  BoxShadow(
+                    color: colors.shadow.withValues(alpha: isDark ? 0.4 : 0.12),
+                    blurRadius: context.scaled(isDark ? 16 : 24),
+                    offset: Offset(0, context.scaled(8)),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(context.scaled(27)),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: barColor.withValues(alpha: isDark ? 0.1 : 0.15),
+                      borderRadius: BorderRadius.circular(context.scaled(27)),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.12)
+                            : Colors.white.withValues(alpha: 0.5),
+                        width: context.scaled(1.2),
                       ),
+                    ),
+                  ),
+                ),
+              ),
             ),
+          ),
+          Container(
+            height: context.scaled(68),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.scaled(6),
+              vertical: context.scaled(6),
+            ),
+            child: Row(
+              children: [
+                for (var index = 0; index < items.length; index++)
+                  Expanded(
+                    child:
+                        _NavButton(
+                              item: items[index],
+                              selected: currentIndex == index,
+                              onTap: items[index].isAction
+                                  ? onAddTransaction
+                                  : () => onTap(index),
+                            )
+                            .animate(delay: Duration(milliseconds: 50 * index))
+                            .fadeIn(duration: 220.ms)
+                            .slideY(
+                              begin: 0.16,
+                              end: 0,
+                              duration: 280.ms,
+                              curve: Curves.easeOutCubic,
+                            ),
+                  ),
+              ],
+            ),
+          ),
         ],
       ),
     );

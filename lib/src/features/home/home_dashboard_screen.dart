@@ -138,7 +138,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               context.scaled(24),
               context.scaled(16),
               context.scaled(24),
-              context.scaled(100),
+              context.scaled(100) + MediaQuery.paddingOf(context).bottom,
             ),
             sliver: SliverToBoxAdapter(
               child: RecentTransactions(transactions: transactions)

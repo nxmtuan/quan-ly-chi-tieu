@@ -29,7 +29,7 @@ class SettingsScreen extends ConsumerWidget {
             context.scaled(24),
             context.scaled(16),
             context.scaled(24),
-            context.scaled(120),
+            context.scaled(120) + MediaQuery.paddingOf(context).bottom,
           ),
           children: [
             Text(

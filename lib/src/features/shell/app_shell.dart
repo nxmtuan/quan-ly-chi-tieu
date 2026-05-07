@@ -15,7 +15,8 @@ class AppShell extends StatelessWidget {
     final currentIndex = _indexForPath(GoRouterState.of(context).uri.path);
 
     return Scaffold(
-      body: SafeArea(child: child),
+      extendBody: true,
+      body: SafeArea(bottom: false, child: child),
       bottomNavigationBar:
           CustomBottomNavBar(
                 currentIndex: currentIndex,
