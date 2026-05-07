@@ -58,52 +58,50 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
               : _CategoryDonutChart(items: items, total: total),
         ),
         SizedBox(height: context.scaled(16)),
-        FlatCard(
-          padding: EdgeInsets.zero,
-          radius: context.scaled(22),
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: context.scaled(18)),
-                child: _CategoryTabs(
-                  selectedType: _selectedType,
-                  onSelected: (type) {
-                    setState(() {
-                      _selectedType = type;
-                    });
-                  },
+        _CategoryTabs(
+          selectedType: _selectedType,
+          onSelected: (type) {
+            setState(() {
+              _selectedType = type;
+            });
+          },
+        ),
+        SizedBox(height: context.scaled(16)),
+        if (items.isEmpty)
+          FlatCard(
+            radius: context.scaled(22),
+            child: Padding(
+              padding: EdgeInsets.all(context.scaled(20)),
+              child: Center(
+                child: Text(
+                  _selectedType == TransactionType.expense
+                      ? 'Chưa có khoản chi nào'
+                      : 'Chưa có khoản thu nào',
+                  style: context.appText.bodyStrong.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
-              if (items.isEmpty)
-                Padding(
-                  padding: EdgeInsets.all(context.scaled(20)),
-                  child: Text(
-                    _selectedType == TransactionType.expense
-                        ? 'Chưa có khoản chi nào'
-                        : 'Chưa có khoản thu nào',
-                    style: context.appText.bodyStrong.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+            ),
+          )
+        else
+          for (final entry in items.indexed)
+            Padding(
+              padding: EdgeInsets.only(bottom: context.scaled(12)),
+              child: _CategoryAmountRow(
+                    item: entry.$2,
+                    total: total,
+                    showDivider: false,
+                  )
+                  .animate(delay: Duration(milliseconds: 38 * entry.$1))
+                  .fadeIn(duration: 240.ms)
+                  .slideX(
+                    begin: 0.04,
+                    end: 0,
+                    duration: 280.ms,
+                    curve: Curves.easeOutCubic,
                   ),
-                )
-              else
-                for (final entry in items.indexed)
-                  _CategoryAmountRow(
-                        item: entry.$2,
-                        total: total,
-                        showDivider: entry.$1 != items.length - 1,
-                      )
-                      .animate(delay: Duration(milliseconds: 38 * entry.$1))
-                      .fadeIn(duration: 240.ms)
-                      .slideX(
-                        begin: 0.04,
-                        end: 0,
-                        duration: 280.ms,
-                        curve: Curves.easeOutCubic,
-                      ),
-            ],
-          ),
-        ),
+            ),
       ],
     );
   }
