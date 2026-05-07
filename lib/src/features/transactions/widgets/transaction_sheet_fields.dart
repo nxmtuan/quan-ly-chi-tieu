@@ -152,10 +152,9 @@ class _TypeButton extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+                style: context.appText.captionStrong.copyWith(
                   color: selected ? color : const Color(0xFF4B5563),
                   fontSize: context.scaledFont(12, min: 12),
-                  fontWeight: FontWeight.w700,
                   letterSpacing: -0.3,
                 ),
               ),
@@ -210,7 +209,7 @@ class _RequiredLabel extends StatelessWidget {
         children: [
           TextSpan(
             text: '*',
-            style: TextStyle(color: color),
+            style: context.appText.fieldLabel.copyWith(color: color),
           ),
         ],
       ),
@@ -495,10 +494,12 @@ class _RequiredStaticLabel extends StatelessWidget {
     return Text.rich(
       TextSpan(
         text: label,
-        children: const [
+        children: [
           TextSpan(
             text: '*',
-            style: TextStyle(color: Color(0xFFFF1493)),
+            style: context.appText.fieldLabel.copyWith(
+              color: const Color(0xFFFF1493),
+            ),
           ),
         ],
       ),

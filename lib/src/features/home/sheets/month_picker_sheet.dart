@@ -85,10 +85,9 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                     child: Text(
                       '$_displayedYear',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: context.appText.sectionTitle.copyWith(
                         color: AppColors.textPrimary,
-                        fontSize: context.scaled(18),
-                        fontWeight: FontWeight.w700,
+                        fontSize: context.scaledFont(18, min: 16),
                       ),
                     ),
                   ),
@@ -154,13 +153,13 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                       alignment: Alignment.center,
                       child: Text(
                         'Tháng $month',
-                        style: TextStyle(
+                        style: context.appText.bodyStrong.copyWith(
                           color: isSelected
                               ? Colors.white
                               : isDisabled
                               ? AppColors.textSecondary.withValues(alpha: 0.4)
                               : AppColors.textPrimary,
-                          fontSize: context.scaled(12),
+                          fontSize: context.scaledFont(12, min: 12),
                           fontWeight: FontWeight.w800,
                         ),
                       ),

@@ -19,9 +19,9 @@ class _ExpenseOverviewCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Expense Overview',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+                style: context.appText.sectionTitle,
               ),
               Text(
                 formatCurrency(totalExpense),
@@ -57,7 +57,7 @@ class _ExpenseOverviewCard extends StatelessWidget {
                             title: '${item.percentage.toStringAsFixed(0)}%',
                             titleStyle: TextStyle(
                               color: Colors.white,
-                              fontSize: context.scaled(11),
+                              fontSize: context.scaledFont(12, min: 12),
                               fontWeight: FontWeight.w700,
                             ),
                           ),

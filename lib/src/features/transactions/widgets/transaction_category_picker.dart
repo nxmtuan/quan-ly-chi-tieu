@@ -157,10 +157,9 @@ class _CategoryTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: context.appText.captionStrong.copyWith(
                   color: selected ? actionColor : AppColors.textPrimary,
                   fontSize: context.scaledFont(12, min: 12),
-                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -204,10 +203,9 @@ class _MoreCategoriesTile extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: context.appText.captionStrong.copyWith(
                 color: AppColors.textPrimary,
                 fontSize: context.scaledFont(12, min: 12),
-                fontWeight: FontWeight.w700,
               ),
             ),
           ],

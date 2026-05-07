@@ -124,7 +124,7 @@ class _SourceSheetOption extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: context.appText.bodyStrong.copyWith(
                 color: color,
                 fontSize: context.scaledFont(13, min: 12),
                 fontWeight: FontWeight.w800,

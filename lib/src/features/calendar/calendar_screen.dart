@@ -131,9 +131,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   child: Center(
                     child: Text(
                       'Ngày này chưa có giao dịch nào',
-                      style: TextStyle(
+                      style: context.appText.bodyStrong.copyWith(
                         color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),

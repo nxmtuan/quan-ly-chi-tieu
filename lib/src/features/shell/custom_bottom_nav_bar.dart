@@ -151,10 +151,9 @@ class _NavButton extends StatelessWidget {
                   item.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: context.appText.navLabel.copyWith(
                     color: colors.primary,
                     fontSize: context.scaledFont(11.5, min: 11),
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -198,10 +197,8 @@ class _NavButton extends StatelessWidget {
               item.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: context.appText.navLabel.copyWith(
                 color: selected ? colors.primary : inactiveColor,
-                fontSize: context.appText.navLabel.fontSize,
-                fontWeight: context.appText.navLabel.fontWeight,
               ),
             ),
           ],
