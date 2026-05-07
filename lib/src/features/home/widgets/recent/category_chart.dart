@@ -365,29 +365,24 @@ class _CategoryBadge extends StatelessWidget {
           width: context.scaled(selected ? 38 : 33),
           height: context.scaled(selected ? 38 : 33),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: item.color,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: const Color(0xFF111827),
-              width: 1.6 * scale,
+              color: Colors.white,
+              width: 2.2 * scale,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: selected ? 0.26 : 0.18),
-                blurRadius: context.scaled(selected ? 9 : 6),
-                offset: Offset(0, context.scaled(3)),
+                color: item.color.withValues(alpha: selected ? 0.35 : 0.15),
+                blurRadius: context.scaled(selected ? 8 : 5),
+                offset: Offset(0, context.scaled(selected ? 4 : 2)),
               ),
             ],
           ),
-          child: Container(
-            margin: EdgeInsets.all(context.scaled(4.5)),
-            decoration: BoxDecoration(
-              color: item.color.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(999),
-            ),
+          child: Center(
             child: Icon(
               item.category.iconData,
-              color: item.color,
+              color: Colors.white,
               size: context.scaled(selected ? 18 : 15),
             ),
           ),
@@ -410,26 +405,24 @@ class _BarCategoryIcon extends StatelessWidget {
         width: context.scaled(33),
         height: context.scaled(33),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: item.color,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: item.color.withValues(alpha: 0.24)),
+          border: Border.all(
+            color: Colors.white,
+            width: 2.2 * context.adaptiveScale,
+          ),
           boxShadow: [
             BoxShadow(
-              color: item.color.withValues(alpha: 0.12),
-              blurRadius: context.scaled(6),
-              offset: Offset(0, context.scaled(3)),
+              color: item.color.withValues(alpha: 0.15),
+              blurRadius: context.scaled(5),
+              offset: Offset(0, context.scaled(2)),
             ),
           ],
         ),
-        child: Container(
-          margin: EdgeInsets.all(context.scaled(4.5)),
-          decoration: BoxDecoration(
-            color: item.color.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(999),
-          ),
+        child: Center(
           child: Icon(
             item.category.iconData,
-            color: item.color,
+            color: Colors.white,
             size: context.scaled(15),
           ),
         ),
