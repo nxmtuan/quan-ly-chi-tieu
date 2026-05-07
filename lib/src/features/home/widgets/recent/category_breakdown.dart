@@ -120,11 +120,13 @@ class _CategoryAmountRow extends StatelessWidget {
     required this.item,
     required this.total,
     required this.showDivider,
+    required this.transactions,
   });
 
   final _CategoryAmountItem item;
   final double total;
   final bool showDivider;
+  final List<Transaction> transactions;
 
   @override
   Widget build(BuildContext context) {
@@ -134,68 +136,81 @@ class _CategoryAmountRow extends StatelessWidget {
     final sign = isExpense ? '-' : '+';
 
     return FlatCard(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.scaled(16),
-        vertical: context.scaled(14),
-      ),
+      padding: EdgeInsets.zero,
       radius: context.scaled(24),
-      child: Row(
-        children: [
-          Container(
-            width: context.scaled(52),
-            height: context.scaled(52),
-            decoration: BoxDecoration(
-              color: item.color.withValues(alpha: 0.13),
-              borderRadius: BorderRadius.circular(context.scaled(19)),
-            ),
-            child: Icon(
-              item.category.iconData,
-              color: item.color,
-              size: context.scaled(24),
-            ),
+      child: InkWell(
+        onTap: () {
+          showCategoryTransactionsSheet(
+            context,
+            category: item.category,
+            transactions: transactions,
+          );
+        },
+        borderRadius: BorderRadius.circular(context.scaled(24)),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.scaled(16),
+            vertical: context.scaled(14),
           ),
-          SizedBox(width: context.scaled(14)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.category.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.appText.fieldValue.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: context.scaled(6)),
-                Text(
-                  'Chiếm $percent% tổng',
-                  style: context.appText.caption.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: context.scaled(12)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          child: Row(
             children: [
-              Text(
-                '$sign${formatCurrency(item.amount)}',
-                style: context.appText.bodyStrong.copyWith(
-                  color: color,
+              Container(
+                width: context.scaled(52),
+                height: context.scaled(52),
+                decoration: BoxDecoration(
+                  color: item.color.withValues(alpha: 0.13),
+                  borderRadius: BorderRadius.circular(context.scaled(19)),
+                ),
+                child: Icon(
+                  item.category.iconData,
+                  color: item.color,
+                  size: context.scaled(24),
                 ),
               ),
-              SizedBox(height: context.scaled(4)),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: AppColors.textSecondary,
-                size: context.scaled(20),
+              SizedBox(width: context.scaled(14)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.category.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.appText.fieldValue.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: context.scaled(6)),
+                    Text(
+                      'Chiếm $percent% tổng',
+                      style: context.appText.caption.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: context.scaled(12)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '$sign${formatCurrency(item.amount)}',
+                    style: context.appText.bodyStrong.copyWith(
+                      color: color,
+                    ),
+                  ),
+                  SizedBox(height: context.scaled(4)),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: AppColors.textSecondary,
+                    size: context.scaled(20),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

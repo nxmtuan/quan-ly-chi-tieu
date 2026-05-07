@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/adaptive.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/flat_card.dart';
 import '../../../models/category.dart';
 import '../../../models/transaction.dart';
@@ -17,6 +18,7 @@ import '../../transactions/add_transaction_sheet.dart';
 part 'recent/category_chart.dart';
 part 'recent/category_breakdown.dart';
 part 'recent/transaction_row.dart';
+part 'recent/category_transactions_sheet.dart';
 
 const _modernChartPalette = [
   Color(0xFFE91E63),
@@ -91,6 +93,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
               child: _CategoryAmountRow(
                     item: entry.$2,
                     total: total,
+                    transactions: widget.transactions,
                     showDivider: false,
                   )
                   .animate(delay: Duration(milliseconds: 38 * entry.$1))
