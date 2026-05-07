@@ -17,7 +17,6 @@ class AuthNotifier extends Notifier<AuthUser?> {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email'],
     clientId: kIsWeb ? googleWebOAuthClientId : null,
-    serverClientId: kIsWeb ? null : googleAndroidOAuthClientId,
   );
   StreamSubscription<GoogleSignInAccount?>? _accountSubscription;
 
