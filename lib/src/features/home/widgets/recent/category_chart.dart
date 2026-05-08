@@ -146,21 +146,14 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
         startDegreeOffset: -90,
         pieTouchData: PieTouchData(
           touchCallback: (event, response) {
-            final touchedSection = response?.touchedSection;
-            final index = touchedSection?.touchedSectionIndex ?? -1;
+            if (event is! FlTapUpEvent) return;
+            final index =
+                response?.touchedSection?.touchedSectionIndex ?? -1;
+            if (index < 0 || index >= chartItems.length) return;
 
-            if (!event.isInterestedForInteractions ||
-                index < 0 ||
-                index >= chartItems.length) {
-              if (_touchedIndex != -1) {
-                setState(() => _touchedIndex = -1);
-              }
-              return;
-            }
-
-            if (_touchedIndex != index) {
-              setState(() => _touchedIndex = index);
-            }
+            setState(() {
+              _touchedIndex = _touchedIndex == index ? -1 : index;
+            });
           },
         ),
         sections: [
@@ -207,7 +200,10 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                 return SideTitleWidget(
                   meta: meta,
                   space: 8,
-                  child: _BarCategoryIcon(item: item),
+                  child: _BarCategoryIcon(
+                    item: item,
+                    selected: index == _touchedBarIndex,
+                  ),
                 );
               },
             ),
@@ -226,18 +222,14 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
           enabled: true,
           handleBuiltInTouches: false,
           touchCallback: (event, response) {
+            if (event is! FlTapUpEvent) return;
             final groupIndex = response?.spot?.touchedBarGroupIndex;
+            if (groupIndex == null) return;
 
-            if (event.isInterestedForInteractions && groupIndex != null) {
-              if (_touchedBarIndex != groupIndex) {
-                setState(() => _touchedBarIndex = groupIndex);
-              }
-              return;
-            }
-
-            if (_touchedBarIndex != null) {
-              setState(() => _touchedBarIndex = null);
-            }
+            setState(() {
+              _touchedBarIndex =
+                  _touchedBarIndex == groupIndex ? null : groupIndex;
+            });
           },
         ),
         barGroups: [
@@ -347,15 +339,83 @@ class _CategoryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: '${item.category.name}: ${formatCurrency(item.amount)}',
-      child: AnimatedScale(
-        scale: selected ? 1.16 : 1,
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutCubic,
-        child: Container(
-          width: selected ? 38.0 : 33.0,
-          height: selected ? 38.0 : 33.0,
+    return AnimatedScale(
+      scale: selected ? 1.16 : 1,
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: selected ? 38.0 : 33.0,
+            height: selected ? 38.0 : 33.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(999),
+              border: const Border.fromBorderSide(
+                BorderSide(color: Colors.white, width: 2.2),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: item.color.withValues(alpha: selected ? 0.35 : 0.15),
+                  blurRadius: selected ? 8.0 : 5.0,
+                  offset: Offset(0, selected ? 4.0 : 2.0),
+                ),
+              ],
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: item.color.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Center(
+                child: Icon(
+                  item.category.iconData,
+                  color: item.color,
+                  size: selected ? 18.0 : 15.0,
+                ),
+              ),
+            ),
+          ),
+          if (selected)
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: const Color(0xE6333333),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                '${item.category.name}\n${formatCurrency(item.amount)}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  height: 1.3,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BarCategoryIcon extends StatelessWidget {
+  const _BarCategoryIcon({required this.item, this.selected = false});
+
+  final _CategoryAmountItem item;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 33,
+          height: 33,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(999),
@@ -366,7 +426,7 @@ class _CategoryBadge extends StatelessWidget {
               BoxShadow(
                 color: item.color.withValues(alpha: selected ? 0.35 : 0.15),
                 blurRadius: selected ? 8.0 : 5.0,
-                offset: Offset(0, selected ? 4.0 : 2.0),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -379,56 +439,12 @@ class _CategoryBadge extends StatelessWidget {
               child: Icon(
                 item.category.iconData,
                 color: item.color,
-                size: selected ? 18.0 : 15.0,
+                size: 15,
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _BarCategoryIcon extends StatelessWidget {
-  const _BarCategoryIcon({required this.item});
-
-  final _CategoryAmountItem item;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: '${item.category.name}: ${formatCurrency(item.amount)}',
-      child: Container(
-        width: 33,
-        height: 33,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(999),
-          border: const Border.fromBorderSide(
-            BorderSide(color: Colors.white, width: 2.2),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: item.color.withValues(alpha: 0.15),
-              blurRadius: 5,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: item.color.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Center(
-            child: Icon(
-              item.category.iconData,
-              color: item.color,
-              size: 15,
-            ),
-          ),
-        ),
-      ),
+      ],
     );
   }
 }
