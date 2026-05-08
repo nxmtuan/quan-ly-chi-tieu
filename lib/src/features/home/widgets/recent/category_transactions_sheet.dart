@@ -3,14 +3,14 @@ part of '../recent_transactions.dart';
 void showCategoryTransactionsSheet(
   BuildContext context, {
   required Category category,
-  required DateTime month,
+  required HomeSummaryScope scope,
 }) {
   showAppBottomSheet<void>(
     context: context,
     builder: (context) {
       return _CategoryTransactionsSheet(
         category: category,
-        month: month,
+        scope: scope,
       );
     },
   );
@@ -19,11 +19,11 @@ void showCategoryTransactionsSheet(
 class _CategoryTransactionsSheet extends ConsumerWidget {
   const _CategoryTransactionsSheet({
     required this.category,
-    required this.month,
+    required this.scope,
   });
 
   final Category category;
-  final DateTime month;
+  final HomeSummaryScope scope;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,8 +32,7 @@ class _CategoryTransactionsSheet extends ConsumerWidget {
         .where((t) =>
             t.categoryId == category.id &&
             t.type == category.type &&
-            t.date.year == month.year &&
-            t.date.month == month.month)
+            scope.matches(t.date))
         .toList()
       ..sort((a, b) => b.date.compareTo(a.date));
 

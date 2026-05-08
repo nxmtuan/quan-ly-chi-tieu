@@ -12,6 +12,7 @@ import '../../models/auth_user.dart';
 import '../../models/transaction.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/transaction_provider.dart';
+import 'models/home_summary_scope.dart';
 import '../transactions/add_transaction_sheet.dart';
 import 'widgets/recent_transactions.dart';
 import 'widgets/summary_card.dart';
@@ -24,13 +25,13 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  late DateTime _selectedMonth;
+  late HomeSummaryScope _selectedScope;
   bool _showQuickAddButton = true;
 
   @override
   void initState() {
     super.initState();
-    _selectedMonth = _monthStart(DateTime.now());
+    _selectedScope = HomeSummaryScope.month(DateTime.now());
   }
 
   @override
@@ -40,21 +41,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final scale = context.adaptiveScale;
     final authUser = ref.watch(authProvider);
     final allTransactions = ref.watch(transactionsProvider);
-    final monthTransactions = [
+    final filteredTransactions = [
       for (final transaction in allTransactions)
-        if (_isSameMonth(transaction.date, _selectedMonth)) transaction,
+        if (_selectedScope.matches(transaction.date)) transaction,
     ];
     final summary = TransactionSummary(
-      income: monthTransactions
+      income: filteredTransactions
           .where((transaction) => transaction.type == TransactionType.income)
           .fold<double>(0, (total, transaction) => total + transaction.amount),
-      expense: monthTransactions
+      expense: filteredTransactions
           .where((transaction) => transaction.type == TransactionType.expense)
           .fold<double>(0, (total, transaction) => total + transaction.amount),
     );
-    final transactions = [...monthTransactions]
+    final transactions = [...filteredTransactions]
       ..sort((a, b) => b.date.compareTo(a.date));
-    final currentMonth = _monthStart(DateTime.now());
+    final now = DateTime.now();
 
     return ColoredBox(
       color: isDark ? colors.surface : const Color(0xFFFAF7FF),
@@ -128,13 +129,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child:
                         SummaryCard(
                               summary: summary,
-                              displayedMonth: _selectedMonth,
-                              canGoNext: _selectedMonth.isBefore(currentMonth),
-                              onPreviousMonth: _goToPreviousMonth,
-                              onNextMonth: _selectedMonth.isBefore(currentMonth)
-                                  ? _goToNextMonth
+                              scope: _selectedScope,
+                              onPreviousScope: _selectedScope.canGoPrevious
+                                  ? _goToPreviousScope
                                   : null,
-                              onPickMonth: _pickMonth,
+                              onNextScope: _selectedScope.canGoNext(now)
+                                  ? _goToNextScope
+                                  : null,
+                              onPickScope: _pickMonth,
                             )
                             .animate(delay: 80.ms)
                             .fadeIn(duration: 320.ms)
@@ -155,7 +157,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   sliver: SliverToBoxAdapter(
                     child: RecentTransactions(
-                      month: _selectedMonth,
+                      scope: _selectedScope,
                       transactions: transactions,
                     )
                         .animate(delay: 150.ms)
@@ -197,31 +199,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _goToPreviousMonth() {
-    setState(() {
-      _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month - 1);
-    });
+  void _goToPreviousScope() {
+    setState(() => _selectedScope = _selectedScope.previous());
   }
 
-  void _goToNextMonth() {
-    final currentMonth = _monthStart(DateTime.now());
-    final nextMonth = DateTime(_selectedMonth.year, _selectedMonth.month + 1);
-    if (nextMonth.isAfter(currentMonth)) {
+  void _goToNextScope() {
+    final now = DateTime.now();
+    if (!_selectedScope.canGoNext(now)) {
       return;
     }
 
-    setState(() => _selectedMonth = nextMonth);
+    setState(() => _selectedScope = _selectedScope.next());
   }
 
   Future<void> _pickMonth() async {
-    final selectedMonth = await showMonthPickerSheet(
+    final selectedScope = await showMonthPickerSheet(
       context,
-      initialMonth: _selectedMonth,
+      initialScope: _selectedScope,
       lastMonth: _monthStart(DateTime.now()),
     );
 
-    if (selectedMonth != null && mounted) {
-      setState(() => _selectedMonth = _monthStart(selectedMonth));
+    if (selectedScope != null && mounted) {
+      setState(() => _selectedScope = selectedScope);
     }
   }
 
@@ -242,10 +241,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return false;
   }
-}
-
-bool _isSameMonth(DateTime a, DateTime b) {
-  return a.year == b.year && a.month == b.month;
 }
 
 DateTime _monthStart(DateTime date) {

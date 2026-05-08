@@ -2,18 +2,16 @@ part of '../summary_card.dart';
 
 class _MonthSelectorBar extends StatelessWidget {
   const _MonthSelectorBar({
-    required this.displayedMonth,
-    required this.canGoNext,
-    required this.onPreviousMonth,
-    required this.onPickMonth,
-    this.onNextMonth,
+    required this.scope,
+    required this.onPickScope,
+    this.onPreviousScope,
+    this.onNextScope,
   });
 
-  final DateTime displayedMonth;
-  final bool canGoNext;
-  final VoidCallback onPreviousMonth;
-  final VoidCallback onPickMonth;
-  final VoidCallback? onNextMonth;
+  final HomeSummaryScope scope;
+  final VoidCallback? onPreviousScope;
+  final VoidCallback onPickScope;
+  final VoidCallback? onNextScope;
 
   @override
   Widget build(BuildContext context) {
@@ -38,16 +36,18 @@ class _MonthSelectorBar extends StatelessWidget {
       child: Row(
         children: [
           AppBounceBuilder(
-            onTap: onPreviousMonth,
+            onTap: onPreviousScope,
             child: Icon(
               Icons.chevron_left_rounded,
-              color: colors.onSurface,
+              color: onPreviousScope != null
+                  ? colors.onSurface
+                  : colors.onSurface.withValues(alpha: 0.24),
               size: context.scaled(28),
             ),
           ),
           Expanded(
             child: AppBounceBuilder(
-              onTap: onPickMonth,
+              onTap: onPickScope,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -66,7 +66,7 @@ class _MonthSelectorBar extends StatelessWidget {
                   ),
                   SizedBox(width: context.scaled(11)),
                   Text(
-                    formatMonthYear(displayedMonth),
+                    scope.label,
                     style: context.appText.cardTitle.copyWith(
                       color: colors.onSurface,
                       fontSize: context.scaledFont(16, min: 15),
@@ -78,10 +78,10 @@ class _MonthSelectorBar extends StatelessWidget {
             ),
           ),
           AppBounceBuilder(
-            onTap: onNextMonth,
+            onTap: onNextScope,
             child: Icon(
               Icons.chevron_right_rounded,
-              color: canGoNext
+              color: onNextScope != null
                   ? colors.onSurface
                   : colors.onSurface.withValues(alpha: 0.24),
               size: context.scaled(28),

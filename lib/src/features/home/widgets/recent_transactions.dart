@@ -14,6 +14,7 @@ import '../../../models/category.dart';
 import '../../../models/transaction.dart';
 import '../../../providers/category_provider.dart';
 import '../../../providers/transaction_provider.dart';
+import '../models/home_summary_scope.dart';
 import '../../transactions/add_transaction_sheet.dart';
 
 part 'recent/category_chart.dart';
@@ -22,9 +23,13 @@ part 'recent/transaction_row.dart';
 part 'recent/category_transactions_sheet.dart';
 
 class RecentTransactions extends ConsumerStatefulWidget {
-  const RecentTransactions({super.key, required this.month, required this.transactions});
+  const RecentTransactions({
+    super.key,
+    required this.scope,
+    required this.transactions,
+  });
 
-  final DateTime month;
+  final HomeSummaryScope scope;
   final List<Transaction> transactions;
 
   @override
@@ -85,7 +90,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
                   _CategoryAmountRow(
                         item: entry.$2,
                         total: total,
-                        month: widget.month,
+                        scope: widget.scope,
                         transactions: widget.transactions,
                         showDivider: false,
                       )

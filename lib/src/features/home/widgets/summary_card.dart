@@ -6,6 +6,7 @@ import '../../../core/utils/adaptive.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/app_bounce_builder.dart';
+import '../models/home_summary_scope.dart';
 import '../../../providers/transaction_provider.dart';
 
 part 'summary/summary_components.dart';
@@ -15,19 +16,17 @@ class SummaryCard extends StatelessWidget {
   const SummaryCard({
     super.key,
     required this.summary,
-    required this.displayedMonth,
-    required this.canGoNext,
-    required this.onPreviousMonth,
-    required this.onPickMonth,
-    this.onNextMonth,
+    required this.scope,
+    required this.onPickScope,
+    this.onPreviousScope,
+    this.onNextScope,
   });
 
   final TransactionSummary summary;
-  final DateTime displayedMonth;
-  final bool canGoNext;
-  final VoidCallback onPreviousMonth;
-  final VoidCallback onPickMonth;
-  final VoidCallback? onNextMonth;
+  final HomeSummaryScope scope;
+  final VoidCallback onPickScope;
+  final VoidCallback? onPreviousScope;
+  final VoidCallback? onNextScope;
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +36,10 @@ class SummaryCard extends StatelessWidget {
     return Column(
       children: [
         _MonthSelectorBar(
-          displayedMonth: displayedMonth,
-          canGoNext: canGoNext,
-          onPreviousMonth: onPreviousMonth,
-          onPickMonth: onPickMonth,
-          onNextMonth: onNextMonth,
+          scope: scope,
+          onPreviousScope: onPreviousScope,
+          onPickScope: onPickScope,
+          onNextScope: onNextScope,
         ),
         SizedBox(height: verticalSpacing),
         Row(
