@@ -7,9 +7,18 @@ import 'src/app.dart';
 import 'src/providers/storage_provider.dart';
 import 'src/core/storage/objectbox_database.dart';
 
+import 'package:workmanager/workmanager.dart';
+import 'src/core/background/background_sync.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('vi_VN');
+  
+  Workmanager().initialize(
+    callbackDispatcher,
+    isInDebugMode: false,
+  );
+  scheduleBackgroundSync();
 
   final objectBoxDb = await ObjectBoxDatabase.create();
   final prefs = await SharedPreferences.getInstance();
