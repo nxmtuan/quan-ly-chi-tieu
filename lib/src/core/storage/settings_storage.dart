@@ -1,30 +1,17 @@
-import '../../../objectbox.g.dart';
-import '../../models/app_setting.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsStorage {
-  const SettingsStorage(this._box);
+  const SettingsStorage(this._prefs);
 
   static const _themeModeKey = 'themeMode';
 
-  final Box<AppSetting> _box;
+  final SharedPreferences _prefs;
 
   String readThemeMode() {
-    final query = _box.query(AppSetting_.key.equals(_themeModeKey)).build();
-    final result = query.findFirst();
-    query.close();
-    return result?.value ?? 'system';
+    return _prefs.getString(_themeModeKey) ?? 'system';
   }
 
   Future<void> saveThemeMode(String value) async {
-    final query = _box.query(AppSetting_.key.equals(_themeModeKey)).build();
-    var setting = query.findFirst();
-    query.close();
-    
-    if (setting != null) {
-      setting.value = value;
-      _box.put(setting);
-    } else {
-      _box.put(AppSetting(key: _themeModeKey, value: value));
-    }
+    await _prefs.setString(_themeModeKey, value);
   }
 }

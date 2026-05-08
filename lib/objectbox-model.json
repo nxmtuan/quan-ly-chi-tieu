@@ -109,73 +109,6 @@
         }
       ],
       "relations": []
-    },
-    {
-      "id": "3:2958872209723789033",
-      "lastPropertyId": "3:254034798580907153",
-      "name": "AppSetting",
-      "properties": [
-        {
-          "id": "1:4003052579714602889",
-          "name": "id",
-          "type": 6,
-          "flags": 1
-        },
-        {
-          "id": "2:6710834331620792108",
-          "name": "key",
-          "indexId": "3:7307916399414270491",
-          "type": 9,
-          "flags": 2080
-        },
-        {
-          "id": "3:254034798580907153",
-          "name": "value",
-          "type": 9
-        }
-      ],
-      "relations": []
-    },
-    {
-      "id": "4:7083601830508858313",
-      "lastPropertyId": "6:4700651710094626068",
-      "name": "AuthUser",
-      "properties": [
-        {
-          "id": "1:6618849966409149179",
-          "name": "obxId",
-          "type": 6,
-          "flags": 1
-        },
-        {
-          "id": "2:8142406804263285886",
-          "name": "id",
-          "indexId": "4:610653384527144065",
-          "type": 9,
-          "flags": 2080
-        },
-        {
-          "id": "3:7977654457734510040",
-          "name": "email",
-          "type": 9
-        },
-        {
-          "id": "4:9168998820421062569",
-          "name": "name",
-          "type": 9
-        },
-        {
-          "id": "5:1545797507743200257",
-          "name": "lastLoginAt",
-          "type": 10
-        },
-        {
-          "id": "6:4700651710094626068",
-          "name": "photoUrl",
-          "type": 9
-        }
-      ],
-      "relations": []
     }
   ],
   "lastEntityId": "4:7083601830508858313",
@@ -184,9 +117,22 @@
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
+  "retiredEntityUids": [
+    2958872209723789033,
+    7083601830508858313
+  ],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    4003052579714602889,
+    6710834331620792108,
+    254034798580907153,
+    6618849966409149179,
+    8142406804263285886,
+    7977654457734510040,
+    9168998820421062569,
+    1545797507743200257,
+    4700651710094626068
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

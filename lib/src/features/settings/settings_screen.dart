@@ -12,6 +12,8 @@ import '../../models/auth_user.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/storage_provider.dart';
+import '../../providers/transaction_provider.dart';
+import '../../providers/category_provider.dart';
 import '../auth/google_web_sign_in_button.dart';
 import '../categories/categories_screen.dart';
 

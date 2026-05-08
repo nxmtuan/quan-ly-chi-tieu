@@ -11,10 +11,13 @@ import '../core/storage/transaction_storage.dart';
 import '../core/storage/objectbox_database.dart';
 import '../models/transaction.dart';
 import '../models/category.dart';
-import '../models/auth_user.dart';
-import '../models/app_setting.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final objectBoxProvider = Provider<ObjectBoxDatabase>((ref) {
+  throw UnimplementedError();
+});
+
+final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError();
 });
 
@@ -29,13 +32,13 @@ final categoryStorageProvider = Provider<CategoryStorage>((ref) {
 });
 
 final settingsStorageProvider = Provider<SettingsStorage>((ref) {
-  final store = ref.watch(objectBoxProvider).store;
-  return SettingsStorage(store.box<AppSetting>());
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return SettingsStorage(prefs);
 });
 
 final authStorageProvider = Provider<AuthStorage>((ref) {
-  final store = ref.watch(objectBoxProvider).store;
-  return AuthStorage(store.box<AuthUser>());
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return AuthStorage(prefs);
 });
 
 final syncServiceProvider = Provider.family<SyncService, drive.DriveApi>((ref, driveApi) {

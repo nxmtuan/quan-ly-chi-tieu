@@ -206,6 +206,10 @@ class _SyncDataRowState extends ConsumerState<_SyncDataRow> {
       final syncService = ref.read(syncServiceProvider(driveApi));
       await syncService.syncData();
 
+      // Refresh UI by invalidating providers so they re-read from ObjectBox
+      ref.invalidate(transactionsProvider);
+      ref.invalidate(categoriesProvider);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

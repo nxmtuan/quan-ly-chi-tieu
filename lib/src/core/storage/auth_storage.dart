@@ -1,22 +1,30 @@
-import '../../../objectbox.g.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/auth_user.dart';
 
 class AuthStorage {
-  const AuthStorage(this._box);
+  const AuthStorage(this._prefs);
 
-  final Box<AuthUser> _box;
+  final SharedPreferences _prefs;
+  static const _userKey = 'authUser';
 
   AuthUser? readUser() {
-    return _box.getAll().firstOrNull;
+    final jsonString = _prefs.getString(_userKey);
+    if (jsonString == null) return null;
+    try {
+      final map = jsonDecode(jsonString) as Map<String, dynamic>;
+      return AuthUser.fromJson(map);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> saveUser(AuthUser user) async {
-    _box.removeAll();
-    user.obxId = 0;
-    _box.put(user);
+    final jsonString = jsonEncode(user.toJson());
+    await _prefs.setString(_userKey, jsonString);
   }
 
   Future<void> clearUser() async {
-    _box.removeAll();
+    await _prefs.remove(_userKey);
   }
 }

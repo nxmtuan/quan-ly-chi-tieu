@@ -14,8 +14,6 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
-import 'src/models/app_setting.dart';
-import 'src/models/auth_user.dart';
 import 'src/models/category.dart';
 import 'src/models/transaction.dart';
 
@@ -146,82 +144,6 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
-  obx_int.ModelEntity(
-    id: const obx_int.IdUid(3, 2958872209723789033),
-    name: 'AppSetting',
-    lastPropertyId: const obx_int.IdUid(3, 254034798580907153),
-    flags: 0,
-    properties: <obx_int.ModelProperty>[
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 4003052579714602889),
-        name: 'id',
-        type: 6,
-        flags: 1,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 6710834331620792108),
-        name: 'key',
-        type: 9,
-        flags: 2080,
-        indexId: const obx_int.IdUid(3, 7307916399414270491),
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 254034798580907153),
-        name: 'value',
-        type: 9,
-        flags: 0,
-      ),
-    ],
-    relations: <obx_int.ModelRelation>[],
-    backlinks: <obx_int.ModelBacklink>[],
-  ),
-  obx_int.ModelEntity(
-    id: const obx_int.IdUid(4, 7083601830508858313),
-    name: 'AuthUser',
-    lastPropertyId: const obx_int.IdUid(6, 4700651710094626068),
-    flags: 0,
-    properties: <obx_int.ModelProperty>[
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 6618849966409149179),
-        name: 'obxId',
-        type: 6,
-        flags: 1,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 8142406804263285886),
-        name: 'id',
-        type: 9,
-        flags: 2080,
-        indexId: const obx_int.IdUid(4, 610653384527144065),
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 7977654457734510040),
-        name: 'email',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 9168998820421062569),
-        name: 'name',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(5, 1545797507743200257),
-        name: 'lastLoginAt',
-        type: 10,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(6, 4700651710094626068),
-        name: 'photoUrl',
-        type: 9,
-        flags: 0,
-      ),
-    ],
-    relations: <obx_int.ModelRelation>[],
-    backlinks: <obx_int.ModelBacklink>[],
-  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -271,9 +193,19 @@ obx_int.ModelDefinition getObjectBoxModel() {
     lastIndexId: const obx_int.IdUid(4, 610653384527144065),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
-    retiredEntityUids: const [],
+    retiredEntityUids: const [2958872209723789033, 7083601830508858313],
     retiredIndexUids: const [],
-    retiredPropertyUids: const [],
+    retiredPropertyUids: const [
+      4003052579714602889,
+      6710834331620792108,
+      254034798580907153,
+      6618849966409149179,
+      8142406804263285886,
+      7977654457734510040,
+      9168998820421062569,
+      1545797507743200257,
+      4700651710094626068,
+    ],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
@@ -438,109 +370,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
-    AppSetting: obx_int.EntityDefinition<AppSetting>(
-      model: _entities[2],
-      toOneRelations: (AppSetting object) => [],
-      toManyRelations: (AppSetting object) => {},
-      getId: (AppSetting object) => object.id,
-      setId: (AppSetting object, int id) {
-        object.id = id;
-      },
-      objectToFB: (AppSetting object, fb.Builder fbb) {
-        final keyOffset = fbb.writeString(object.key);
-        final valueOffset = fbb.writeString(object.value);
-        fbb.startTable(4);
-        fbb.addInt64(0, object.id);
-        fbb.addOffset(1, keyOffset);
-        fbb.addOffset(2, valueOffset);
-        fbb.finish(fbb.endTable());
-        return object.id;
-      },
-      objectFromFB: (obx.Store store, ByteData fbData) {
-        final buffer = fb.BufferContext(fbData);
-        final rootOffset = buffer.derefObject(0);
-        final idParam = const fb.Int64Reader().vTableGet(
-          buffer,
-          rootOffset,
-          4,
-          0,
-        );
-        final keyParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 6, '');
-        final valueParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 8, '');
-        final object = AppSetting(
-          id: idParam,
-          key: keyParam,
-          value: valueParam,
-        );
-
-        return object;
-      },
-    ),
-    AuthUser: obx_int.EntityDefinition<AuthUser>(
-      model: _entities[3],
-      toOneRelations: (AuthUser object) => [],
-      toManyRelations: (AuthUser object) => {},
-      getId: (AuthUser object) => object.obxId,
-      setId: (AuthUser object, int id) {
-        object.obxId = id;
-      },
-      objectToFB: (AuthUser object, fb.Builder fbb) {
-        final idOffset = fbb.writeString(object.id);
-        final emailOffset = fbb.writeString(object.email);
-        final nameOffset = fbb.writeString(object.name);
-        final photoUrlOffset = object.photoUrl == null
-            ? null
-            : fbb.writeString(object.photoUrl!);
-        fbb.startTable(7);
-        fbb.addInt64(0, object.obxId);
-        fbb.addOffset(1, idOffset);
-        fbb.addOffset(2, emailOffset);
-        fbb.addOffset(3, nameOffset);
-        fbb.addInt64(4, object.lastLoginAt.millisecondsSinceEpoch);
-        fbb.addOffset(5, photoUrlOffset);
-        fbb.finish(fbb.endTable());
-        return object.obxId;
-      },
-      objectFromFB: (obx.Store store, ByteData fbData) {
-        final buffer = fb.BufferContext(fbData);
-        final rootOffset = buffer.derefObject(0);
-        final obxIdParam = const fb.Int64Reader().vTableGet(
-          buffer,
-          rootOffset,
-          4,
-          0,
-        );
-        final idParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 6, '');
-        final emailParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 8, '');
-        final nameParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 10, '');
-        final lastLoginAtParam = DateTime.fromMillisecondsSinceEpoch(
-          const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0),
-        );
-        final photoUrlParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 14);
-        final object = AuthUser(
-          obxId: obxIdParam,
-          id: idParam,
-          email: emailParam,
-          name: nameParam,
-          lastLoginAt: lastLoginAtParam,
-          photoUrl: photoUrlParam,
-        );
-
-        return object;
-      },
-    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -634,56 +463,5 @@ class Transaction_ {
   /// See [Transaction.isDeleted].
   static final isDeleted = obx.QueryBooleanProperty<Transaction>(
     _entities[1].properties[8],
-  );
-}
-
-/// [AppSetting] entity fields to define ObjectBox queries.
-class AppSetting_ {
-  /// See [AppSetting.id].
-  static final id = obx.QueryIntegerProperty<AppSetting>(
-    _entities[2].properties[0],
-  );
-
-  /// See [AppSetting.key].
-  static final key = obx.QueryStringProperty<AppSetting>(
-    _entities[2].properties[1],
-  );
-
-  /// See [AppSetting.value].
-  static final value = obx.QueryStringProperty<AppSetting>(
-    _entities[2].properties[2],
-  );
-}
-
-/// [AuthUser] entity fields to define ObjectBox queries.
-class AuthUser_ {
-  /// See [AuthUser.obxId].
-  static final obxId = obx.QueryIntegerProperty<AuthUser>(
-    _entities[3].properties[0],
-  );
-
-  /// See [AuthUser.id].
-  static final id = obx.QueryStringProperty<AuthUser>(
-    _entities[3].properties[1],
-  );
-
-  /// See [AuthUser.email].
-  static final email = obx.QueryStringProperty<AuthUser>(
-    _entities[3].properties[2],
-  );
-
-  /// See [AuthUser.name].
-  static final name = obx.QueryStringProperty<AuthUser>(
-    _entities[3].properties[3],
-  );
-
-  /// See [AuthUser.lastLoginAt].
-  static final lastLoginAt = obx.QueryDateProperty<AuthUser>(
-    _entities[3].properties[4],
-  );
-
-  /// See [AuthUser.photoUrl].
-  static final photoUrl = obx.QueryStringProperty<AuthUser>(
-    _entities[3].properties[5],
   );
 }
