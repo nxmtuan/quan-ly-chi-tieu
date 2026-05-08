@@ -50,6 +50,9 @@ dependencies:
   googleapis_auth: ^2.3.0
   extension_google_sign_in_as_googleapis_auth: ^2.0.13
   http: ^1.6.0
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
@@ -61,6 +64,11 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  build_runner: ^2.4.9
+  isar_generator: ^3.1.0+1
+
+dependency_overrides:
+  analyzer: '>=5.0.0 <14.0.0'
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
