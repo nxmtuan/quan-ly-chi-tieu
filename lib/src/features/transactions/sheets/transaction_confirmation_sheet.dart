@@ -35,167 +35,132 @@ class _TransactionConfirmationSheet extends StatelessWidget {
     final color = isExpense ? const Color(0xFFFF1493) : AppColors.success;
     final sign = isExpense ? '-' : '+';
 
-    return AppSheetContainer(
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            0,
-            0,
-            0,
-            appSheetBottomPadding(context, extra: 16),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const AppSheetHeader(
-                title: 'Xác nhận',
+    return AppSheetScaffold(
+      title: 'Xác nhận',
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: context.scaled(24)),
+            Container(
+              width: context.scaled(72),
+              height: context.scaled(72),
+              decoration: BoxDecoration(
+                color: category.color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
               ),
-              SizedBox(height: context.scaled(20)),
-              // 1. Icon danh mục to ở giữa
-              Container(
-                width: context.scaled(72),
-                height: context.scaled(72),
-                decoration: BoxDecoration(
-                  color: category.color.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  category.iconData,
-                  color: category.color,
-                  size: context.scaled(32),
-                ),
+              child: Icon(
+                category.iconData,
+                color: category.color,
+                size: context.scaled(32),
               ),
+            ),
+            SizedBox(height: context.scaled(12)),
+            Text(
+              '$sign${formatCurrency(transaction.amount)}',
+              style: context.appText.amountXL.copyWith(
+                color: color,
+                fontSize: context.scaledFont(32, min: 28),
+              ),
+            ),
+            if (transaction.note.isNotEmpty) ...[
               SizedBox(height: context.scaled(12)),
-              
-              // 2. Số tiền
-              Text(
-                '$sign${formatCurrency(transaction.amount)}',
-                style: context.appText.amountXL.copyWith(
-                  color: color,
-                  fontSize: context.scaledFont(32, min: 28),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.scaled(12),
+                  vertical: context.scaled(8),
                 ),
-              ),
-              
-              // 3. Ghi chú (nếu có)
-              if (transaction.note.isNotEmpty) ...[
-                SizedBox(height: context.scaled(12)),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.scaled(12),
-                    vertical: context.scaled(8),
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(context.scaled(8)),
-                  ),
-                  child: Text(
-                    transaction.note,
-                    textAlign: TextAlign.center,
-                    style: context.appText.body.copyWith(
-                      color: const Color(0xFF475569),
-                    ),
-                  ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(context.scaled(8)),
                 ),
-              ],
-              SizedBox(height: context.scaled(24)),
-              
-              // 4. Khung thông tin còn lại
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: context.scaled(20)),
-                child: Container(
-                  padding: EdgeInsets.all(context.scaled(16)),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(context.scaled(16)),
-                    border: Border.all(color: AppColors.border),
+                child: Text(
+                  transaction.note,
+                  textAlign: TextAlign.center,
+                  style: context.appText.body.copyWith(
+                    color: const Color(0xFF475569),
                   ),
-                  child: Column(
-                    children: [
-                      _buildRow(
-                        context,
-                        label: 'Danh mục',
-                        value: category.name,
-                      ),
-                      Divider(color: AppColors.border, height: context.scaled(24)),
-                      _buildRow(
-                        context,
-                        label: 'Loại',
-                        value: isExpense ? 'Chi tiêu' : 'Thu nhập',
-                      ),
-                      Divider(color: AppColors.border, height: context.scaled(24)),
-                      _buildRow(
-                        context,
-                        label: 'Nguồn tiền',
-                        value: source,
-                      ),
-                      Divider(color: AppColors.border, height: context.scaled(24)),
-                      _buildRow(
-                        context,
-                        label: 'Ngày giao dịch',
-                        value: formatShortDate(transaction.date),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: context.scaled(32)),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: context.scaled(20)),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () => Navigator.of(context).pop(false),
-                        borderRadius: BorderRadius.circular(context.scaled(16)),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(context.scaled(16)),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Chỉnh sửa',
-                            style: context.appText.buttonLabel.copyWith(
-                              color: const Color(0xFF475569),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: context.scaled(12)),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () => Navigator.of(context).pop(true),
-                        borderRadius: BorderRadius.circular(context.scaled(16)),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
-                          decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(context.scaled(16)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: color.withValues(alpha: 0.2),
-                                blurRadius: context.scaled(8),
-                                offset: Offset(0, context.scaled(4)),
-                              ),
-                            ],
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Lưu',
-                            style: context.appText.buttonLabel,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ],
-          ),
+            SizedBox(height: context.scaled(24)),
+            Container(
+              padding: EdgeInsets.all(context.scaled(16)),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(context.scaled(16)),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                children: [
+                  _buildRow(context, label: 'Danh mục', value: category.name),
+                  Divider(color: AppColors.border, height: context.scaled(24)),
+                  _buildRow(
+                    context,
+                    label: 'Loại',
+                    value: isExpense ? 'Chi tiêu' : 'Thu nhập',
+                  ),
+                  Divider(color: AppColors.border, height: context.scaled(24)),
+                  _buildRow(context, label: 'Nguồn tiền', value: source),
+                  Divider(color: AppColors.border, height: context.scaled(24)),
+                  _buildRow(
+                    context,
+                    label: 'Ngày giao dịch',
+                    value: formatShortDate(transaction.date),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: context.scaled(8)),
+          ],
         ),
+      ),
+      action: Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: () => Navigator.of(context).pop(false),
+              borderRadius: BorderRadius.circular(context.scaled(16)),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(context.scaled(16)),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Chỉnh sửa',
+                  style: context.appText.buttonLabel.copyWith(
+                    color: const Color(0xFF475569),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: InkWell(
+              onTap: () => Navigator.of(context).pop(true),
+              borderRadius: BorderRadius.circular(context.scaled(16)),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(context.scaled(16)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.2),
+                      blurRadius: context.scaled(8),
+                      offset: Offset(0, context.scaled(4)),
+                    ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: Text('Lưu', style: context.appText.buttonLabel),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -229,7 +194,9 @@ class _TransactionConfirmationSheet extends StatelessWidget {
                   textAlign: TextAlign.right,
                   style: context.appText.bodyStrong.copyWith(
                     color: valueColor ?? AppColors.textPrimary,
-                    fontSize: valueSize != null ? context.scaledFont(valueSize, min: valueSize - 2) : null,
+                    fontSize: valueSize != null
+                        ? context.scaledFont(valueSize, min: valueSize - 2)
+                        : null,
                   ),
                 ),
           ),

@@ -26,7 +26,7 @@ Future<T?> showAppBottomSheet<T>({
     backgroundColor: Colors.transparent,
     builder: (context) {
       return Padding(
-        padding: EdgeInsets.only(top: currentDepth * 30.0),
+        padding: EdgeInsets.only(top: currentDepth * 20.0),
         child: SizedBox(
           height: double.infinity,
           child: builder(context),
@@ -64,6 +64,61 @@ class AppSheetContainer extends StatelessWidget {
     );
   }
 }
+
+/// Standard full-screen sheet layout: fixed [AppSheetHeader] on top,
+/// scrollable [body] in the middle, and an optional [AppSheetFooter] with
+/// [action] widget pinned at the bottom.
+class AppSheetScaffold extends StatelessWidget {
+  const AppSheetScaffold({
+    super.key,
+    required this.title,
+    required this.body,
+    this.subtitle,
+    this.onClose,
+    this.showCloseButton = true,
+    this.action,
+    this.bodyPadding,
+    this.radius = 28,
+    this.boxShadow,
+  });
+
+  final String title;
+  final String? subtitle;
+  final Widget body;
+  final Widget? action;
+  final VoidCallback? onClose;
+  final bool showCloseButton;
+  final EdgeInsetsGeometry? bodyPadding;
+  final double radius;
+  final List<BoxShadow>? boxShadow;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSheetContainer(
+      radius: radius,
+      boxShadow: boxShadow,
+      child: Column(
+        children: [
+          AppSheetHeader(
+            title: title,
+            subtitle: subtitle,
+            onClose: onClose,
+            showCloseButton: showCloseButton,
+          ),
+          Expanded(
+            child: Padding(
+              padding: bodyPadding ??
+                  EdgeInsets.symmetric(horizontal: context.scaled(16)),
+              child: body,
+            ),
+          ),
+          if (action != null) AppSheetFooter(child: action!),
+        ],
+      ),
+    );
+  }
+}
+
 
 class AppSheetHandle extends StatelessWidget {
   const AppSheetHandle({super.key, this.color});

@@ -42,71 +42,52 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return AppSheetContainer(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          context.scaled(16),
-          0,
-          context.scaled(16),
-          appSheetBottomPadding(context),
-        ),
-        child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const AppSheetHeader(
-                title: 'Chọn danh mục',
-                subtitle: 'Hiển thị toàn bộ danh mục của nhóm hiện tại.',
-              ),
-              SizedBox(height: context.scaled(14)),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final itemWidth =
-                          (constraints.maxWidth - context.scaled(24)) / 4;
+    return AppSheetScaffold(
+      title: 'Chọn danh mục',
+      subtitle: 'Hiển thị toàn bộ danh mục của nhóm hiện tại.',
+      body: SingleChildScrollView(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final itemWidth =
+                (constraints.maxWidth - context.scaled(24)) / 4;
 
-                      return Wrap(
-                        spacing: context.scaled(8),
-                        runSpacing: context.scaled(8),
-                        children: [
-                          for (final category in widget.categories)
-                            SizedBox(
-                              width: itemWidth,
-                              child: _CategoryTile(
-                                category: category,
-                                selected: category.id == _selectedCategoryId,
-                                actionColor: widget.actionColor,
-                                onTap: () {
-                                  setState(() {
-                                    _selectedCategoryId = category.id;
-                                  });
-                                },
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ),
-              SizedBox(height: context.scaled(16)),
-              AppPrimaryButton(
-                label: 'Chọn',
-                color: widget.actionColor,
-                onTap: _selectedCategoryId == null
-                    ? null
-                    : () {
-                        final category = widget.categories
-                            .where((item) => item.id == _selectedCategoryId)
-                            .firstOrNull;
-                        if (category != null) {
-                          Navigator.of(context).pop(category);
-                        }
+            return Wrap(
+              spacing: context.scaled(8),
+              runSpacing: context.scaled(8),
+              children: [
+                for (final category in widget.categories)
+                  SizedBox(
+                    width: itemWidth,
+                    child: _CategoryTile(
+                      category: category,
+                      selected: category.id == _selectedCategoryId,
+                      actionColor: widget.actionColor,
+                      onTap: () {
+                        setState(() {
+                          _selectedCategoryId = category.id;
+                        });
                       },
-              ),
-            ],
-          ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
+      ),
+      action: AppPrimaryButton(
+        label: 'Chọn',
+        color: widget.actionColor,
+        onTap: _selectedCategoryId == null
+            ? null
+            : () {
+                final category = widget.categories
+                    .where((item) => item.id == _selectedCategoryId)
+                    .firstOrNull;
+                if (category != null) {
+                  Navigator.of(context).pop(category);
+                }
+              },
+      ),
     );
   }
 }

@@ -393,62 +393,50 @@ class _ThemeModeSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppSheetContainer(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          context.scaled(16),
-          0,
-          context.scaled(16),
-          appSheetBottomPadding(context),
-        ),
-        child: Column(
-            mainAxisSize: MainAxisSize.min,
+    return AppSheetScaffold(
+      title: 'Chọn giao diện',
+      subtitle: 'Áp dụng cho toàn bộ ứng dụng.',
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: context.scaled(24)),
+          Row(
             children: [
-              const AppSheetHeader(
-                title: 'Chọn giao diện',
-                subtitle: 'Áp dụng cho toàn bộ ứng dụng.',
-                showCloseButton: false,
+              Expanded(
+                child: _ThemeModeOption(
+                  icon: Icons.settings_suggest_rounded,
+                  label: 'Theo máy',
+                  isActive: selectedTheme == ThemeMode.system,
+                  onTap: () => onSelected(ThemeMode.system),
+                ),
               ),
-              SizedBox(height: context.scaled(54)),
-              Row(
-                children: [
-                  Expanded(
-                    child: _ThemeModeOption(
-                      icon: Icons.settings_suggest_rounded,
-                      label: 'Theo máy',
-                      isActive: selectedTheme == ThemeMode.system,
-                      onTap: () => onSelected(ThemeMode.system),
-                    ),
-                  ),
-                  SizedBox(width: context.scaled(10)),
-                  Expanded(
-                    child: _ThemeModeOption(
-                      icon: Icons.light_mode_rounded,
-                      label: 'Sáng',
-                      isActive: selectedTheme == ThemeMode.light,
-                      onTap: () => onSelected(ThemeMode.light),
-                    ),
-                  ),
-                  SizedBox(width: context.scaled(10)),
-                  Expanded(
-                    child: _ThemeModeOption(
-                      icon: Icons.dark_mode_rounded,
-                      label: 'Tối',
-                      isActive: selectedTheme == ThemeMode.dark,
-                      onTap: () => onSelected(ThemeMode.dark),
-                    ),
-                  ),
-                ],
+              SizedBox(width: context.scaled(10)),
+              Expanded(
+                child: _ThemeModeOption(
+                  icon: Icons.light_mode_rounded,
+                  label: 'Sáng',
+                  isActive: selectedTheme == ThemeMode.light,
+                  onTap: () => onSelected(ThemeMode.light),
+                ),
               ),
-              SizedBox(height: context.scaled(18)),
-              AppPrimaryButton(
-                label: 'Đóng',
-                color: AppColors.primary,
-                onTap: () => Navigator.of(context).pop(),
+              SizedBox(width: context.scaled(10)),
+              Expanded(
+                child: _ThemeModeOption(
+                  icon: Icons.dark_mode_rounded,
+                  label: 'Tối',
+                  isActive: selectedTheme == ThemeMode.dark,
+                  onTap: () => onSelected(ThemeMode.dark),
+                ),
               ),
             ],
           ),
-        ),
+        ],
+      ),
+      action: AppPrimaryButton(
+        label: 'Đóng',
+        color: AppColors.primary,
+        onTap: () => Navigator.of(context).pop(),
+      ),
     );
   }
 }

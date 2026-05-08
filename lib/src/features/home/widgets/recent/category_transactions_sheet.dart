@@ -42,52 +42,33 @@ class _CategoryTransactionsSheet extends ConsumerWidget {
       (sum, t) => sum + t.amount,
     );
 
-    return AppSheetContainer(
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            0,
-            0,
-            0,
-            appSheetBottomPadding(context, extra: 16),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AppSheetHeader(
-                title: category.name,
-                subtitle: 'Tổng: ${formatCurrency(total)}',
-              ),
-              SizedBox(height: context.scaled(16)),
-              if (categoryTransactions.isEmpty)
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: context.scaled(20)),
-                  child: Text(
-                    'Không có giao dịch nào',
-                    style: context.appText.bodyStrong.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                )
-              else
-                Flexible(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(horizontal: context.scaled(16)),
-                    itemCount: categoryTransactions.length,
-                    separatorBuilder: (_, __) => SizedBox(height: context.scaled(12)),
-                    itemBuilder: (context, index) {
-                      return TransactionRow(
-                        transaction: categoryTransactions[index],
-                      );
-                    },
-                  ),
+    return AppSheetScaffold(
+      title: category.name,
+      subtitle: 'Tổng: ${formatCurrency(total)}',
+      bodyPadding: EdgeInsets.zero,
+      body: categoryTransactions.isEmpty
+          ? Center(
+              child: Text(
+                'Không có giao dịch nào',
+                style: context.appText.bodyStrong.copyWith(
+                  color: AppColors.textSecondary,
                 ),
-            ],
-          ),
-        ),
-      ),
+              ),
+            )
+          : ListView.separated(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.scaled(16),
+                vertical: context.scaled(8),
+              ),
+              itemCount: categoryTransactions.length,
+              separatorBuilder: (_, __) =>
+                  SizedBox(height: context.scaled(12)),
+              itemBuilder: (context, index) {
+                return TransactionRow(
+                  transaction: categoryTransactions[index],
+                );
+              },
+            ),
     );
   }
 }

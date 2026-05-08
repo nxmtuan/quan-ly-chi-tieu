@@ -17,46 +17,34 @@ class _SourcePickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppSheetContainer(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          context.scaled(16),
-          0,
-          context.scaled(16),
-          appSheetBottomPadding(context),
-        ),
-        child: Column(
-            mainAxisSize: MainAxisSize.min,
+    return AppSheetScaffold(
+      title: 'Chọn nguồn tiền',
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: context.scaled(24)),
+          Row(
             children: [
-              const AppSheetHeader(
-                title: 'Chọn nguồn tiền',
-                showCloseButton: false,
-              ),
-              SizedBox(height: context.scaled(54)),
-              Row(
-                children: [
-                  for (final entry in ['Tiền mặt', 'Chuyển khoản', 'Khác'].indexed) ...[
-                    Expanded(
-                      child: _SourceSheetOption(
-                        source: entry.$2,
-                        icon: _sourceIcon(entry.$2),
-                        selected: entry.$2 == selectedSource,
-                        onTap: () => Navigator.of(context).pop(entry.$2),
-                      ),
-                    ),
-                    if (entry.$1 != 2) SizedBox(width: context.scaled(10)),
-                  ],
-                ],
-              ),
-              SizedBox(height: context.scaled(18)),
-              AppPrimaryButton(
-                label: 'Đóng',
-                color: AppColors.primary,
-                onTap: () => Navigator.of(context).pop(),
-              ),
+              for (final entry in ['Tiền mặt', 'Chuyển khoản', 'Khác'].indexed) ...[
+                Expanded(
+                  child: _SourceSheetOption(
+                    source: entry.$2,
+                    icon: _sourceIcon(entry.$2),
+                    selected: entry.$2 == selectedSource,
+                    onTap: () => Navigator.of(context).pop(entry.$2),
+                  ),
+                ),
+                if (entry.$1 != 2) SizedBox(width: context.scaled(10)),
+              ],
             ],
           ),
-        ),
+        ],
+      ),
+      action: AppPrimaryButton(
+        label: 'Đóng',
+        color: AppColors.primary,
+        onTap: () => Navigator.of(context).pop(),
+      ),
     );
   }
 }
