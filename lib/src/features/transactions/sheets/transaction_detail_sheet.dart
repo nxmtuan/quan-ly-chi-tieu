@@ -115,9 +115,8 @@ class _TransactionDetailSheet extends ConsumerWidget {
       action: Row(
         children: [
           Expanded(
-            child: InkWell(
+            child: AppBounceBuilder(
               onTap: () => _confirmDelete(context, ref),
-              borderRadius: BorderRadius.circular(context.scaled(16)),
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
                 decoration: BoxDecoration(
@@ -136,7 +135,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
           ),
           SizedBox(width: context.scaled(12)),
           Expanded(
-            child: InkWell(
+            child: AppBounceBuilder(
               onTap: () {
                 Navigator.of(context).pop();
                 showAddTransactionSheet(
@@ -145,7 +144,6 @@ class _TransactionDetailSheet extends ConsumerWidget {
                   replaceSheet: true,
                 );
               },
-              borderRadius: BorderRadius.circular(context.scaled(16)),
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
                 decoration: BoxDecoration(
