@@ -59,7 +59,7 @@ class AppTableCalendar extends StatelessWidget {
         availableCalendarFormats: const {CalendarFormat.month: 'Month'},
         headerStyle: HeaderStyle(
           formatButtonVisible: false,
-          titleCentered: false,
+          titleCentered: true,
           leftChevronIcon: Icon(
             Icons.chevron_left_rounded,
             color: colors.onSurface,

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
+import '../../core/widgets/app_page_header.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../core/widgets/app_bounce_builder.dart';
 import '../../models/category.dart';
@@ -21,41 +22,44 @@ class CategoriesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final categories = ref.watch(categoriesProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Categories'),
-        actions: [
-          IconButton(
+    return ListView(
+      padding: EdgeInsets.fromLTRB(
+        context.scaled(24),
+        context.scaled(22),
+        context.scaled(24),
+        context.scaled(120),
+      ),
+      children: [
+        const AppPageHeader(
+          subtitle: 'Danh mục',
+          title: 'Quản lý danh mục',
+        ),
+        SizedBox(height: context.scaled(22)),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: FilledButton.icon(
             onPressed: () => showCategoryDialog(context, ref),
             icon: const Icon(Icons.add_rounded),
+            label: const Text('Thêm danh mục'),
           ),
-        ],
-      ),
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(
-          context.scaled(24),
-          context.scaled(16),
-          context.scaled(24),
-          context.scaled(32),
         ),
-        children: [
-          for (final type in TransactionType.values) ...[
-            Text(
-              type == TransactionType.income ? 'Income' : 'Expense',
-              style: context.appText.sectionTitle,
+        SizedBox(height: context.scaled(22)),
+        for (final type in TransactionType.values) ...[
+          Text(
+            type == TransactionType.income ? 'Thu nhập' : 'Chi tiêu',
+            style: context.appText.sectionTitle,
+          ),
+          SizedBox(height: context.scaled(12)),
+          for (final category in categories.where(
+            (item) => item.type == type,
+          ))
+            Padding(
+              padding: EdgeInsets.only(bottom: context.scaled(12)),
+              child: _CategoryRow(category: category),
             ),
-            SizedBox(height: context.scaled(12)),
-            for (final category in categories.where(
-              (item) => item.type == type,
-            ))
-              Padding(
-                padding: EdgeInsets.only(bottom: context.scaled(12)),
-                child: _CategoryRow(category: category),
-              ),
-            SizedBox(height: context.scaled(12)),
-          ],
+          SizedBox(height: context.scaled(12)),
         ],
-      ),
+      ],
     );
   }
 }

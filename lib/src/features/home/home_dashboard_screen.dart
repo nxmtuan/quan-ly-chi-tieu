@@ -2,15 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/widgets/app_bounce_builder.dart';
-import '../../models/auth_user.dart';
+import '../../core/widgets/app_page_header.dart';
 import '../../models/transaction.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/transaction_provider.dart';
 import 'models/home_summary_scope.dart';
 import '../transactions/add_transaction_sheet.dart';
@@ -39,8 +35,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final scale = context.adaptiveScale;
-    final authUser = ref.watch(authProvider);
     final allTransactions = ref.watch(transactionsProvider);
     final filteredTransactions = [
       for (final transaction in allTransactions)
@@ -75,39 +69,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   sliver: SliverToBoxAdapter(
                     child:
-                        Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Tổng quan',
-                                        style: context.appText.pageEyebrow,
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Text(
-                                        'Quản lý tài chính',
-                                        style:
-                                            context.appText.pageTitle.copyWith(
-                                              color: colors.onSurface,
-                                              fontSize: context.scaledFont(
-                                                27,
-                                                min: 24,
-                                              ),
-                                              letterSpacing: -1.0 * scale,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                _ProfileAvatarButton(
-                                  authUser: authUser,
-                                  onTap: () => context.go('/settings'),
-                                ),
-                              ],
+                        const AppPageHeader(
+                              subtitle: 'Tổng quan',
+                              title: 'Quản lý tài chính',
                             )
                             .animate()
                             .fadeIn(duration: 260.ms)
@@ -251,100 +215,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 DateTime _monthStart(DateTime date) {
   return DateTime(date.year, date.month);
-}
-
-class _ProfileAvatarButton extends StatelessWidget {
-  const _ProfileAvatarButton({required this.authUser, required this.onTap});
-
-  final AuthUser? authUser;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final avatarLabel = _avatarLabel(authUser);
-    final size = context.scaled(60);
-    final innerPadding = context.scaled(6);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(18)),
-      child: Container(
-        width: size,
-        height: size,
-        padding: EdgeInsets.all(innerPadding),
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(context.scaled(18)),
-          boxShadow: [
-            BoxShadow(
-              color: colors.shadow.withValues(alpha: isDark ? 0.3 : 0.08),
-              blurRadius: context.scaled(isDark ? 10 : 18),
-              offset: Offset(0, context.scaled(8)),
-            ),
-          ],
-        ),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: authUser == null
-                ? AppColors.primary.withValues(alpha: 0.12)
-                : const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(context.scaled(14)),
-          ),
-          child: _buildAvatarContent(context, avatarLabel),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAvatarContent(BuildContext context, String avatarLabel) {
-    final radius = context.scaled(14);
-    final photoUrl = authUser?.photoUrl;
-    if (photoUrl == null || photoUrl.isEmpty) {
-      return _AvatarFallback(label: avatarLabel);
-    }
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: Image.network(
-        photoUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _AvatarFallback(label: avatarLabel);
-        },
-      ),
-    );
-  }
-
-  String _avatarLabel(AuthUser? authUser) {
-    final source = authUser?.name.trim();
-    if (source == null || source.isEmpty) {
-      return 'A';
-    }
-
-    return source.substring(0, 1).toUpperCase();
-  }
-}
-
-class _AvatarFallback extends StatelessWidget {
-  const _AvatarFallback({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        label,
-        style: context.appText.pageTitle.copyWith(
-          color: AppColors.primary,
-          fontSize: context.scaledFont(22, min: 18),
-          letterSpacing: -0.5,
-        ),
-      ),
-    );
-  }
 }
 
 class _QuickAddButton extends StatelessWidget {

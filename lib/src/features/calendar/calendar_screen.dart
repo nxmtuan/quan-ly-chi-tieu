@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
+import '../../core/widgets/app_page_header.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_table_calendar.dart';
 import '../../core/widgets/flat_card.dart';
@@ -53,23 +54,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             context.scaled(120) + MediaQuery.paddingOf(context).bottom,
           ),
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Lịch',
-                  style: context.appText.pageEyebrow,
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  'Thống kê giao dịch',
-                  style: context.appText.pageTitle.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: context.scaledFont(27, min: 24),
-                    letterSpacing: -1.0 * context.adaptiveScale,
-                  ),
-                ),
-              ],
+            const AppPageHeader(
+              subtitle: 'Lịch',
+              title: 'Thống kê giao dịch',
             ),
             SizedBox(height: context.scaled(22)),
             AppTableCalendar(

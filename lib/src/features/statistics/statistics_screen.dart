@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
+import '../../core/widgets/app_page_header.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../core/widgets/app_bounce_builder.dart';
@@ -47,18 +48,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             context.scaled(120) + MediaQuery.paddingOf(context).bottom,
           ),
           children: [
-            Text(
-              'Statistics',
-              style: context.appText.pageTitle.copyWith(
-                fontSize: context.scaledFont(27, min: 24),
-              ),
-            ),
-            SizedBox(height: context.scaled(8)),
-            Text(
-              'Track where your money goes',
-              style: context.appText.pageSubtitle.copyWith(
-                color: AppColors.textSecondary,
-              ),
+            const AppPageHeader(
+              subtitle: 'Thống kê',
+              title: 'Phân tích chi tiêu',
             ),
             SizedBox(height: context.scaled(22)),
             _RangeSelector(

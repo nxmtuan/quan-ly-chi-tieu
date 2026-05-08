@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
+import '../../core/widgets/app_page_header.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../core/widgets/app_bounce_builder.dart';
@@ -36,18 +37,9 @@ class SettingsScreen extends ConsumerWidget {
             context.scaled(120) + MediaQuery.paddingOf(context).bottom,
           ),
           children: [
-            Text(
-              'Cài đặt',
-              style: context.appText.pageEyebrow,
-            ),
-            SizedBox(height: context.scaled(5)),
-            Text(
-              'Tuỳ chỉnh ứng dụng',
-              style: context.appText.pageTitle.copyWith(
-                fontWeight: FontWeight.w800,
-                letterSpacing: -1.0,
-                fontSize: context.scaledFont(27, min: 24),
-              ),
+            const AppPageHeader(
+              subtitle: 'Cài đặt',
+              title: 'Tuỳ chỉnh ứng dụng',
             ),
             SizedBox(height: context.scaled(24)),
             FlatCard(
