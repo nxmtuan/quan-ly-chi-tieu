@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/widgets/app_toast.dart';
 import '../../core/widgets/gradient_button.dart';
 import '../../providers/auth_provider.dart';
 import 'google_web_sign_in_button.dart';
@@ -106,12 +107,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       await ref.read(authProvider.notifier).signInWithGoogle();
+      if (mounted && ref.read(authProvider) != null) {
+        AppToast.show(
+          context,
+          message: 'Đăng nhập thành công',
+          type: AppToastType.success,
+        );
+      }
     } catch (_) {
       if (mounted) {
         setState(() {
           _errorMessage =
               'Không thể đăng nhập Google. Vui lòng kiểm tra cấu hình OAuth.';
         });
+        AppToast.show(
+          context,
+          message: _errorMessage!,
+          type: AppToastType.error,
+        );
       }
     } finally {
       if (mounted) {

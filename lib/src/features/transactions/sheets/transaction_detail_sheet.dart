@@ -182,6 +182,11 @@ class _TransactionDetailSheet extends ConsumerWidget {
 
     if (confirmed == true && context.mounted) {
       ref.read(transactionsProvider.notifier).deleteTransaction(transaction.id);
+      AppToast.show(
+        context,
+        message: 'Đã xóa giao dịch',
+        type: AppToastType.success,
+      );
       Navigator.of(context).pop();
     }
   }

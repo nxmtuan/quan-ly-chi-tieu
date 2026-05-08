@@ -11,6 +11,7 @@ import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_table_calendar.dart';
+import '../../core/widgets/app_toast.dart';
 import '../../models/category.dart';
 import '../../models/transaction.dart';
 import '../../providers/category_provider.dart';
@@ -257,10 +258,24 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
 
     if (widget.transaction == null) {
       await ref.read(transactionsProvider.notifier).addTransaction(transaction);
+      if (mounted) {
+        AppToast.show(
+          context,
+          message: 'Đã thêm giao dịch thành công',
+          type: AppToastType.success,
+        );
+      }
     } else {
       await ref
           .read(transactionsProvider.notifier)
           .updateTransaction(transaction);
+      if (mounted) {
+        AppToast.show(
+          context,
+          message: 'Đã cập nhật giao dịch thành công',
+          type: AppToastType.success,
+        );
+      }
     }
 
     if (mounted) {

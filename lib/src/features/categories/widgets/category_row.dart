@@ -55,26 +55,13 @@ class _CategoryRow extends ConsumerWidget {
   }
 
   Future<void> _deleteCategory(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete category?'),
-          content: const Text(
-            'Transactions in this category will also be deleted.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
+    final confirmed = await showAppConfirmDialog(
+      context,
+      title: 'Xóa danh mục',
+      message: 'Các giao dịch trong danh mục này cũng sẽ bị xóa.',
+      confirmText: 'Xóa',
+      confirmTextColor: const Color(0xFFDC2626),
+      confirmBackgroundColor: const Color(0xFFFEE2E2),
     );
 
     if (confirmed != true) {
@@ -85,5 +72,12 @@ class _CategoryRow extends ConsumerWidget {
         .read(transactionsProvider.notifier)
         .deleteTransactionsByCategory(category.id);
     await ref.read(categoriesProvider.notifier).deleteCategory(category.id);
+    if (context.mounted) {
+      AppToast.show(
+        context,
+        message: 'Đã xóa danh mục',
+        type: AppToastType.success,
+      );
+    }
   }
 }

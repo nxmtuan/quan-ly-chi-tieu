@@ -30,6 +30,11 @@ class _ThemeSettingsRow extends ConsumerWidget {
               selectedTheme: ref.watch(themeModeProvider),
               onSelected: (themeMode) {
                 ref.read(themeModeProvider.notifier).setThemeMode(themeMode);
+                AppToast.show(
+                  context,
+                  message: 'Đã cập nhật giao diện',
+                  type: AppToastType.success,
+                );
               },
             );
           },
@@ -164,14 +169,19 @@ class _AuthSettingsRow extends ConsumerWidget {
   Future<void> _signIn(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(authProvider.notifier).signInWithGoogle();
+      if (context.mounted && ref.read(authProvider) != null) {
+        AppToast.show(
+          context,
+          message: 'Đăng nhập thành công',
+          type: AppToastType.success,
+        );
+      }
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Không thể đăng nhập Google. Vui lòng kiểm tra cấu hình OAuth.',
-            ),
-          ),
+        AppToast.show(
+          context,
+          message: 'Không thể đăng nhập Google. Vui lòng kiểm tra cấu hình OAuth.',
+          type: AppToastType.error,
         );
       }
     }
@@ -189,6 +199,14 @@ class _AuthSettingsRow extends ConsumerWidget {
 
     if (confirmed == true && context.mounted) {
       await ref.read(authProvider.notifier).signOut();
+      if (!context.mounted) {
+        return;
+      }
+      AppToast.show(
+        context,
+        message: 'Đăng xuất thành công',
+        type: AppToastType.success,
+      );
     }
   }
 }
@@ -261,6 +279,15 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
                       await ref
                           .read(autoSyncSettingsProvider.notifier)
                           .setEnabled(value);
+                      if (context.mounted) {
+                        AppToast.show(
+                          context,
+                          message: value
+                              ? 'Đã bật tự động đồng bộ'
+                              : 'Đã tắt tự động đồng bộ',
+                          type: AppToastType.success,
+                        );
+                      }
                     },
                   ),
                   const _DividerIndent(),
@@ -351,6 +378,13 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
 
     if (updated != null) {
       await ref.read(autoSyncSettingsProvider.notifier).save(updated);
+      if (mounted) {
+        AppToast.show(
+          context,
+          message: 'Đã lưu lịch tự động đồng bộ',
+          type: AppToastType.success,
+        );
+      }
     }
   }
 
@@ -368,20 +402,18 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
       ref.invalidate(categoriesProvider);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đồng bộ dữ liệu thành công!'),
-            backgroundColor: AppColors.success,
-          ),
+        AppToast.show(
+          context,
+          message: 'Đồng bộ dữ liệu thành công',
+          type: AppToastType.success,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi đồng bộ: $e'),
-            backgroundColor: AppColors.danger,
-          ),
+        AppToast.show(
+          context,
+          message: 'Lỗi đồng bộ: $e',
+          type: AppToastType.error,
         );
       }
     } finally {
@@ -417,26 +449,20 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
       final deleted = await syncService.deleteRemoteData();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              deleted
-                  ? 'Đã xóa dữ liệu đồng bộ trên Drive.'
-                  : 'Không tìm thấy dữ liệu đồng bộ trên Drive.',
-            ),
-            backgroundColor: deleted
-                ? AppColors.success
-                : AppColors.textSecondary,
-          ),
+        AppToast.show(
+          context,
+          message: deleted
+              ? 'Đã xóa dữ liệu đồng bộ trên Drive'
+              : 'Không tìm thấy dữ liệu đồng bộ trên Drive',
+          type: deleted ? AppToastType.success : AppToastType.info,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Không thể xóa dữ liệu trên Drive: $e'),
-            backgroundColor: AppColors.danger,
-          ),
+        AppToast.show(
+          context,
+          message: 'Không thể xóa dữ liệu trên Drive: $e',
+          type: AppToastType.error,
         );
       }
     } finally {
