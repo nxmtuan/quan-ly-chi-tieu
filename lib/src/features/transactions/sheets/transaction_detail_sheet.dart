@@ -173,29 +173,13 @@ class _TransactionDetailSheet extends ConsumerWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: const Text('Xóa giao dịch'),
-        content: const Text('Bạn có chắc muốn xóa giao dịch này không?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Hủy',
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: const Color(0xFFDC2626)),
-            child: const Text('Xóa'),
-          ),
-        ],
-      ),
+    final confirmed = await showAppConfirmDialog(
+      context,
+      title: 'Xóa giao dịch',
+      message: 'Bạn có chắc muốn xóa giao dịch này không?',
+      confirmText: 'Xóa',
+      confirmTextColor: const Color(0xFFDC2626),
+      confirmBackgroundColor: const Color(0xFFFEE2E2),
     );
 
     if (confirmed == true && context.mounted) {
