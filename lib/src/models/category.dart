@@ -49,6 +49,10 @@ const categoryIconOptions = [
   Icons.receipt_long_rounded,
   Icons.storefront_rounded,
   Icons.fitness_center_rounded,
+  Icons.campaign_rounded,
+  Icons.park_rounded,
+  Icons.security_rounded,
+  Icons.emoji_food_beverage_rounded,
 ];
 
 const categoryColorOptions = [
@@ -67,6 +71,12 @@ const categoryColorOptions = [
   Color(0xFFE11D48),
   Color(0xFFDB2777),
   Color(0xFF6B7280),
+  Color(0xFF14B8A6),
+  Color(0xFFA16207),
+  Color(0xFF9333EA),
+  Color(0xFF0F766E),
+  Color(0xFFB91C1C),
+  Color(0xFF1D4ED8),
 ];
 
 @Entity()

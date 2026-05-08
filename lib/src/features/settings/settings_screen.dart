@@ -21,7 +21,7 @@ import '../../providers/storage_provider.dart';
 import '../../providers/transaction_provider.dart';
 import '../../providers/category_provider.dart';
 import '../auth/google_web_sign_in_button.dart';
-import '../categories/categories_screen.dart';
+import '../categories/category_management_sheet.dart';
 
 part 'widgets/settings_sections.dart';
 

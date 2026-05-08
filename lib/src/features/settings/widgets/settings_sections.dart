@@ -44,11 +44,11 @@ class _ThemeSettingsRow extends ConsumerWidget {
   }
 }
 
-class _ManageCategoriesRow extends StatelessWidget {
+class _ManageCategoriesRow extends ConsumerWidget {
   const _ManageCategoriesRow();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return _SettingsRow(
       icon: Icons.category_rounded,
       iconColor: AppColors.success,
@@ -58,13 +58,7 @@ class _ManageCategoriesRow extends StatelessWidget {
         Icons.chevron_right_rounded,
         color: AppColors.textSecondary,
       ),
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (context) => const CategoriesScreen(),
-          ),
-        );
-      },
+      onTap: () => showCategoryManagementSheet(context, ref),
     );
   }
 }

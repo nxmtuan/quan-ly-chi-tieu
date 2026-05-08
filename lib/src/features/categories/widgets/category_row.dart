@@ -7,11 +7,8 @@ class _CategoryRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FlatCard(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.scaled(16),
-        vertical: context.scaled(14),
-      ),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: context.scaled(14)),
       child: Row(
         children: [
           Container(
@@ -29,25 +26,35 @@ class _CategoryRow extends ConsumerWidget {
           ),
           SizedBox(width: context.scaled(14)),
           Expanded(
-            child: Text(
-              category.name,
-              style: context.appText.bodyStrong.copyWith(
-                color: AppColors.textPrimary,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  category.name,
+                  style: context.appText.bodyStrong.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: context.scaled(3)),
+                Text(
+                  category.type == TransactionType.income ? 'Thu nhập' : 'Chi tiêu',
+                  style: context.appText.caption.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
-          IconButton(
-            onPressed: () =>
-                showCategoryDialog(context, ref, category: category),
-            icon: Icon(Icons.edit_rounded, size: context.scaled(21)),
+          _ActionIconButton(
+            icon: Icons.edit_rounded,
+            onTap: () => showCategoryDialog(context, ref, category: category),
           ),
-          IconButton(
-            onPressed: () => _deleteCategory(context, ref),
-            icon: Icon(
-              Icons.delete_rounded,
-              color: AppColors.danger,
-              size: context.scaled(21),
-            ),
+          SizedBox(width: context.scaled(8)),
+          _ActionIconButton(
+            icon: Icons.delete_rounded,
+            color: AppColors.danger,
+            backgroundColor: AppColors.danger.withValues(alpha: 0.1),
+            onTap: () => _deleteCategory(context, ref),
           ),
         ],
       ),
@@ -79,5 +86,40 @@ class _CategoryRow extends ConsumerWidget {
         type: AppToastType.success,
       );
     }
+  }
+}
+
+class _ActionIconButton extends StatelessWidget {
+  const _ActionIconButton({
+    required this.icon,
+    required this.onTap,
+    this.color = AppColors.textPrimary,
+    this.backgroundColor = const Color(0xFFF8FAFC),
+  });
+
+  final IconData icon;
+  final Color color;
+  final Color backgroundColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: Container(
+        width: context.scaled(38),
+        height: context.scaled(38),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(context.scaled(14)),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Icon(
+          icon,
+          color: color,
+          size: context.scaled(18),
+        ),
+      ),
+    );
   }
 }
