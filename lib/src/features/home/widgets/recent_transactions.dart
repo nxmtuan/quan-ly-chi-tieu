@@ -21,17 +21,6 @@ part 'recent/category_breakdown.dart';
 part 'recent/transaction_row.dart';
 part 'recent/category_transactions_sheet.dart';
 
-const _modernChartPalette = [
-  Color(0xFFE91E63),
-  Color(0xFF8E24AA),
-  Color(0xFFFF7043),
-  Color(0xFF00A6A6),
-  Color(0xFF42A5F5),
-  Color(0xFFFFC107),
-  Color(0xFF7E57C2),
-  Color(0xFF66BB6A),
-];
-
 class RecentTransactions extends ConsumerStatefulWidget {
   const RecentTransactions({super.key, required this.month, required this.transactions});
 

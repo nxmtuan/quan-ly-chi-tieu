@@ -61,7 +61,7 @@ class _CategoryTransactionsSheet extends ConsumerWidget {
                 vertical: context.scaled(8),
               ),
               itemCount: categoryTransactions.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   SizedBox(height: context.scaled(12)),
               itemBuilder: (context, index) {
                 return TransactionRow(

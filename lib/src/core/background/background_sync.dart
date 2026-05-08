@@ -21,14 +21,16 @@ void callbackDispatcher() {
           AndroidInitializationSettings('@mipmap/ic_launcher');
       const InitializationSettings initializationSettings =
           InitializationSettings(android: initializationSettingsAndroid);
-      await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+      await flutterLocalNotificationsPlugin.initialize(
+        settings: initializationSettings,
+      );
 
       // Hiển thị thông báo chuẩn bị
       await flutterLocalNotificationsPlugin.show(
-        888,
-        'Đồng bộ dữ liệu',
-        'Đang chuẩn bị đồng bộ...',
-        const NotificationDetails(
+        id: 888,
+        title: 'Đồng bộ dữ liệu',
+        body: 'Đang chuẩn bị đồng bộ...',
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'sync_channel_id',
             'Đồng bộ dữ liệu',
@@ -56,23 +58,23 @@ void callbackDispatcher() {
       // Kiểm tra đăng nhập
       final authUser = container.read(authProvider);
       if (authUser == null) {
-        await flutterLocalNotificationsPlugin.cancel(888);
+        await flutterLocalNotificationsPlugin.cancel(id: 888);
         return Future.value(true);
       }
 
       // Lấy DriveApi
       final driveApi = await container.read(authProvider.notifier).getDriveApi();
       if (driveApi == null) {
-        await flutterLocalNotificationsPlugin.cancel(888);
+        await flutterLocalNotificationsPlugin.cancel(id: 888);
         return Future.value(true);
       }
 
       // Hiển thị thông báo đang đồng bộ
       await flutterLocalNotificationsPlugin.show(
-        888,
-        'Đồng bộ dữ liệu',
-        'Đang tiến hành đồng bộ...',
-        const NotificationDetails(
+        id: 888,
+        title: 'Đồng bộ dữ liệu',
+        body: 'Đang tiến hành đồng bộ...',
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'sync_channel_id',
             'Đồng bộ dữ liệu',
@@ -91,16 +93,16 @@ void callbackDispatcher() {
       await syncService.syncData();
 
       // Đồng bộ thành công thì xóa luôn thông báo
-      await flutterLocalNotificationsPlugin.cancel(888);
+      await flutterLocalNotificationsPlugin.cancel(id: 888);
 
       return Future.value(true);
     } catch (e) {
       // Đồng bộ thất bại thì thông báo thất bại
       await flutterLocalNotificationsPlugin.show(
-        889,
-        'Đồng bộ dữ liệu',
-        'Đồng bộ thất bại. Sẽ thử lại sau.',
-        const NotificationDetails(
+        id: 889,
+        title: 'Đồng bộ dữ liệu',
+        body: 'Đồng bộ thất bại. Sẽ thử lại sau.',
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'sync_channel_id',
             'Đồng bộ dữ liệu',
@@ -110,7 +112,7 @@ void callbackDispatcher() {
           ),
         ),
       );
-      await flutterLocalNotificationsPlugin.cancel(888);
+      await flutterLocalNotificationsPlugin.cancel(id: 888);
       // Trả về false để WorkManager retry
       return Future.value(false);
     }

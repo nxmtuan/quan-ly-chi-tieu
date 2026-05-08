@@ -16,10 +16,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('vi_VN');
   
-  Workmanager().initialize(
-    callbackDispatcher,
-    isInDebugMode: false,
-  );
+  Workmanager().initialize(callbackDispatcher);
   scheduleBackgroundSync();
 
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();

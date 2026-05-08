@@ -19,18 +19,18 @@ class TransactionsNotifier extends Notifier<List<Transaction>> {
   List<Transaction> build() {
     final storedTransactions = ref
         .read(transactionStorageProvider)
-        .readTransactions();
+        .readTransactions(includeDeleted: true);
     final filteredTransactions = _removeSeedTransactions(storedTransactions);
 
     if (filteredTransactions.length != storedTransactions.length) {
       unawaited(
         ref
             .read(transactionStorageProvider)
-            .saveTransactions(filteredTransactions),
+            .replaceAllTransactions(filteredTransactions),
       );
     }
 
-    return filteredTransactions;
+    return _visibleTransactions(filteredTransactions);
   }
 
   Future<void> addTransaction(Transaction transaction) async {
@@ -38,7 +38,7 @@ class TransactionsNotifier extends Notifier<List<Transaction>> {
       ..sort((a, b) => b.date.compareTo(a.date));
 
     state = updatedTransactions;
-    await _save();
+    await ref.read(transactionStorageProvider).putTransaction(transaction);
   }
 
   Future<void> updateTransaction(Transaction transaction) async {
@@ -48,23 +48,21 @@ class TransactionsNotifier extends Notifier<List<Transaction>> {
     ]..sort((a, b) => b.date.compareTo(a.date));
 
     state = updatedTransactions;
-    await _save();
+    await ref.read(transactionStorageProvider).putTransaction(transaction);
   }
 
   Future<void> deleteTransaction(String id) async {
     state = state.where((transaction) => transaction.id != id).toList();
-    await _save();
+    await ref.read(transactionStorageProvider).markTransactionDeleted(id);
   }
 
   Future<void> deleteTransactionsByCategory(String categoryId) async {
     state = state
         .where((transaction) => transaction.categoryId != categoryId)
         .toList();
-    await _save();
-  }
-
-  Future<void> _save() {
-    return ref.read(transactionStorageProvider).saveTransactions(state);
+    await ref
+        .read(transactionStorageProvider)
+        .markTransactionsDeletedByCategory(categoryId);
   }
 
   static List<Transaction> _removeSeedTransactions(
@@ -74,6 +72,13 @@ class TransactionsNotifier extends Notifier<List<Transaction>> {
       for (final transaction in transactions)
         if (!_seedTransactionIds.contains(transaction.id)) transaction,
     ];
+  }
+
+  static List<Transaction> _visibleTransactions(List<Transaction> transactions) {
+    return [
+      for (final transaction in transactions)
+        if (!transaction.isDeleted) transaction,
+    ]..sort((a, b) => b.date.compareTo(a.date));
   }
 }
 

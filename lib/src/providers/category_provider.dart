@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,18 +10,28 @@ import 'storage_provider.dart';
 class CategoriesNotifier extends Notifier<List<Category>> {
   @override
   List<Category> build() {
-    final storedCategories = ref.read(categoryStorageProvider).readCategories();
+    final storedCategories = ref
+        .read(categoryStorageProvider)
+        .readCategories(includeDeleted: true);
 
     if (storedCategories.isNotEmpty) {
-      return storedCategories;
+      return _visibleCategories(storedCategories);
     }
 
-    return defaultCategories;
+    final seededCategories = [
+      for (final category in defaultCategories) category.copyWith(),
+    ];
+    unawaited(
+      ref.read(categoryStorageProvider).replaceAllCategories([
+        for (final category in seededCategories) category.copyWith(),
+      ]),
+    );
+    return seededCategories;
   }
 
   Future<void> addCategory(Category category) async {
     state = [...state, category];
-    await _save();
+    await ref.read(categoryStorageProvider).putCategory(category);
   }
 
   Future<void> updateCategory(Category category) async {
@@ -27,16 +39,19 @@ class CategoriesNotifier extends Notifier<List<Category>> {
       for (final item in state)
         if (item.id == category.id) category else item,
     ];
-    await _save();
+    await ref.read(categoryStorageProvider).putCategory(category);
   }
 
   Future<void> deleteCategory(String id) async {
     state = state.where((category) => category.id != id).toList();
-    await _save();
+    await ref.read(categoryStorageProvider).markCategoryDeleted(id);
   }
 
-  Future<void> _save() {
-    return ref.read(categoryStorageProvider).saveCategories(state);
+  static List<Category> _visibleCategories(List<Category> categories) {
+    return [
+      for (final category in categories)
+        if (!category.isDeleted) category,
+    ];
   }
 }
 

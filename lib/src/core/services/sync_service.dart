@@ -17,16 +17,13 @@ class SyncService {
   final Box<Category> categoryBox;
 
   Future<void> syncData() async {
-    // 1. Download
     final remoteJsonString = await driveService.downloadData();
-    
-    // Remote data structures
     final Map<String, Transaction> remoteTransactions = {};
     final Map<String, Category> remoteCategories = {};
 
     if (remoteJsonString != null && remoteJsonString.isNotEmpty) {
       final decoded = jsonDecode(remoteJsonString) as Map<String, dynamic>;
-      
+
       final txList = decoded['transactions'] as List<dynamic>? ?? [];
       for (final txJson in txList) {
         final tx = Transaction.fromJson(txJson as Map<String, dynamic>);
@@ -40,48 +37,41 @@ class SyncService {
       }
     }
 
-    // 2. Merge Categories
     final localCategories = categoryBox.getAll();
     final localCategoryMap = {for (var cat in localCategories) cat.id: cat};
+    final mergedCategories = <String, Category>{...localCategoryMap};
 
     for (final remoteCat in remoteCategories.values) {
-      final localCat = localCategoryMap[remoteCat.id];
-      if (localCat == null) {
-        // Exists on remote, not local -> Insert
-        categoryBox.put(remoteCat);
-      } else {
-        // Exists on both -> Merge based on updatedAt
-        if (remoteCat.updatedAt.isAfter(localCat.updatedAt)) {
-          remoteCat.obxId = localCat.obxId; // Preserve local ObjectBox ID
-          categoryBox.put(remoteCat);
-        }
+      final localCat = mergedCategories[remoteCat.id];
+      if (localCat == null || remoteCat.updatedAt.isAfter(localCat.updatedAt)) {
+        mergedCategories[remoteCat.id] = remoteCat;
       }
     }
 
-    // 3. Merge Transactions
     final localTransactions = transactionBox.getAll();
     final localTransactionMap = {for (var tx in localTransactions) tx.id: tx};
+    final mergedTransactions = <String, Transaction>{...localTransactionMap};
 
     for (final remoteTx in remoteTransactions.values) {
-      final localTx = localTransactionMap[remoteTx.id];
-      if (localTx == null) {
-        // Exists on remote, not local -> Insert
-        transactionBox.put(remoteTx);
-      } else {
-        // Exists on both -> Merge based on updatedAt
-        if (remoteTx.updatedAt.isAfter(localTx.updatedAt)) {
-          remoteTx.obxId = localTx.obxId; // Preserve local ObjectBox ID
-          transactionBox.put(remoteTx);
-        }
+      final localTx = mergedTransactions[remoteTx.id];
+      if (localTx == null || remoteTx.updatedAt.isAfter(localTx.updatedAt)) {
+        mergedTransactions[remoteTx.id] = remoteTx;
       }
     }
 
-    // 4. Clean up (Optional: Hard delete items marked as isDeleted > 30 days)
-    // _cleanupDeletedItems();
+    final finalLocalCategories = [
+      for (final category in mergedCategories.values)
+        category.copyWith(obxId: 0),
+    ];
+    final finalLocalTransactions = [
+      for (final transaction in mergedTransactions.values)
+        transaction.copyWith(obxId: 0),
+    ];
 
-    // 5. Push
-    final finalLocalCategories = categoryBox.getAll();
-    final finalLocalTransactions = transactionBox.getAll();
+    categoryBox.removeAll();
+    categoryBox.putMany(finalLocalCategories);
+    transactionBox.removeAll();
+    transactionBox.putMany(finalLocalTransactions);
 
     final exportData = {
       'categories': finalLocalCategories.map((c) => c.toJson()).toList(),
