@@ -23,69 +23,63 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
     final chartItems = _chartItems;
 
     return Container(
-      padding: EdgeInsets.all(context.scaled(16)),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(context.scaled(26)),
-        boxShadow: [
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: const [
           BoxShadow(
-            color: const Color(0xFF1B2338).withValues(alpha: 0.16),
-            blurRadius: context.scaled(15),
-            offset: Offset(0, context.scaled(7)),
+            color: Color(0x281B2338),
+            blurRadius: 15,
+            offset: Offset(0, 7),
           ),
         ],
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
-          final chartSize = width < 360
-              ? context.scaled(320)
-              : context.scaled(370);
-          final isPieChart = _selectedChartView == _CategoryChartView.pie;
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Cơ cấu chi tiêu',
-                      style: context.appText.sectionTitle.copyWith(
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                  _ChartViewSwitch(
-                    selectedView: _selectedChartView,
-                    onSelected: _selectChartView,
-                  ),
-                ],
-              ),
-              SizedBox(height: context.scaled(12)),
               Expanded(
-                child: Center(
-                  child: SizedBox(
-                    width: isPieChart ? chartSize : width,
-                    height: chartSize,
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 360),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
-                      transitionBuilder: _buildChartTransition,
-                      layoutBuilder: (currentChild, previousChildren) {
-                        return currentChild ?? const SizedBox.shrink();
-                      },
-                      child: isPieChart
-                          ? _buildPieChart(chartItems, chartSize)
-                          : _buildBarChart(chartItems),
-                    ),
+                child: Text(
+                  'Cơ cấu chi tiêu',
+                  style: context.appText.sectionTitle.copyWith(
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
+              _ChartViewSwitch(
+                selectedView: _selectedChartView,
+                onSelected: _selectChartView,
+              ),
             ],
-          );
-        },
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final chartSize = constraints.biggest.shortestSide;
+                final isPieChart =
+                    _selectedChartView == _CategoryChartView.pie;
+
+                return Center(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 360),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: _buildChartTransition,
+                    layoutBuilder: (currentChild, previousChildren) {
+                      return currentChild ?? const SizedBox.shrink();
+                    },
+                    child: isPieChart
+                        ? _buildPieChart(chartItems, chartSize)
+                        : _buildBarChart(chartItems),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -263,7 +257,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
       barRods: [
         BarChartRodData(
           toY: item.amount,
-          width: isTouched ? context.scaled(36) : context.scaled(30),
+          width: isTouched ? 36.0 : 30.0,
           gradient: LinearGradient(
             colors: [item.color.withValues(alpha: 0.62), item.color],
             begin: Alignment.bottomCenter,
@@ -275,7 +269,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
             style: TextStyle(
               color: item.color,
               fontWeight: FontWeight.w700,
-              fontSize: context.scaledFont(16, min: 13),
+              fontSize: 16,
               shadows: const [
                 Shadow(
                   color: Colors.white,
@@ -295,9 +289,9 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
       return widget.items;
     }
 
-    final visibleItems = widget.items.take(3).toList();
+    final visibleItems = widget.items.take(4).toList();
     final remainingAmount = widget.items
-        .skip(3)
+        .skip(4)
         .fold<double>(0, (sum, item) => sum + item.amount);
 
     return [
@@ -335,7 +329,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
       badgePositionPercentageOffset: 0.98,
       titleStyle: TextStyle(
         color: Colors.white,
-        fontSize: context.scaledFont(isTouched ? 14 : 12, min: 12),
+        fontSize: isTouched ? 14.0 : 12.0,
         fontWeight: FontWeight.w700,
         shadows: const [
           Shadow(color: Colors.black38, blurRadius: 4, offset: Offset(0, 1)),
@@ -353,8 +347,6 @@ class _CategoryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scale = context.adaptiveScale;
-
     return Tooltip(
       message: '${item.category.name}: ${formatCurrency(item.amount)}',
       child: AnimatedScale(
@@ -362,20 +354,19 @@ class _CategoryBadge extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
         child: Container(
-          width: context.scaled(selected ? 38 : 33),
-          height: context.scaled(selected ? 38 : 33),
+          width: selected ? 38.0 : 33.0,
+          height: selected ? 38.0 : 33.0,
           decoration: BoxDecoration(
-            color: Colors.white, // Keep white background to prevent transparency overlap
+            color: Colors.white,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: Colors.white,
-              width: 2.2 * scale,
+            border: const Border.fromBorderSide(
+              BorderSide(color: Colors.white, width: 2.2),
             ),
             boxShadow: [
               BoxShadow(
                 color: item.color.withValues(alpha: selected ? 0.35 : 0.15),
-                blurRadius: context.scaled(selected ? 8 : 5),
-                offset: Offset(0, context.scaled(selected ? 4 : 2)),
+                blurRadius: selected ? 8.0 : 5.0,
+                offset: Offset(0, selected ? 4.0 : 2.0),
               ),
             ],
           ),
@@ -388,7 +379,7 @@ class _CategoryBadge extends StatelessWidget {
               child: Icon(
                 item.category.iconData,
                 color: item.color,
-                size: context.scaled(selected ? 18 : 15),
+                size: selected ? 18.0 : 15.0,
               ),
             ),
           ),
@@ -408,20 +399,19 @@ class _BarCategoryIcon extends StatelessWidget {
     return Tooltip(
       message: '${item.category.name}: ${formatCurrency(item.amount)}',
       child: Container(
-        width: context.scaled(33),
-        height: context.scaled(33),
+        width: 33,
+        height: 33,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: Colors.white,
-            width: 2.2 * context.adaptiveScale,
+          border: const Border.fromBorderSide(
+            BorderSide(color: Colors.white, width: 2.2),
           ),
           boxShadow: [
             BoxShadow(
               color: item.color.withValues(alpha: 0.15),
-              blurRadius: context.scaled(5),
-              offset: Offset(0, context.scaled(2)),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -434,7 +424,7 @@ class _BarCategoryIcon extends StatelessWidget {
             child: Icon(
               item.category.iconData,
               color: item.color,
-              size: context.scaled(15),
+              size: 15,
             ),
           ),
         ),
@@ -455,10 +445,10 @@ class _ChartViewSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(context.scaled(3)),
+      padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(context.scaled(13)),
+        borderRadius: BorderRadius.circular(13),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.28)),
       ),
       child: Row(
@@ -495,21 +485,21 @@ class _ChartViewButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(10)),
+      borderRadius: BorderRadius.circular(10),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
-        width: context.scaled(38),
-        height: context.scaled(29),
+        width: 38,
+        height: 29,
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.14)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(context.scaled(10)),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
           icon,
-          size: context.scaled(20),
+          size: 20,
           color: isSelected ? AppColors.primary : AppColors.textSecondary,
         ),
       ),
