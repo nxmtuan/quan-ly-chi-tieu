@@ -39,7 +39,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
         builder: (context, constraints) {
           final width = constraints.maxWidth;
           final chartSize = width < 360
-              ? context.scaled(270)
+              ? context.scaled(320)
               : context.scaled(370);
           final isPieChart = _selectedChartView == _CategoryChartView.pie;
 

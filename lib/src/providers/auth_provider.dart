@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
 
 import '../models/auth_user.dart';
 import 'storage_provider.dart';
@@ -15,7 +17,10 @@ const authSessionDuration = Duration(days: 30);
 
 class AuthNotifier extends Notifier<AuthUser?> {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['email'],
+    scopes: [
+      'email',
+      drive.DriveApi.driveAppdataScope,
+    ],
     clientId: kIsWeb ? googleWebOAuthClientId : null,
   );
   StreamSubscription<GoogleSignInAccount?>? _accountSubscription;
@@ -90,6 +95,19 @@ class AuthNotifier extends Notifier<AuthUser?> {
     await _googleSignIn.signOut();
     await ref.read(authStorageProvider).clearUser();
     state = null;
+  }
+
+  Future<drive.DriveApi?> getDriveApi() async {
+    if (state == null) {
+      return null;
+    }
+
+    final httpClient = await _googleSignIn.authenticatedClient();
+    if (httpClient == null) {
+      return null;
+    }
+
+    return drive.DriveApi(httpClient);
   }
 }
 
