@@ -33,6 +33,24 @@ class CategoriesNotifier extends Notifier<List<Category>> {
   }
 
   Future<void> updateCategory(Category category) async {
+    if (isDefaultCategoryId(category.id)) {
+      final existingCategory = state.where((item) => item.id == category.id).firstOrNull;
+      if (existingCategory == null) {
+        return;
+      }
+
+      final updatedDefaultCategory = existingCategory.copyWith(
+        iconData: category.iconData,
+        updatedAt: DateTime.now(),
+      );
+      state = [
+        for (final item in state)
+          if (item.id == category.id) updatedDefaultCategory else item,
+      ];
+      await ref.read(categoryStorageProvider).putCategory(updatedDefaultCategory);
+      return;
+    }
+
     state = [
       for (final item in state)
         if (item.id == category.id) category else item,
@@ -70,7 +88,6 @@ class CategoriesNotifier extends Notifier<List<Category>> {
 
       final needsUpdate =
           storedCategory.name != defaultCategory.name ||
-          storedCategory.iconData.codePoint != defaultCategory.iconData.codePoint ||
           storedCategory.colorHex != defaultCategory.colorHex ||
           storedCategory.type != defaultCategory.type ||
           storedCategory.isDeleted;
@@ -79,7 +96,6 @@ class CategoriesNotifier extends Notifier<List<Category>> {
         needsUpdate
             ? storedCategory.copyWith(
                 name: defaultCategory.name,
-                iconData: defaultCategory.iconData,
                 colorHex: defaultCategory.colorHex,
                 type: defaultCategory.type,
                 updatedAt: DateTime.now(),

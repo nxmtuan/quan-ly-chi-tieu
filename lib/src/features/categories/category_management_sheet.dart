@@ -330,6 +330,8 @@ class _CategoryEditorSheetState extends ConsumerState<_CategoryEditorSheet> {
   late int _colorHex;
 
   bool get _isEditing => widget.category != null;
+  bool get _isDefaultCategory =>
+      widget.category != null && isDefaultCategoryId(widget.category!.id);
 
   @override
   void initState() {
@@ -369,6 +371,7 @@ class _CategoryEditorSheetState extends ConsumerState<_CategoryEditorSheet> {
             SizedBox(height: context.scaled(10)),
             _EditorTypeToggleGroup(
               value: _type,
+              enabled: !_isDefaultCategory,
               onChanged: (value) => setState(() => _type = value),
             ),
             SizedBox(height: context.scaled(18)),
@@ -377,7 +380,8 @@ class _CategoryEditorSheetState extends ConsumerState<_CategoryEditorSheet> {
             _EditorNameField(
               controller: _nameController,
               focusNode: _nameFocusNode,
-              isFocused: _nameFocusNode.hasFocus,
+              isFocused: _nameFocusNode.hasFocus && !_isDefaultCategory,
+              readOnly: _isDefaultCategory,
             ),
             SizedBox(height: context.scaled(18)),
             _EditorSectionLabel(label: 'Biểu tượng'),
@@ -405,6 +409,7 @@ class _CategoryEditorSheetState extends ConsumerState<_CategoryEditorSheet> {
                   _EditorColorOption(
                     color: color,
                     selected: _colorHex == color.toARGB32(),
+                    enabled: !_isDefaultCategory,
                     onTap: () => setState(() => _colorHex = color.toARGB32()),
                   ),
               ],
@@ -479,11 +484,13 @@ class _EditorNameField extends StatelessWidget {
     required this.controller,
     required this.focusNode,
     required this.isFocused,
+    required this.readOnly,
   });
 
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool isFocused;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -500,6 +507,7 @@ class _EditorNameField extends StatelessWidget {
       child: TextField(
         controller: controller,
         focusNode: focusNode,
+        readOnly: readOnly,
         cursorColor: AppColors.primary,
         style: context.appText.bodyStrong.copyWith(
           color: AppColors.textPrimary,
@@ -530,10 +538,12 @@ class _EditorNameField extends StatelessWidget {
 class _EditorTypeToggleGroup extends StatelessWidget {
   const _EditorTypeToggleGroup({
     required this.value,
+    required this.enabled,
     required this.onChanged,
   });
 
   final TransactionType value;
+  final bool enabled;
   final ValueChanged<TransactionType> onChanged;
 
   @override
@@ -546,6 +556,7 @@ class _EditorTypeToggleGroup extends StatelessWidget {
             icon: Icons.north_east_rounded,
             color: AppColors.danger,
             selected: value == TransactionType.expense,
+            enabled: enabled,
             onTap: () => onChanged(TransactionType.expense),
           ),
         ),
@@ -556,6 +567,7 @@ class _EditorTypeToggleGroup extends StatelessWidget {
             icon: Icons.south_west_rounded,
             color: AppColors.success,
             selected: value == TransactionType.income,
+            enabled: enabled,
             onTap: () => onChanged(TransactionType.income),
           ),
         ),
@@ -570,6 +582,7 @@ class _EditorTypeToggleButton extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.selected,
+    required this.enabled,
     required this.onTap,
   });
 
@@ -577,12 +590,13 @@ class _EditorTypeToggleButton extends StatelessWidget {
   final IconData icon;
   final Color color;
   final bool selected;
+  final bool enabled;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return AppBounceBuilder(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: EdgeInsets.symmetric(
@@ -590,20 +604,30 @@ class _EditorTypeToggleButton extends StatelessWidget {
           vertical: context.scaled(14),
         ),
         decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.08) : Colors.white,
+          color: selected
+              ? color.withValues(alpha: enabled ? 0.08 : 0.05)
+              : Colors.white,
           borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
-            color: selected ? color.withValues(alpha: 0.24) : AppColors.border,
+            color: selected
+                ? color.withValues(alpha: enabled ? 0.24 : 0.16)
+                : AppColors.border,
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: context.scaled(18)),
+            Icon(
+              icon,
+              color: enabled ? color : color.withValues(alpha: 0.55),
+              size: context.scaled(18),
+            ),
             SizedBox(width: context.scaled(8)),
             Text(
               label,
-              style: context.appText.bodyStrong.copyWith(color: color),
+              style: context.appText.bodyStrong.copyWith(
+                color: enabled ? color : color.withValues(alpha: 0.55),
+              ),
             ),
           ],
         ),
@@ -654,17 +678,19 @@ class _EditorColorOption extends StatelessWidget {
   const _EditorColorOption({
     required this.color,
     required this.selected,
+    required this.enabled,
     required this.onTap,
   });
 
   final Color color;
   final bool selected;
+  final bool enabled;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return AppBounceBuilder(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         width: context.scaled(52),
@@ -682,7 +708,7 @@ class _EditorColorOption extends StatelessWidget {
             width: context.scaled(30),
             height: context.scaled(30),
             decoration: BoxDecoration(
-              color: color,
+              color: enabled ? color : color.withValues(alpha: 0.55),
               borderRadius: BorderRadius.circular(context.scaled(10)),
             ),
           ),
