@@ -8,6 +8,7 @@ import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/flat_card.dart';
+import '../../core/widgets/app_bounce_builder.dart';
 import '../../models/auth_user.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';

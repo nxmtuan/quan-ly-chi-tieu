@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../utils/adaptive.dart';
+import 'app_bounce_builder.dart';
 
 Future<bool?> showAppConfirmDialog(
   BuildContext context, {
@@ -48,9 +49,8 @@ Future<bool?> showAppConfirmDialog(
             Row(
               children: [
                 Expanded(
-                  child: InkWell(
+                  child: AppBounceBuilder(
                     onTap: () => Navigator.of(context).pop(false),
-                    borderRadius: BorderRadius.circular(context.scaled(16)),
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         vertical: context.scaled(16),
@@ -71,9 +71,8 @@ Future<bool?> showAppConfirmDialog(
                 ),
                 SizedBox(width: context.scaled(12)),
                 Expanded(
-                  child: InkWell(
+                  child: AppBounceBuilder(
                     onTap: () => Navigator.of(context).pop(true),
-                    borderRadius: BorderRadius.circular(context.scaled(16)),
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         vertical: context.scaled(16),

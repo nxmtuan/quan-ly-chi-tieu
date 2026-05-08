@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../utils/adaptive.dart';
+import 'app_bounce_builder.dart';
 
 double appSheetBottomPadding(BuildContext context, {double extra = 0}) {
   return MediaQuery.of(context).padding.bottom + context.scaled(16) + extra;
@@ -199,9 +200,8 @@ class AppSheetHeader extends StatelessWidget {
                 ),
               ),
               if (showCloseButton)
-                InkWell(
+                AppBounceBuilder(
                   onTap: onClose ?? () => Navigator.of(context).pop(),
-                  borderRadius: BorderRadius.circular(999),
                   child: Container(
                     width: context.scaled(38),
                     height: context.scaled(38),
@@ -279,24 +279,23 @@ class AppPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: height,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: color.withValues(alpha: 0.45),
-          disabledForegroundColor: Colors.white.withValues(alpha: 0.9),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(context.scaled(radius)),
-          ),
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: height,
+        decoration: BoxDecoration(
+          color: onTap != null ? color : color.withValues(alpha: 0.45),
+          borderRadius: BorderRadius.circular(context.scaled(radius)),
         ),
+        alignment: Alignment.center,
         child: Text(
           label,
-          style: context.appText.buttonLabel,
+          style: context.appText.buttonLabel.copyWith(
+            color: onTap != null
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.9),
+          ),
         ),
       ),
     );

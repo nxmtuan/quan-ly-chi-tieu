@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
+import '../../core/widgets/app_bounce_builder.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   const CustomBottomNavBar({
@@ -131,9 +132,8 @@ class _NavButton extends StatelessWidget {
     final scale = context.adaptiveScale;
 
     if (isAction) {
-      return InkWell(
+      return AppBounceBuilder(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
         child: SizedBox(
           height: context.scaled(54),
           child: Stack(
@@ -193,9 +193,8 @@ class _NavButton extends StatelessWidget {
       );
     }
 
-    return InkWell(
+    return AppBounceBuilder(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(26)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         height: context.scaled(54),

@@ -20,9 +20,8 @@ class _RangeSelector extends StatelessWidget {
         children: [
           for (final range in ranges)
             Expanded(
-              child: InkWell(
+              child: AppBounceBuilder(
                 onTap: () => onChanged(range),
-                borderRadius: BorderRadius.circular(context.scaled(18)),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   padding: EdgeInsets.symmetric(vertical: context.scaled(12)),

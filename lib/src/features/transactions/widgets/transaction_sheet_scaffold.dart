@@ -35,9 +35,8 @@ class _SheetHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              InkWell(
+              AppBounceBuilder(
                 onTap: () => Navigator.of(context).pop(),
-                borderRadius: BorderRadius.circular(999),
                 child: Container(
                   width: context.scaled(38),
                   height: context.scaled(38),

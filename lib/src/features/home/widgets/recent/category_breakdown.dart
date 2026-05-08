@@ -65,9 +65,8 @@ class _CategoryTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return AppBounceBuilder(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(14)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         height: double.infinity,
@@ -137,7 +136,7 @@ class _CategoryAmountRow extends StatelessWidget {
     final color = isExpense ? AppColors.danger : AppColors.success;
     final sign = isExpense ? '-' : '+';
 
-    return InkWell(
+    return AppBounceBuilder(
       onTap: () {
         showCategoryTransactionsSheet(
           context,
@@ -145,7 +144,6 @@ class _CategoryAmountRow extends StatelessWidget {
           month: month,
         );
       },
-      borderRadius: BorderRadius.circular(context.scaled(12)),
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: context.scaled(4),

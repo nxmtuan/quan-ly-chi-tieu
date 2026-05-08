@@ -66,9 +66,8 @@ class _SourceSheetOption extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = selected ? AppColors.primary : AppColors.textSecondary;
 
-    return InkWell(
+    return AppBounceBuilder(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(18)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: EdgeInsets.symmetric(

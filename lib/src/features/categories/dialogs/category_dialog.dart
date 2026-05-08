@@ -73,10 +73,9 @@ Future<void> showCategoryDialog(
                     spacing: 8,
                     children: [
                       for (final item in colors)
-                        InkWell(
+                        AppBounceBuilder(
                           onTap: () =>
                               setState(() => colorHex = item.toARGB32()),
-                          borderRadius: BorderRadius.circular(999),
                           child: Container(
                             width: 34,
                             height: 34,

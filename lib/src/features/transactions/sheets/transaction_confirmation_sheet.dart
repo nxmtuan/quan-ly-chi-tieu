@@ -118,9 +118,8 @@ class _TransactionConfirmationSheet extends StatelessWidget {
       action: Row(
         children: [
           Expanded(
-            child: InkWell(
+            child: AppBounceBuilder(
               onTap: () => Navigator.of(context).pop(false),
-              borderRadius: BorderRadius.circular(context.scaled(16)),
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
                 decoration: BoxDecoration(
@@ -139,9 +138,8 @@ class _TransactionConfirmationSheet extends StatelessWidget {
           ),
           SizedBox(width: context.scaled(12)),
           Expanded(
-            child: InkWell(
+            child: AppBounceBuilder(
               onTap: () => Navigator.of(context).pop(true),
-              borderRadius: BorderRadius.circular(context.scaled(16)),
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
                 decoration: BoxDecoration(

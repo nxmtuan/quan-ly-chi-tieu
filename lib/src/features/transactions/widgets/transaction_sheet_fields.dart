@@ -116,9 +116,8 @@ class _TypeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return AppBounceBuilder(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(14)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         height: double.infinity,
@@ -382,9 +381,8 @@ class _SourceTrigger extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return AppBounceBuilder(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(14)),
       child: _FormCard(
         padding: EdgeInsets.symmetric(
           horizontal: context.scaled(14),
@@ -433,9 +431,8 @@ class _DateTrigger extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return AppBounceBuilder(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(14)),
       child: _FormCard(
         padding: EdgeInsets.symmetric(
           horizontal: context.scaled(14),

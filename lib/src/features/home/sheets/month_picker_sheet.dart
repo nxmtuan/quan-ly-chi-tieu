@@ -55,9 +55,8 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
           // Year navigation
           Row(
             children: [
-              InkWell(
+              AppBounceBuilder(
                 onTap: () => setState(() => _displayedYear -= 1),
-                borderRadius: BorderRadius.circular(999),
                 child: Padding(
                   padding: EdgeInsets.all(context.scaled(8)),
                   child: Icon(
@@ -76,11 +75,10 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                   ),
                 ),
               ),
-              InkWell(
+              AppBounceBuilder(
                 onTap: canGoNextYear
                     ? () => setState(() => _displayedYear += 1)
                     : null,
-                borderRadius: BorderRadius.circular(999),
                 child: Padding(
                   padding: EdgeInsets.all(context.scaled(8)),
                   child: Icon(
@@ -113,12 +111,11 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                   _selectedMonth.month == month;
               final isDisabled = candidateMonth.isAfter(widget.lastMonth);
 
-              return InkWell(
+              return AppBounceBuilder(
                 onTap: isDisabled
                     ? null
                     : () =>
                         setState(() => _selectedMonth = candidateMonth),
-                borderRadius: BorderRadius.circular(context.scaled(16)),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   decoration: BoxDecoration(

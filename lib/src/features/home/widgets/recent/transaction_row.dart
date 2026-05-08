@@ -25,7 +25,7 @@ class _TransactionRow extends ConsumerWidget {
     final color = transaction.isExpense ? AppColors.danger : AppColors.success;
     final sign = transaction.isExpense ? '-' : '+';
 
-    return InkWell(
+    return AppBounceBuilder(
       onTap: () {
         if (category != null) {
           showTransactionDetailSheet(
@@ -35,7 +35,6 @@ class _TransactionRow extends ConsumerWidget {
           );
         }
       },
-      borderRadius: BorderRadius.circular(context.scaled(12)),
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: context.scaled(4),

@@ -73,9 +73,8 @@ class _AuthSettingsRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (authUser == null) {
       if (kIsWeb) {
-        return InkWell(
+        return AppBounceBuilder(
           onTap: null,
-          borderRadius: BorderRadius.circular(context.scaled(24)),
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: context.scaled(8),
@@ -320,9 +319,8 @@ class _SettingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return AppBounceBuilder(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(24)),
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: context.scaled(8),
@@ -458,9 +456,8 @@ class _ThemeModeOption extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = isActive ? AppColors.primary : AppColors.textSecondary;
 
-    return InkWell(
+    return AppBounceBuilder(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(18)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: EdgeInsets.symmetric(

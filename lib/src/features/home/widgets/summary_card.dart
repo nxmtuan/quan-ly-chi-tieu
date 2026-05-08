@@ -5,6 +5,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/adaptive.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_sheet.dart';
+import '../../../core/widgets/app_bounce_builder.dart';
 import '../../../providers/transaction_provider.dart';
 
 part 'summary/summary_components.dart';

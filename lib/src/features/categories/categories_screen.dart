@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/widgets/flat_card.dart';
+import '../../core/widgets/app_bounce_builder.dart';
 import '../../models/category.dart';
 import '../../models/transaction.dart';
 import '../../providers/category_provider.dart';

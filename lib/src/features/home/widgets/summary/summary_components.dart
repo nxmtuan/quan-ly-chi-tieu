@@ -37,9 +37,8 @@ class _MonthSelectorBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          InkWell(
+          AppBounceBuilder(
             onTap: onPreviousMonth,
-            borderRadius: BorderRadius.circular(999),
             child: Icon(
               Icons.chevron_left_rounded,
               color: colors.onSurface,
@@ -47,9 +46,8 @@ class _MonthSelectorBar extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: InkWell(
+            child: AppBounceBuilder(
               onTap: onPickMonth,
-              borderRadius: BorderRadius.circular(context.scaled(16)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -79,9 +77,8 @@ class _MonthSelectorBar extends StatelessWidget {
               ),
             ),
           ),
-          InkWell(
+          AppBounceBuilder(
             onTap: onNextMonth,
-            borderRadius: BorderRadius.circular(999),
             child: Icon(
               Icons.chevron_right_rounded,
               color: canGoNext

@@ -112,9 +112,8 @@ class _CategoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return AppBounceBuilder(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(14)),
       child: SizedBox(
         height: context.scaled(110),
         child: AnimatedContainer(
@@ -177,9 +176,8 @@ class _MoreCategoriesTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return AppBounceBuilder(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.scaled(14)),
       child: Container(
         height: context.scaled(110),
         padding: EdgeInsets.fromLTRB(
