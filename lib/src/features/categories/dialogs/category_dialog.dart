@@ -10,13 +10,6 @@ Future<void> showCategoryDialog(
   var iconData = category?.iconData ?? Icons.category_rounded;
   var colorHex = category?.colorHex ?? AppColors.primary.toARGB32();
 
-  const colors = [
-    AppColors.primary,
-    AppColors.success,
-    AppColors.danger,
-    AppColors.warning,
-  ];
-
   await showDialog<void>(
     context: context,
     builder: (context) {
@@ -72,7 +65,7 @@ Future<void> showCategoryDialog(
                   Wrap(
                     spacing: 8,
                     children: [
-                      for (final item in colors)
+                      for (final item in categoryColorOptions)
                         AppBounceBuilder(
                           onTap: () =>
                               setState(() => colorHex = item.toARGB32()),
