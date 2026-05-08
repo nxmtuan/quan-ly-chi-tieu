@@ -14,4 +14,8 @@ class ObjectBoxDatabase {
     final store = await openStore(directory: storeDir);
     return ObjectBoxDatabase._create(store);
   }
+
+  static ObjectBoxDatabase createForTest(Store store) {
+    return ObjectBoxDatabase._create(store);
+  }
 }
