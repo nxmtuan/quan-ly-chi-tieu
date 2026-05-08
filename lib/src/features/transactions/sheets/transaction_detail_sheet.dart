@@ -139,7 +139,11 @@ class _TransactionDetailSheet extends StatelessWidget {
             child: InkWell(
               onTap: () {
                 Navigator.of(context).pop();
-                showAddTransactionSheet(context, transaction: transaction);
+                showAddTransactionSheet(
+                  context,
+                  transaction: transaction,
+                  replaceSheet: true,
+                );
               },
               borderRadius: BorderRadius.circular(context.scaled(16)),
               child: Container(

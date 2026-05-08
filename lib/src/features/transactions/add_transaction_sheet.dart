@@ -22,9 +22,14 @@ part 'sheets/all_categories_sheet.dart';
 part 'sheets/transaction_confirmation_sheet.dart';
 part 'sheets/transaction_detail_sheet.dart';
 
-void showAddTransactionSheet(BuildContext context, {Transaction? transaction}) {
+void showAddTransactionSheet(
+  BuildContext context, {
+  Transaction? transaction,
+  bool replaceSheet = false,
+}) {
   showAppBottomSheet<void>(
     context: context,
+    replacesCurrentSheet: replaceSheet,
     builder: (context) => AddTransactionSheet(transaction: transaction),
   );
 }

@@ -14,10 +14,17 @@ Future<T?> showAppBottomSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
   bool useRootNavigator = true,
+  // Set true khi sheet này mở ra để thay thế sheet hiện tại (sheet kia bị pop).
+  // Khi đó dùng depth của sheet bị thay thế để tránh bị lệch vị trí.
+  bool replacesCurrentSheet = false,
 }) {
-  final currentDepth = _sheetDepth;
+  // Nếu thay thế sheet hiện tại, depth bằng depth của sheet bị đóng (sheetDepth - 1),
+  // không tăng thêm. _sheetDepth vẫn tăng để cân bằng với whenComplete của sheet cũ.
+  final currentDepth = replacesCurrentSheet
+      ? (_sheetDepth - 1).clamp(0, 99)
+      : _sheetDepth;
   _sheetDepth++;
-  
+
   return showModalBottomSheet<T>(
     context: context,
     useRootNavigator: useRootNavigator,
@@ -26,7 +33,7 @@ Future<T?> showAppBottomSheet<T>({
     backgroundColor: Colors.transparent,
     builder: (context) {
       return Padding(
-        padding: EdgeInsets.only(top: currentDepth * 20.0),
+        padding: EdgeInsets.only(top: currentDepth * 30.0),
         child: SizedBox(
           height: double.infinity,
           child: builder(context),
