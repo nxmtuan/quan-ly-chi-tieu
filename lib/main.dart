@@ -17,7 +17,8 @@ Future<void> main() async {
   await initializeDateFormatting('vi_VN');
   
   Workmanager().initialize(callbackDispatcher);
-  scheduleBackgroundSync();
+  final prefs = await SharedPreferences.getInstance();
+  await configureBackgroundSyncFromPreferences(prefs);
 
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   await flutterLocalNotificationsPlugin
@@ -26,7 +27,6 @@ Future<void> main() async {
       ?.requestNotificationsPermission();
 
   final objectBoxDb = await ObjectBoxDatabase.create();
-  final prefs = await SharedPreferences.getInstance();
 
   runApp(
     ProviderScope(

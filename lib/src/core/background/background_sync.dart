@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../models/auto_sync_settings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/storage_provider.dart';
+import '../storage/settings_storage.dart';
 import '../storage/objectbox_database.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -119,20 +121,79 @@ void callbackDispatcher() {
   });
 }
 
-void scheduleBackgroundSync() {
-  final now = DateTime.now();
-  var nextMidnight = DateTime(now.year, now.month, now.day + 1);
-  final delay = nextMidnight.difference(now);
+const _autoSyncTaskName = 'configured_auto_sync_task';
+const _autoSyncTaskId = 'sync_to_drive';
 
-  Workmanager().registerPeriodicTask(
-    "daily_sync_task",
-    "sync_to_drive",
-    frequency: const Duration(hours: 24),
-    initialDelay: delay,
+Future<void> cancelBackgroundSync() async {
+  await Workmanager().cancelByUniqueName(_autoSyncTaskName);
+}
+
+Future<void> configureBackgroundSync(AutoSyncSettings settings) async {
+  await cancelBackgroundSync();
+  if (!settings.enabled) {
+    return;
+  }
+
+  final now = DateTime.now();
+  final nextRun = switch (settings.scheduleType) {
+    AutoSyncScheduleType.daily => _nextDailyRun(
+      now,
+      settings.hour,
+      settings.minute,
+    ),
+    AutoSyncScheduleType.weekly => _nextWeeklyRun(
+      now,
+      settings.weekday,
+      settings.hour,
+      settings.minute,
+    ),
+  };
+
+  await Workmanager().registerPeriodicTask(
+    _autoSyncTaskName,
+    _autoSyncTaskId,
+    frequency: settings.scheduleType == AutoSyncScheduleType.weekly
+        ? const Duration(days: 7)
+        : const Duration(days: 1),
+    initialDelay: nextRun.difference(now),
     constraints: Constraints(
       networkType: NetworkType.connected,
     ),
     backoffPolicy: BackoffPolicy.linear,
     backoffPolicyDelay: const Duration(minutes: 15),
+    existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
   );
+}
+
+Future<void> configureBackgroundSyncFromPreferences(
+  SharedPreferences prefs,
+) async {
+  final settings = SettingsStorage(prefs).readAutoSyncSettings();
+  await configureBackgroundSync(settings);
+}
+
+DateTime _nextDailyRun(DateTime now, int hour, int minute) {
+  var scheduled = DateTime(now.year, now.month, now.day, hour, minute);
+  if (!scheduled.isAfter(now)) {
+    scheduled = scheduled.add(const Duration(days: 1));
+  }
+  return scheduled;
+}
+
+DateTime _nextWeeklyRun(
+  DateTime now,
+  int weekday,
+  int hour,
+  int minute,
+) {
+  final currentWeekday = now.weekday;
+  var dayDelta = weekday - currentWeekday;
+  var scheduled = DateTime(now.year, now.month, now.day, hour, minute)
+      .add(Duration(days: dayDelta));
+
+  if (!scheduled.isAfter(now)) {
+    scheduled = scheduled.add(const Duration(days: 7));
+  }
+
+  return scheduled;
 }

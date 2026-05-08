@@ -83,4 +83,14 @@ class GoogleDriveService {
       rethrow;
     }
   }
+
+  Future<bool> deleteData() async {
+    final file = await _getSyncFile();
+    if (file == null || file.id == null) {
+      return false;
+    }
+
+    await _driveApi.files.delete(file.id!);
+    return true;
+  }
 }

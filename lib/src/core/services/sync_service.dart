@@ -81,4 +81,8 @@ class SyncService {
     final exportJsonString = jsonEncode(exportData);
     await driveService.uploadData(exportJsonString);
   }
+
+  Future<bool> deleteRemoteData() {
+    return driveService.deleteData();
+  }
 }
