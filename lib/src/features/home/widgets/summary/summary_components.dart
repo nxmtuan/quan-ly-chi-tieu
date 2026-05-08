@@ -48,32 +48,14 @@ class _MonthSelectorBar extends StatelessWidget {
           Expanded(
             child: AppBounceBuilder(
               onTap: onPickScope,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: context.scaled(26),
-                    height: context.scaled(26),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(context.scaled(7)),
-                    ),
-                    child: Icon(
-                      Icons.calendar_month_rounded,
-                      color: Colors.white,
-                      size: context.scaled(16),
-                    ),
-                  ),
-                  SizedBox(width: context.scaled(11)),
-                  Text(
-                    scope.label,
-                    style: context.appText.cardTitle.copyWith(
-                      color: colors.onSurface,
-                      fontSize: context.scaledFont(16, min: 15),
-                      letterSpacing: -0.2 * scale,
-                    ),
-                  ),
-                ],
+              child: Text(
+                scope.label,
+                textAlign: TextAlign.center,
+                style: context.appText.cardTitle.copyWith(
+                  color: colors.onSurface,
+                  fontSize: context.scaledFont(16, min: 15),
+                  letterSpacing: -0.2 * scale,
+                ),
               ),
             ),
           ),

@@ -30,7 +30,7 @@ class _MonthPickerSheet extends StatefulWidget {
 }
 
 class _MonthPickerSheetState extends State<_MonthPickerSheet> {
-  static const _yearRangeCount = 40;
+  static const _yearRangeCount = 20;
 
   late HomeSummaryScopeType _selectedTab;
   late int _displayedYear;
@@ -55,6 +55,14 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
       HomeSummaryScopeType.all => DateTime(widget.lastMonth.year, widget.lastMonth.month),
     };
     _selectedYear = widget.initialScope.anchor?.year ?? widget.lastMonth.year;
+    final earliestYear = widget.lastMonth.year - (_yearRangeCount - 1);
+    if (_selectedYear < earliestYear) {
+      _selectedYear = earliestYear;
+      _selectedMonth = DateTime(earliestYear, _selectedMonth.month);
+    } else if (_selectedYear > widget.lastMonth.year) {
+      _selectedYear = widget.lastMonth.year;
+      _selectedMonth = DateTime(widget.lastMonth.year, _selectedMonth.month);
+    }
     _displayedYear = _selectedYear;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _jumpToSelectedYear();
@@ -73,6 +81,8 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
   @override
   Widget build(BuildContext context) {
     final canGoNextYear = _displayedYear < widget.lastMonth.year;
+    final earliestYear = widget.lastMonth.year - (_yearRangeCount - 1);
+    final canGoPreviousYear = _displayedYear > earliestYear;
 
     return AppSheetScaffold(
       title: 'Chọn bộ lọc',
@@ -97,14 +107,19 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
             Row(
               children: [
                 AppBounceBuilder(
-                  onTap: () => setState(() {
-                    _displayedYear -= 1;
-                  }),
+                  onTap: canGoPreviousYear
+                      ? () => setState(() {
+                          _displayedYear -= 1;
+                        })
+                      : null,
                   child: Padding(
                     padding: EdgeInsets.all(context.scaled(8)),
                     child: Icon(
                       Icons.chevron_left_rounded,
                       size: context.scaled(26),
+                      color: canGoPreviousYear
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -324,6 +339,12 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
     }
 
     final currentYear = widget.lastMonth.year;
+    final earliestYear = currentYear - (_yearRangeCount - 1);
+    if (_selectedYear < earliestYear) {
+      _selectedYear = earliestYear;
+    } else if (_selectedYear > currentYear) {
+      _selectedYear = currentYear;
+    }
     final selectedIndex =
         (currentYear - _selectedYear).clamp(0, _yearRangeCount - 1);
     final row = selectedIndex ~/ 2;
