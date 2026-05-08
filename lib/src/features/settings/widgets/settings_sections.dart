@@ -153,8 +153,11 @@ class _AuthSettingsRow extends ConsumerWidget {
       iconColor: AppColors.danger,
       title: 'Đăng xuất',
       subtitle: authUser!.email,
-      trailing: const Icon(Icons.logout_rounded),
-      onTap: () => ref.read(authProvider.notifier).signOut(),
+      trailing: const Icon(
+        Icons.logout_rounded,
+        color: AppColors.danger,
+      ),
+      onTap: () => _confirmSignOut(context, ref),
     );
   }
 
@@ -171,6 +174,21 @@ class _AuthSettingsRow extends ConsumerWidget {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _confirmSignOut(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showAppConfirmDialog(
+      context,
+      title: 'Đăng xuất',
+      message: 'Bạn có chắc muốn đăng xuất khỏi ứng dụng không?',
+      confirmText: 'Đăng xuất',
+      confirmBackgroundColor: const Color(0xFFFEE2E2),
+      confirmTextColor: const Color(0xFFDC2626),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await ref.read(authProvider.notifier).signOut();
     }
   }
 }

@@ -53,8 +53,6 @@ class SettingsScreen extends ConsumerWidget {
                   _ThemeSettingsRow(themeMode: themeMode),
                   const _DividerIndent(),
                   const _ManageCategoriesRow(),
-                  const _DividerIndent(),
-                  _AuthSettingsRow(authUser: authUser),
                   if (authUser != null) ...[
                     const _DividerIndent(),
                     const _SyncDataRow(),
@@ -64,6 +62,16 @@ class SettingsScreen extends ConsumerWidget {
             ),
             SizedBox(height: context.scaled(24)),
             const _SettingsTipCard(),
+            SizedBox(height: context.scaled(24)),
+            FlatCard(
+              radius: context.scaled(24),
+              padding: EdgeInsets.all(context.scaled(10)),
+              child: Column(
+                children: [
+                  _AuthSettingsRow(authUser: authUser),
+                ],
+              ),
+            ),
           ],
         )
         .animate()
