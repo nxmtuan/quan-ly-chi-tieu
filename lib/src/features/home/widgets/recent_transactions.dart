@@ -61,52 +61,61 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
               : _CategoryDonutChart(items: items, total: total),
         ),
         SizedBox(height: context.scaled(16)),
-        _CategoryTabs(
-          selectedType: _selectedType,
-          onSelected: (type) {
-            setState(() {
-              _selectedType = type;
-            });
-          },
-        ),
-        SizedBox(height: context.scaled(16)),
-        if (items.isEmpty)
-          FlatCard(
-            radius: context.scaled(22),
-            child: Padding(
-              padding: EdgeInsets.all(context.scaled(20)),
-              child: Center(
-                child: Text(
-                  _selectedType == TransactionType.expense
-                      ? 'Chưa có khoản chi nào'
-                      : 'Chưa có khoản thu nào',
-                  style: context.appText.bodyStrong.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
+        FlatCard(
+          radius: context.scaled(22),
+          padding: EdgeInsets.all(context.scaled(14)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _CategoryTabs(
+                selectedType: _selectedType,
+                onSelected: (type) {
+                  setState(() {
+                    _selectedType = type;
+                  });
+                },
               ),
-            ),
-          )
-        else
-          for (final entry in items.indexed)
-            Padding(
-              padding: EdgeInsets.only(bottom: context.scaled(12)),
-              child: _CategoryAmountRow(
-                    item: entry.$2,
-                    total: total,
-                    month: widget.month,
-                    transactions: widget.transactions,
-                    showDivider: false,
-                  )
-                  .animate(delay: Duration(milliseconds: 38 * entry.$1))
-                  .fadeIn(duration: 240.ms)
-                  .slideX(
-                    begin: 0.04,
-                    end: 0,
-                    duration: 280.ms,
-                    curve: Curves.easeOutCubic,
+              SizedBox(height: context.scaled(12)),
+              if (items.isEmpty)
+                Padding(
+                  padding: EdgeInsets.all(context.scaled(20)),
+                  child: Center(
+                    child: Text(
+                      _selectedType == TransactionType.expense
+                          ? 'Chưa có khoản chi nào'
+                          : 'Chưa có khoản thu nào',
+                      style: context.appText.bodyStrong.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
                   ),
-            ),
+                )
+              else
+                for (final entry in items.indexed) ...[
+                  _CategoryAmountRow(
+                        item: entry.$2,
+                        total: total,
+                        month: widget.month,
+                        transactions: widget.transactions,
+                        showDivider: false,
+                      )
+                      .animate(delay: Duration(milliseconds: 38 * entry.$1))
+                      .fadeIn(duration: 240.ms)
+                      .slideX(
+                        begin: 0.04,
+                        end: 0,
+                        duration: 280.ms,
+                        curve: Curves.easeOutCubic,
+                      ),
+                  if (entry.$1 < items.length - 1)
+                    Divider(
+                      height: context.scaled(1),
+                      color: AppColors.border,
+                    ),
+                ],
+            ],
+          ),
+        ),
       ],
     );
   }

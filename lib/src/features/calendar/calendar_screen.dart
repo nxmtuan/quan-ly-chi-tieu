@@ -151,11 +151,19 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 ),
               )
             else
-              for (final transaction in dailyTransactions)
-                Padding(
-                  padding: EdgeInsets.only(bottom: context.scaled(12)),
-                  child: TransactionRow(transaction: transaction),
+              FlatCard(
+                radius: context.scaled(22),
+                padding: EdgeInsets.all(context.scaled(14)),
+                child: Column(
+                  children: [
+                    for (final entry in dailyTransactions.indexed) ...[
+                      TransactionRow(transaction: entry.$2),
+                      if (entry.$1 < dailyTransactions.length - 1)
+                        Divider(height: context.scaled(1), color: AppColors.border),
+                    ],
+                  ],
                 ),
+              ),
           ],
         )
         .animate()
