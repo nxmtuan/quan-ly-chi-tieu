@@ -14,6 +14,7 @@ class AppToast {
 
   static OverlayEntry? _currentEntry;
   static Timer? _dismissTimer;
+  static ValueNotifier<bool>? _visibilityNotifier;
 
   static void show(
     BuildContext context, {
@@ -27,13 +28,28 @@ class AppToast {
     }
 
     _dismissTimer?.cancel();
+    _visibilityNotifier?.dispose();
+    _visibilityNotifier = null;
     _currentEntry?.remove();
+    final visibilityNotifier = ValueNotifier<bool>(true);
+    _visibilityNotifier = visibilityNotifier;
 
     _currentEntry = OverlayEntry(
       builder: (overlayContext) {
         return _ToastOverlay(
           message: message,
           type: type,
+          visibility: visibilityNotifier,
+          onDismissed: () {
+            if (identical(_visibilityNotifier, visibilityNotifier)) {
+              _dismissTimer?.cancel();
+              _dismissTimer = null;
+              _currentEntry?.remove();
+              _currentEntry = null;
+              _visibilityNotifier?.dispose();
+              _visibilityNotifier = null;
+            }
+          },
         );
       },
     );
@@ -45,8 +61,7 @@ class AppToast {
   static void dismiss() {
     _dismissTimer?.cancel();
     _dismissTimer = null;
-    _currentEntry?.remove();
-    _currentEntry = null;
+    _visibilityNotifier?.value = false;
   }
 }
 
@@ -54,10 +69,14 @@ class _ToastOverlay extends StatefulWidget {
   const _ToastOverlay({
     required this.message,
     required this.type,
+    required this.visibility,
+    required this.onDismissed,
   });
 
   final String message;
   final AppToastType type;
+  final ValueNotifier<bool> visibility;
+  final VoidCallback onDismissed;
 
   @override
   State<_ToastOverlay> createState() => _ToastOverlayState();
@@ -76,15 +95,38 @@ class _ToastOverlayState extends State<_ToastOverlay>
       vsync: this,
       duration: const Duration(milliseconds: 220),
     )..forward();
-    _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    widget.visibility.addListener(_handleVisibilityChanged);
+    _opacity = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
     _offset = Tween<Offset>(
       begin: const Offset(0, -0.12),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      ),
+    );
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.dismissed) {
+        widget.onDismissed();
+      }
+    });
+  }
+
+  void _handleVisibilityChanged() {
+    if (!widget.visibility.value) {
+      _controller.reverse();
+    }
   }
 
   @override
   void dispose() {
+    widget.visibility.removeListener(_handleVisibilityChanged);
     _controller.dispose();
     super.dispose();
   }
