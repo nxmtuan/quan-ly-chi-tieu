@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:objectbox/objectbox.dart';
 
 import 'transaction.dart';
 
@@ -14,24 +15,64 @@ const categoryIconOptions = [
   Icons.category_rounded,
 ];
 
+@Entity()
 class Category {
-  const Category({
+  Category({
+    this.obxId = 0,
     required this.id,
     required this.name,
-    required this.iconData,
+    IconData? iconData,
+    int? dbIconCodePoint,
     required this.colorHex,
-    required this.type,
-  });
+    TransactionType? type,
+    String? dbType,
+  }) {
+    if (iconData != null) {
+      _iconCodePoint = iconData.codePoint;
+    } else if (dbIconCodePoint != null) {
+      _iconCodePoint = dbIconCodePoint;
+    } else {
+      _iconCodePoint = Icons.category_rounded.codePoint;
+    }
+    
+    if (type != null) {
+      _type = type.name;
+    } else if (dbType != null) {
+      _type = dbType;
+    } else {
+      _type = TransactionType.expense.name;
+    }
+  }
 
-  final String id;
-  final String name;
-  final IconData iconData;
-  final int colorHex;
-  final TransactionType type;
+  @Id()
+  int obxId;
+
+  @Unique()
+  String id;
+
+  String name;
+
+  int _iconCodePoint = 0;
+  String _type = 'expense';
+
+  @Transient()
+  IconData get iconData => _iconFromCodePoint(_iconCodePoint);
+
+  int get dbIconCodePoint => _iconCodePoint;
+  set dbIconCodePoint(int value) => _iconCodePoint = value;
+
+  int colorHex;
+
+  @Transient()
+  TransactionType get type => TransactionType.values.byName(_type);
+
+  String get dbType => _type;
+  set dbType(String value) => _type = value;
 
   Color get color => Color(colorHex);
 
   Category copyWith({
+    int? obxId,
     String? id,
     String? name,
     IconData? iconData,
@@ -39,6 +80,7 @@ class Category {
     TransactionType? type,
   }) {
     return Category(
+      obxId: obxId ?? this.obxId,
       id: id ?? this.id,
       name: name ?? this.name,
       iconData: iconData ?? this.iconData,

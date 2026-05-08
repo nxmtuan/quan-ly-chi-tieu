@@ -1,25 +1,55 @@
+import 'package:objectbox/objectbox.dart';
+
 enum TransactionType { income, expense }
 
+@Entity()
 class Transaction {
-  const Transaction({
+  Transaction({
+    this.obxId = 0,
     required this.id,
     required this.amount,
-    required this.type,
+    TransactionType? type,
+    String? dbType,
     required this.categoryId,
     required this.date,
     required this.note,
-  });
+  }) {
+    if (type != null) {
+      _type = type.name;
+    } else if (dbType != null) {
+      _type = dbType;
+    } else {
+      _type = TransactionType.expense.name;
+    }
+  }
 
-  final String id;
-  final double amount;
-  final TransactionType type;
-  final String categoryId;
-  final DateTime date;
-  final String note;
+  @Id()
+  int obxId;
+
+  @Unique()
+  String id;
+
+  double amount;
+
+  String _type = 'expense';
+
+  @Transient()
+  TransactionType get type => TransactionType.values.byName(_type);
+
+  String get dbType => _type;
+  set dbType(String value) => _type = value;
+
+  String categoryId;
+
+  @Property(type: PropertyType.date)
+  DateTime date;
+
+  String note;
 
   bool get isExpense => type == TransactionType.expense;
 
   Transaction copyWith({
+    int? obxId,
     String? id,
     double? amount,
     TransactionType? type,
@@ -28,6 +58,7 @@ class Transaction {
     String? note,
   }) {
     return Transaction(
+      obxId: obxId ?? this.obxId,
       id: id ?? this.id,
       amount: amount ?? this.amount,
       type: type ?? this.type,

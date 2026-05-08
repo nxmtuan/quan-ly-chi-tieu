@@ -44,7 +44,7 @@ final categoriesProvider = NotifierProvider<CategoriesNotifier, List<Category>>(
   CategoriesNotifier.new,
 );
 
-const defaultCategories = [
+final defaultCategories = [
   Category(
     id: 'salary',
     name: 'Salary',

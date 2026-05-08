@@ -1,35 +1,20 @@
-import 'dart:convert';
-
-import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../../objectbox.g.dart';
 import '../../models/transaction.dart';
 
 class TransactionStorage {
-  const TransactionStorage(this._preferences);
+  const TransactionStorage(this._box);
 
-  static const _transactionsKey = 'transactions';
-
-  final SharedPreferences _preferences;
+  final Box<Transaction> _box;
 
   List<Transaction> readTransactions() {
-    final rawTransactions = _preferences.getStringList(_transactionsKey);
-
-    if (rawTransactions == null) {
-      return const [];
-    }
-
-    return rawTransactions
-        .map(
-          (rawTransaction) => Transaction.fromJson(jsonDecode(rawTransaction)),
-        )
-        .toList();
+    return _box.getAll()..sort((a, b) => b.date.compareTo(a.date));
   }
 
-  Future<void> saveTransactions(List<Transaction> transactions) {
-    final rawTransactions = transactions
-        .map((transaction) => jsonEncode(transaction.toJson()))
-        .toList();
-
-    return _preferences.setStringList(_transactionsKey, rawTransactions);
+  Future<void> saveTransactions(List<Transaction> transactions) async {
+    _box.removeAll();
+    for (final tx in transactions) {
+      tx.obxId = 0; // reset for new insertion since we removed all
+    }
+    _box.putMany(transactions);
   }
 }
