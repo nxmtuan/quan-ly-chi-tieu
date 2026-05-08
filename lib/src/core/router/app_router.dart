@@ -29,6 +29,18 @@ final appRouter = GoRouter(
           },
         ),
         GoRoute(
+          path: '/wallet',
+          pageBuilder: (context, state) {
+            return _buildPage(
+              state: state,
+              child: const ComingSoonScreen(
+                title: 'Ví',
+                icon: Icons.account_balance_wallet_rounded,
+              ),
+            );
+          },
+        ),
+        GoRoute(
           path: '/statistics',
           pageBuilder: (context, state) {
             return _buildPage(state: state, child: const StatisticsScreen());

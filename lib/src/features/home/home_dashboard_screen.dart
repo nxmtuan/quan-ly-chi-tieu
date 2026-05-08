@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,10 +7,12 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
+import '../../core/widgets/app_bounce_builder.dart';
 import '../../models/auth_user.dart';
 import '../../models/transaction.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/transaction_provider.dart';
+import '../transactions/add_transaction_sheet.dart';
 import 'widgets/recent_transactions.dart';
 import 'widgets/summary_card.dart';
 
@@ -22,6 +25,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   late DateTime _selectedMonth;
+  bool _showQuickAddButton = true;
 
   @override
   void initState() {
@@ -54,105 +58,138 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return ColoredBox(
       color: isDark ? colors.surface : const Color(0xFFFAF7FF),
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              context.scaled(24),
-              context.scaled(22),
-              context.scaled(24),
-              0,
-            ),
-            sliver: SliverToBoxAdapter(
-              child:
-                  Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
+      child: Stack(
+        children: [
+          NotificationListener<UserScrollNotification>(
+            onNotification: _handleScrollNotification,
+            child: CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(
+                    context.scaled(24),
+                    context.scaled(22),
+                    context.scaled(24),
+                    0,
+                  ),
+                  sliver: SliverToBoxAdapter(
+                    child:
+                        Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Tổng quan',
-                                  style: context.appText.pageEyebrow,
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  'Quản lý tài chính',
-                                  style: context.appText.pageTitle.copyWith(
-                                    color: colors.onSurface,
-                                    fontSize: context.scaledFont(27, min: 24),
-                                    letterSpacing: -1.0 * scale,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Tổng quan',
+                                        style: context.appText.pageEyebrow,
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        'Quản lý tài chính',
+                                        style:
+                                            context.appText.pageTitle.copyWith(
+                                              color: colors.onSurface,
+                                              fontSize: context.scaledFont(
+                                                27,
+                                                min: 24,
+                                              ),
+                                              letterSpacing: -1.0 * scale,
+                                            ),
+                                      ),
+                                    ],
                                   ),
                                 ),
+                                _ProfileAvatarButton(
+                                  authUser: authUser,
+                                  onTap: () => context.go('/settings'),
+                                ),
                               ],
+                            )
+                            .animate()
+                            .fadeIn(duration: 260.ms)
+                            .slideY(
+                              begin: -0.08,
+                              end: 0,
+                              duration: 320.ms,
+                              curve: Curves.easeOutCubic,
                             ),
-                          ),
-                          _ProfileAvatarButton(
-                            authUser: authUser,
-                            onTap: () => context.go('/settings'),
-                          ),
-                        ],
-                      )
-                      .animate()
-                      .fadeIn(duration: 260.ms)
-                      .slideY(
-                        begin: -0.08,
-                        end: 0,
-                        duration: 320.ms,
-                        curve: Curves.easeOutCubic,
-                      ),
-            ),
-          ),
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              context.scaled(24),
-              context.scaled(24),
-              context.scaled(24),
-              0,
-            ),
-            sliver: SliverToBoxAdapter(
-              child:
-                  SummaryCard(
-                        summary: summary,
-                        displayedMonth: _selectedMonth,
-                        canGoNext: _selectedMonth.isBefore(currentMonth),
-                        onPreviousMonth: _goToPreviousMonth,
-                        onNextMonth: _selectedMonth.isBefore(currentMonth)
-                            ? _goToNextMonth
-                            : null,
-                        onPickMonth: _pickMonth,
-                      )
-                      .animate(delay: 80.ms)
-                      .fadeIn(duration: 320.ms)
-                      .slideY(
-                        begin: 0.08,
-                        end: 0,
-                        duration: 360.ms,
-                        curve: Curves.easeOutCubic,
-                      ),
-            ),
-          ),
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              context.scaled(24),
-              context.scaled(16),
-              context.scaled(24),
-              context.scaled(100) + MediaQuery.paddingOf(context).bottom,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: RecentTransactions(
-                month: _selectedMonth,
-                transactions: transactions,
-              )
-                  .animate(delay: 150.ms)
-                  .fadeIn(duration: 320.ms)
-                  .slideY(
-                    begin: 0.06,
-                    end: 0,
-                    duration: 360.ms,
-                    curve: Curves.easeOutCubic,
                   ),
+                ),
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(
+                    context.scaled(24),
+                    context.scaled(24),
+                    context.scaled(24),
+                    0,
+                  ),
+                  sliver: SliverToBoxAdapter(
+                    child:
+                        SummaryCard(
+                              summary: summary,
+                              displayedMonth: _selectedMonth,
+                              canGoNext: _selectedMonth.isBefore(currentMonth),
+                              onPreviousMonth: _goToPreviousMonth,
+                              onNextMonth: _selectedMonth.isBefore(currentMonth)
+                                  ? _goToNextMonth
+                                  : null,
+                              onPickMonth: _pickMonth,
+                            )
+                            .animate(delay: 80.ms)
+                            .fadeIn(duration: 320.ms)
+                            .slideY(
+                              begin: 0.08,
+                              end: 0,
+                              duration: 360.ms,
+                              curve: Curves.easeOutCubic,
+                            ),
+                  ),
+                ),
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(
+                    context.scaled(24),
+                    context.scaled(16),
+                    context.scaled(24),
+                    context.scaled(176) + MediaQuery.paddingOf(context).bottom,
+                  ),
+                  sliver: SliverToBoxAdapter(
+                    child: RecentTransactions(
+                      month: _selectedMonth,
+                      transactions: transactions,
+                    )
+                        .animate(delay: 150.ms)
+                        .fadeIn(duration: 320.ms)
+                        .slideY(
+                          begin: 0.06,
+                          end: 0,
+                          duration: 360.ms,
+                          curve: Curves.easeOutCubic,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            right: context.scaled(24),
+            bottom: context.scaled(26) + MediaQuery.paddingOf(context).bottom,
+            child: IgnorePointer(
+              ignoring: !_showQuickAddButton,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                offset: _showQuickAddButton
+                    ? Offset.zero
+                    : const Offset(0, 1.2),
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 180),
+                  opacity: _showQuickAddButton ? 1 : 0,
+                  child: _QuickAddButton(
+                    onTap: () => showAddTransactionSheet(context),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -186,6 +223,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (selectedMonth != null && mounted) {
       setState(() => _selectedMonth = _monthStart(selectedMonth));
     }
+  }
+
+  bool _handleScrollNotification(UserScrollNotification notification) {
+    if (!mounted) {
+      return false;
+    }
+
+    if (notification.direction == ScrollDirection.reverse) {
+      if (_showQuickAddButton) {
+        setState(() => _showQuickAddButton = false);
+      }
+    } else if (notification.direction == ScrollDirection.forward) {
+      if (!_showQuickAddButton) {
+        setState(() => _showQuickAddButton = true);
+      }
+    }
+
+    return false;
   }
 }
 
@@ -285,6 +340,53 @@ class _AvatarFallback extends StatelessWidget {
           color: AppColors.primary,
           fontSize: context.scaledFont(22, min: 18),
           letterSpacing: -0.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickAddButton extends StatelessWidget {
+  const _QuickAddButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: Container(
+        width: context.scaled(60),
+        height: context.scaled(60),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              colors.primary.withValues(alpha: 0.72),
+              colors.primary,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: Colors.white,
+            width: context.scaled(2.4),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: colors.primary.withValues(alpha: isDark ? 0.28 : 0.34),
+              blurRadius: context.scaled(16),
+              offset: Offset(0, context.scaled(8)),
+            ),
+          ],
+        ),
+        child: Icon(
+          Icons.add_rounded,
+          color: Colors.white,
+          size: context.scaled(30),
         ),
       ),
     );

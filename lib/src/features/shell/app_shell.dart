@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
-import '../transactions/add_transaction_sheet.dart';
 import 'custom_bottom_nav_bar.dart';
 
 class AppShell extends StatelessWidget {
@@ -21,7 +20,6 @@ class AppShell extends StatelessWidget {
           CustomBottomNavBar(
                 currentIndex: currentIndex,
                 onTap: (index) => _goToIndex(context, index),
-                onAddTransaction: () => showAddTransactionSheet(context),
               )
               .animate()
               .fadeIn(duration: 260.ms)
@@ -37,6 +35,7 @@ class AppShell extends StatelessWidget {
   int _indexForPath(String path) {
     return switch (path) {
       '/calendar' => 1,
+      '/wallet' => 2,
       '/recurring' => 3,
       '/settings' => 4,
       _ => 0,
@@ -50,7 +49,7 @@ class AppShell extends StatelessWidget {
       case 1:
         context.go('/calendar');
       case 2:
-        showAddTransactionSheet(context);
+        context.go('/wallet');
       case 3:
         context.go('/recurring');
       case 4:

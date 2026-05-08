@@ -12,12 +12,10 @@ class CustomBottomNavBar extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onTap,
-    required this.onAddTransaction,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
-  final VoidCallback onAddTransaction;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +25,7 @@ class CustomBottomNavBar extends StatelessWidget {
     final items = [
       const _NavItem(Icons.grid_view_rounded, 'Tổng quan'),
       const _NavItem(Icons.calendar_month_rounded, 'Lịch'),
-      const _NavItem(Icons.add_rounded, 'Nhập', isAction: true),
+      const _NavItem(Icons.account_balance_wallet_rounded, 'Ví'),
       const _NavItem(Icons.repeat_rounded, 'Định kỳ'),
       const _NavItem(Icons.settings_rounded, 'Cài đặt'),
     ];
@@ -88,9 +86,7 @@ class CustomBottomNavBar extends StatelessWidget {
                         _NavButton(
                               item: items[index],
                               selected: currentIndex == index,
-                              onTap: items[index].isAction
-                                  ? onAddTransaction
-                                  : () => onTap(index),
+                              onTap: () => onTap(index),
                             )
                             .animate(delay: Duration(milliseconds: 50 * index))
                             .fadeIn(duration: 220.ms)
@@ -124,74 +120,10 @@ class _NavButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final isAction = item.isAction;
     final inactiveColor = colors.onSurface.withValues(alpha: 0.54);
     final foreground = selected
         ? colors.primary
-        : colors.onSurface.withValues(alpha: isAction ? 0.92 : 0.54);
-    final scale = context.adaptiveScale;
-
-    if (isAction) {
-      return AppBounceBuilder(
-        onTap: onTap,
-        child: SizedBox(
-          height: context.scaled(54),
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                top: -context.scaled(21),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  width: context.scaled(54),
-                  height: context.scaled(54),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        colors.primary.withValues(alpha: 0.72),
-                        colors.primary,
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 2.2 * scale,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: colors.primary.withValues(alpha: 0.34),
-                        blurRadius: context.scaled(14),
-                        offset: Offset(0, context.scaled(7)),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.add_rounded,
-                    color: Colors.white,
-                    size: context.scaled(29),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                child: Text(
-                  item.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.appText.navLabel.copyWith(
-                    color: colors.primary,
-                    fontSize: context.scaledFont(11.5, min: 11),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+        : colors.onSurface.withValues(alpha: 0.54);
 
     return AppBounceBuilder(
       onTap: onTap,
@@ -238,9 +170,8 @@ class _NavButton extends StatelessWidget {
 }
 
 class _NavItem {
-  const _NavItem(this.icon, this.label, {this.isAction = false});
+  const _NavItem(this.icon, this.label);
 
   final IconData icon;
   final String label;
-  final bool isAction;
 }
