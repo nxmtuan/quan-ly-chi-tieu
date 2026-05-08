@@ -16,7 +16,7 @@ void showTransactionDetailSheet(
   );
 }
 
-class _TransactionDetailSheet extends StatelessWidget {
+class _TransactionDetailSheet extends ConsumerWidget {
   const _TransactionDetailSheet({
     required this.transaction,
     required this.category,
@@ -26,7 +26,7 @@ class _TransactionDetailSheet extends StatelessWidget {
   final Category category;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isExpense = transaction.type == TransactionType.expense;
     final color = isExpense ? const Color(0xFFFF1493) : AppColors.success;
     final sign = isExpense ? '-' : '+';
@@ -116,19 +116,19 @@ class _TransactionDetailSheet extends StatelessWidget {
         children: [
           Expanded(
             child: InkWell(
-              onTap: () => Navigator.of(context).pop(),
+              onTap: () => _confirmDelete(context, ref),
               borderRadius: BorderRadius.circular(context.scaled(16)),
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: const Color(0xFFFEE2E2),
                   borderRadius: BorderRadius.circular(context.scaled(16)),
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  'Đóng',
+                  'Xóa',
                   style: context.appText.buttonLabel.copyWith(
-                    color: const Color(0xFF475569),
+                    color: const Color(0xFFDC2626),
                   ),
                 ),
               ),
@@ -170,6 +170,38 @@ class _TransactionDetailSheet extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: const Text('Xóa giao dịch'),
+        content: const Text('Bạn có chắc muốn xóa giao dịch này không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              'Hủy',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: const Color(0xFFDC2626)),
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      ref.read(transactionsProvider.notifier).deleteTransaction(transaction.id);
+      Navigator.of(context).pop();
+    }
   }
 
   Widget _buildRow(
