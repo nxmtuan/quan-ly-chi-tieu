@@ -145,7 +145,7 @@ class AppSheetHeader extends StatelessWidget {
     this.subtitle,
     this.onClose,
     this.showCloseButton = true,
-    this.padding = const EdgeInsets.fromLTRB(16, 12, 16, 0),
+    this.padding = const EdgeInsets.fromLTRB(12, 16, 12, 16),
     this.titleStyle,
   });
 
