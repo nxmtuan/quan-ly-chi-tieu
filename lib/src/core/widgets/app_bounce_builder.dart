@@ -5,12 +5,16 @@ class AppBounceBuilder extends StatefulWidget {
     super.key,
     required this.child,
     this.onTap,
-    this.scaleDown = 0.95,
+    this.scaleDown = 0.90,
+    this.pressInDuration = const Duration(milliseconds: 70),
+    this.releaseDuration = const Duration(milliseconds: 140),
   });
 
   final Widget child;
   final VoidCallback? onTap;
   final double scaleDown;
+  final Duration pressInDuration;
+  final Duration releaseDuration;
 
   @override
   State<AppBounceBuilder> createState() => _AppBounceBuilderState();
@@ -26,11 +30,15 @@ class _AppBounceBuilderState extends State<AppBounceBuilder>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 150),
-      reverseDuration: const Duration(milliseconds: 150),
+      duration: widget.pressInDuration,
+      reverseDuration: widget.releaseDuration,
     );
     _scaleAnimation = Tween<double>(begin: 1.0, end: widget.scaleDown).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeOutCubic,
+      ),
     );
   }
 
@@ -40,20 +48,19 @@ class _AppBounceBuilderState extends State<AppBounceBuilder>
     super.dispose();
   }
 
-  void _onTapDown(TapDownDetails details) {
+  void _onPointerDown(PointerDownEvent event) {
     if (widget.onTap != null) {
       _controller.forward();
     }
   }
 
-  void _onTapUp(TapUpDetails details) {
+  void _onPointerUp(PointerUpEvent event) {
     if (widget.onTap != null) {
       _controller.reverse();
-      widget.onTap!();
     }
   }
 
-  void _onTapCancel() {
+  void _onPointerCancel(PointerCancelEvent event) {
     if (widget.onTap != null) {
       _controller.reverse();
     }
@@ -61,14 +68,18 @@ class _AppBounceBuilderState extends State<AppBounceBuilder>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: _onTapDown,
-      onTapUp: _onTapUp,
-      onTapCancel: _onTapCancel,
+    return Listener(
       behavior: HitTestBehavior.opaque,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: widget.child,
+      onPointerDown: _onPointerDown,
+      onPointerUp: _onPointerUp,
+      onPointerCancel: _onPointerCancel,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: widget.child,
+        ),
       ),
     );
   }
