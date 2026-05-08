@@ -5,12 +5,8 @@ void showTransactionDetailSheet(
   required Transaction transaction,
   required Category category,
 }) {
-  showModalBottomSheet<void>(
+  showAppBottomSheet<void>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    useSafeArea: false,
-    backgroundColor: Colors.transparent,
     builder: (context) {
       return _TransactionDetailSheet(
         transaction: transaction,

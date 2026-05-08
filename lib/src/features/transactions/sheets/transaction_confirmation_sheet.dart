@@ -6,19 +6,13 @@ Future<bool> showTransactionConfirmationSheet(
   required Category category,
   required String source,
 }) async {
-  final result = await showModalBottomSheet<bool>(
+  final result = await showAppBottomSheet<bool>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    useSafeArea: false,
-    backgroundColor: Colors.transparent,
-    builder: (context) {
-      return _TransactionConfirmationSheet(
-        transaction: transaction,
-        category: category,
-        source: source,
-      );
-    },
+    builder: (context) => _TransactionConfirmationSheet(
+      transaction: transaction,
+      category: category,
+      source: source,
+    ),
   );
 
   return result ?? false;

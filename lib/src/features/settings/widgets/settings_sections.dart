@@ -21,12 +21,8 @@ class _ThemeSettingsRow extends ConsumerWidget {
   }
 
   Future<void> _showThemeSheet(BuildContext context, WidgetRef ref) async {
-    await showModalBottomSheet<void>(
+    await showAppBottomSheet<void>(
       context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      useSafeArea: false,
-      backgroundColor: Colors.transparent,
       builder: (context) {
         return Consumer(
           builder: (context, ref, child) {

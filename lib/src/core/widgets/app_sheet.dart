@@ -8,6 +8,36 @@ double appSheetBottomPadding(BuildContext context, {double extra = 0}) {
   return MediaQuery.of(context).padding.bottom + context.scaled(16) + extra;
 }
 
+int _sheetDepth = 0;
+
+Future<T?> showAppBottomSheet<T>({
+  required BuildContext context,
+  required WidgetBuilder builder,
+  bool useRootNavigator = true,
+}) {
+  final currentDepth = _sheetDepth;
+  _sheetDepth++;
+  
+  return showModalBottomSheet<T>(
+    context: context,
+    useRootNavigator: useRootNavigator,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return Padding(
+        padding: EdgeInsets.only(top: currentDepth * 20.0),
+        child: SizedBox(
+          height: double.infinity,
+          child: builder(context),
+        ),
+      );
+    },
+  ).whenComplete(() {
+    _sheetDepth--;
+  });
+}
+
 class AppSheetContainer extends StatelessWidget {
   const AppSheetContainer({
     super.key,

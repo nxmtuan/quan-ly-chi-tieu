@@ -4,13 +4,9 @@ Future<String?> showTransactionSourceSheet(
   BuildContext context, {
   required String selectedSource,
 }) {
-  return showModalBottomSheet<String>(
+  return showAppBottomSheet<String>(
     context: context,
-    useRootNavigator: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) {
-      return _SourcePickerSheet(selectedSource: selectedSource);
-    },
+    builder: (context) => _SourcePickerSheet(selectedSource: selectedSource),
   );
 }
 

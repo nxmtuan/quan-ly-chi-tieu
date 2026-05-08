@@ -5,12 +5,8 @@ void showCategoryTransactionsSheet(
   required Category category,
   required DateTime month,
 }) {
-  showModalBottomSheet<void>(
+  showAppBottomSheet<void>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    useSafeArea: false,
-    backgroundColor: Colors.transparent,
     builder: (context) {
       return _CategoryTransactionsSheet(
         category: category,

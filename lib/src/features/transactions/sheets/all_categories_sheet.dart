@@ -6,19 +6,13 @@ Future<Category?> showAllCategoriesSheet(
   required String? initialSelectedCategoryId,
   required Color actionColor,
 }) {
-  return showModalBottomSheet<Category>(
+  return showAppBottomSheet<Category>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    useSafeArea: false,
-    backgroundColor: Colors.transparent,
-    builder: (context) {
-      return _AllCategoriesSheet(
-        categories: categories,
-        initialSelectedCategoryId: initialSelectedCategoryId,
-        actionColor: actionColor,
-      );
-    },
+    builder: (context) => _AllCategoriesSheet(
+      categories: categories,
+      initialSelectedCategoryId: initialSelectedCategoryId,
+      actionColor: actionColor,
+    ),
   );
 }
 

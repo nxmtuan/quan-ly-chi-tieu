@@ -23,12 +23,8 @@ part 'sheets/transaction_confirmation_sheet.dart';
 part 'sheets/transaction_detail_sheet.dart';
 
 void showAddTransactionSheet(BuildContext context, {Transaction? transaction}) {
-  showModalBottomSheet<void>(
+  showAppBottomSheet<void>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    useSafeArea: false,
-    backgroundColor: Colors.transparent,
     builder: (context) => AddTransactionSheet(transaction: transaction),
   );
 }
@@ -88,9 +84,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child:
-          SizedBox(
-                height: MediaQuery.of(context).size.height * 0.98,
-                child: AppSheetContainer(
+                AppSheetContainer(
                   child: Column(
                     children: [
                       _SheetHeader(
@@ -156,8 +150,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                       ),
                     ],
                   ),
-                ),
-              )
+                )
               .animate()
               .fadeIn(duration: 220.ms)
               .slideY(

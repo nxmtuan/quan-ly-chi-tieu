@@ -7,20 +7,14 @@ Future<DateTime?> showAppCalendarSheet(
   String title = 'Chọn ngày',
   String? subtitle,
 }) {
-  return showModalBottomSheet<DateTime>(
+  return showAppBottomSheet<DateTime>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    useSafeArea: false,
-    backgroundColor: Colors.transparent,
-    builder: (context) {
-      return _CalendarBottomSheet(
-        initialDate: initialDate,
-        eventLoader: eventLoader,
-        title: title,
-        subtitle: subtitle,
-      );
-    },
+    builder: (context) => _CalendarBottomSheet(
+      initialDate: initialDate,
+      eventLoader: eventLoader,
+      title: title,
+      subtitle: subtitle,
+    ),
   );
 }
 

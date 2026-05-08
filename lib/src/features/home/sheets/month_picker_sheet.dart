@@ -5,12 +5,8 @@ Future<DateTime?> showMonthPickerSheet(
   required DateTime initialMonth,
   required DateTime lastMonth,
 }) {
-  return showModalBottomSheet<DateTime>(
+  return showAppBottomSheet<DateTime>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    useSafeArea: false,
-    backgroundColor: Colors.transparent,
     builder: (context) {
       return _MonthPickerSheet(
         initialMonth: initialMonth,
