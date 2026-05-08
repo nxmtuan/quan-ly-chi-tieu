@@ -79,6 +79,18 @@ const categoryColorOptions = [
   Color(0xFF1D4ED8),
 ];
 
+const defaultCategoryIds = {
+  'food',
+  'transport',
+  'bills',
+  'study',
+  'salary',
+  'allowance',
+  'profit',
+};
+
+bool isDefaultCategoryId(String id) => defaultCategoryIds.contains(id);
+
 @Entity()
 class Category {
   Category({

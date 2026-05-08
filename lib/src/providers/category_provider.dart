@@ -14,19 +14,17 @@ class CategoriesNotifier extends Notifier<List<Category>> {
         .read(categoryStorageProvider)
         .readCategories(includeDeleted: true);
 
-    if (storedCategories.isNotEmpty) {
-      return _visibleCategories(storedCategories);
+    final mergedCategories = _mergeWithDefaultCategories(storedCategories);
+
+    if (!_listEqualsByContent(storedCategories, mergedCategories)) {
+      unawaited(
+        ref.read(categoryStorageProvider).replaceAllCategories([
+          for (final category in mergedCategories) category.copyWith(),
+        ]),
+      );
     }
 
-    final seededCategories = [
-      for (final category in defaultCategories) category.copyWith(),
-    ];
-    unawaited(
-      ref.read(categoryStorageProvider).replaceAllCategories([
-        for (final category in seededCategories) category.copyWith(),
-      ]),
-    );
-    return seededCategories;
+    return _visibleCategories(mergedCategories);
   }
 
   Future<void> addCategory(Category category) async {
@@ -43,6 +41,9 @@ class CategoriesNotifier extends Notifier<List<Category>> {
   }
 
   Future<void> deleteCategory(String id) async {
+    if (isDefaultCategoryId(id)) {
+      return;
+    }
     state = state.where((category) => category.id != id).toList();
     await ref.read(categoryStorageProvider).markCategoryDeleted(id);
   }
@@ -53,6 +54,68 @@ class CategoriesNotifier extends Notifier<List<Category>> {
         if (!category.isDeleted) category,
     ];
   }
+
+  static List<Category> _mergeWithDefaultCategories(List<Category> storedCategories) {
+    final storedById = {
+      for (final category in storedCategories) category.id: category,
+    };
+    final merged = <Category>[];
+
+    for (final defaultCategory in defaultCategories) {
+      final storedCategory = storedById.remove(defaultCategory.id);
+      if (storedCategory == null) {
+        merged.add(defaultCategory.copyWith());
+        continue;
+      }
+
+      final needsUpdate =
+          storedCategory.name != defaultCategory.name ||
+          storedCategory.iconData.codePoint != defaultCategory.iconData.codePoint ||
+          storedCategory.colorHex != defaultCategory.colorHex ||
+          storedCategory.type != defaultCategory.type ||
+          storedCategory.isDeleted;
+
+      merged.add(
+        needsUpdate
+            ? storedCategory.copyWith(
+                name: defaultCategory.name,
+                iconData: defaultCategory.iconData,
+                colorHex: defaultCategory.colorHex,
+                type: defaultCategory.type,
+                updatedAt: DateTime.now(),
+                isDeleted: false,
+              )
+            : storedCategory,
+      );
+    }
+
+    merged.addAll(storedById.values);
+    return merged;
+  }
+
+  static bool _listEqualsByContent(List<Category> a, List<Category> b) {
+    if (identical(a, b)) {
+      return true;
+    }
+    if (a.length != b.length) {
+      return false;
+    }
+
+    for (var index = 0; index < a.length; index++) {
+      final left = a[index];
+      final right = b[index];
+      if (left.id != right.id ||
+          left.name != right.name ||
+          left.iconData.codePoint != right.iconData.codePoint ||
+          left.colorHex != right.colorHex ||
+          left.type != right.type ||
+          left.isDeleted != right.isDeleted) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 final categoriesProvider = NotifierProvider<CategoriesNotifier, List<Category>>(
@@ -62,58 +125,51 @@ final categoriesProvider = NotifierProvider<CategoriesNotifier, List<Category>>(
 final defaultCategories = [
   Category(
     id: 'salary',
-    name: 'Salary',
+    name: 'Lương',
     iconData: Icons.payments_rounded,
     colorHex: 0xFF10B981,
     type: TransactionType.income,
   ),
   Category(
-    id: 'freelance',
-    name: 'Freelance',
-    iconData: Icons.laptop_mac_rounded,
-    colorHex: 0xFF7C3AED,
+    id: 'allowance',
+    name: 'Trợ cấp',
+    iconData: Icons.volunteer_activism_rounded,
+    colorHex: 0xFF14B8A6,
+    type: TransactionType.income,
+  ),
+  Category(
+    id: 'profit',
+    name: 'Lợi nhuận',
+    iconData: Icons.trending_up_rounded,
+    colorHex: 0xFF9333EA,
     type: TransactionType.income,
   ),
   Category(
     id: 'food',
-    name: 'Food',
+    name: 'Ăn uống',
     iconData: Icons.restaurant_rounded,
     colorHex: 0xFFEF4444,
     type: TransactionType.expense,
   ),
   Category(
-    id: 'shopping',
-    name: 'Shopping',
-    iconData: Icons.shopping_bag_rounded,
-    colorHex: 0xFF7C3AED,
+    id: 'transport',
+    name: 'Di chuyển',
+    iconData: Icons.directions_car_rounded,
+    colorHex: 0xFF2563EB,
     type: TransactionType.expense,
   ),
   Category(
-    id: 'home',
-    name: 'Home',
-    iconData: Icons.home_rounded,
+    id: 'bills',
+    name: 'Hóa đơn',
+    iconData: Icons.receipt_long_rounded,
     colorHex: 0xFFF59E0B,
     type: TransactionType.expense,
   ),
   Category(
-    id: 'transport',
-    name: 'Transport',
-    iconData: Icons.directions_car_rounded,
+    id: 'study',
+    name: 'Học tập',
+    iconData: Icons.school_rounded,
     colorHex: 0xFF7C3AED,
-    type: TransactionType.expense,
-  ),
-  Category(
-    id: 'health',
-    name: 'Health',
-    iconData: Icons.favorite_rounded,
-    colorHex: 0xFFEF4444,
-    type: TransactionType.expense,
-  ),
-  Category(
-    id: 'travel',
-    name: 'Travel',
-    iconData: Icons.flight_takeoff_rounded,
-    colorHex: 0xFF10B981,
     type: TransactionType.expense,
   ),
 ];

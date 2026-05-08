@@ -218,6 +218,8 @@ class _ManagedCategoryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canDelete = !isDefaultCategoryId(category.id);
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.scaled(16),
@@ -256,13 +258,15 @@ class _ManagedCategoryRow extends StatelessWidget {
             icon: Icons.edit_rounded,
             onTap: onEdit,
           ),
-          SizedBox(width: context.scaled(8)),
-          _CategoryActionButton(
-            icon: Icons.delete_rounded,
-            color: AppColors.danger,
-            backgroundColor: AppColors.danger.withValues(alpha: 0.1),
-            onTap: onDelete,
-          ),
+          if (canDelete) ...[
+            SizedBox(width: context.scaled(8)),
+            _CategoryActionButton(
+              icon: Icons.delete_rounded,
+              color: AppColors.danger,
+              backgroundColor: AppColors.danger.withValues(alpha: 0.1),
+              onTap: onDelete,
+            ),
+          ],
         ],
       ),
     );

@@ -7,6 +7,8 @@ class _CategoryRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final canDelete = !isDefaultCategoryId(category.id);
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: context.scaled(14)),
       child: Row(
@@ -49,13 +51,15 @@ class _CategoryRow extends ConsumerWidget {
             icon: Icons.edit_rounded,
             onTap: () => showCategoryDialog(context, ref, category: category),
           ),
-          SizedBox(width: context.scaled(8)),
-          _ActionIconButton(
-            icon: Icons.delete_rounded,
-            color: AppColors.danger,
-            backgroundColor: AppColors.danger.withValues(alpha: 0.1),
-            onTap: () => _deleteCategory(context, ref),
-          ),
+          if (canDelete) ...[
+            SizedBox(width: context.scaled(8)),
+            _ActionIconButton(
+              icon: Icons.delete_rounded,
+              color: AppColors.danger,
+              backgroundColor: AppColors.danger.withValues(alpha: 0.1),
+              onTap: () => _deleteCategory(context, ref),
+            ),
+          ],
         ],
       ),
     );
