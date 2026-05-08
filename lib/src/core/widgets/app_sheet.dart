@@ -26,7 +26,7 @@ Future<T?> showAppBottomSheet<T>({
     backgroundColor: Colors.transparent,
     builder: (context) {
       return Padding(
-        padding: EdgeInsets.only(top: currentDepth * 20.0),
+        padding: EdgeInsets.only(top: currentDepth * 30.0),
         child: SizedBox(
           height: double.infinity,
           child: builder(context),
