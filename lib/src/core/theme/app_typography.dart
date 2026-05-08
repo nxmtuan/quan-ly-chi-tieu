@@ -112,6 +112,13 @@ class AppTextTokens {
     fontWeight: FontWeight.w700,
   );
 
+  TextStyle get amountSM => TextStyle(
+    color: _colors.onSurface,
+    fontSize: context.scaledFont(18, min: 16),
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.4,
+  );
+
   TextStyle get buttonLabel => TextStyle(
     color: Colors.white,
     fontSize: context.scaledFont(16, min: 14),

@@ -203,9 +203,8 @@ class _SummaryMetricCard extends StatelessWidget {
             formatCurrency(amount),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: context.appText.amountLG.copyWith(
+            style: context.appText.amountSM.copyWith(
               color: colors.onSurface,
-              fontSize: context.scaledFont(22, min: 20),
             ),
           ),
         ],
