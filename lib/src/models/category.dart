@@ -26,7 +26,9 @@ class Category {
     required this.colorHex,
     TransactionType? type,
     String? dbType,
-  }) {
+    DateTime? updatedAt,
+    this.isDeleted = false,
+  }) : updatedAt = updatedAt ?? DateTime.now() {
     if (iconData != null) {
       _iconCodePoint = iconData.codePoint;
     } else if (dbIconCodePoint != null) {
@@ -71,6 +73,11 @@ class Category {
 
   Color get color => Color(colorHex);
 
+  @Property(type: PropertyType.date)
+  DateTime updatedAt;
+
+  bool isDeleted;
+
   Category copyWith({
     int? obxId,
     String? id,
@@ -78,6 +85,8 @@ class Category {
     IconData? iconData,
     int? colorHex,
     TransactionType? type,
+    DateTime? updatedAt,
+    bool? isDeleted,
   }) {
     return Category(
       obxId: obxId ?? this.obxId,
@@ -86,6 +95,8 @@ class Category {
       iconData: iconData ?? this.iconData,
       colorHex: colorHex ?? this.colorHex,
       type: type ?? this.type,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 
@@ -98,6 +109,8 @@ class Category {
       'iconFontPackage': iconData.fontPackage,
       'colorHex': colorHex,
       'type': type.name,
+      'updatedAt': updatedAt.toIso8601String(),
+      'isDeleted': isDeleted,
     };
   }
 
@@ -108,6 +121,10 @@ class Category {
       iconData: _iconFromCodePoint(json['iconCodePoint'] as int),
       colorHex: json['colorHex'] as int,
       type: TransactionType.values.byName(json['type'] as String),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
+      isDeleted: json['isDeleted'] as bool? ?? false,
     );
   }
 }

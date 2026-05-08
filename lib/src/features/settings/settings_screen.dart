@@ -11,6 +11,7 @@ import '../../core/widgets/flat_card.dart';
 import '../../models/auth_user.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../providers/storage_provider.dart';
 import '../auth/google_web_sign_in_button.dart';
 import '../categories/categories_screen.dart';
 
@@ -56,6 +57,10 @@ class SettingsScreen extends ConsumerWidget {
                   const _ManageCategoriesRow(),
                   const _DividerIndent(),
                   _AuthSettingsRow(authUser: authUser),
+                  if (authUser != null) ...[
+                    const _DividerIndent(),
+                    const _SyncDataRow(),
+                  ],
                 ],
               ),
             ),

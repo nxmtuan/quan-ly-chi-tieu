@@ -13,7 +13,9 @@ class Transaction {
     required this.categoryId,
     required this.date,
     required this.note,
-  }) {
+    DateTime? updatedAt,
+    this.isDeleted = false,
+  }) : updatedAt = updatedAt ?? DateTime.now() {
     if (type != null) {
       _type = type.name;
     } else if (dbType != null) {
@@ -46,6 +48,11 @@ class Transaction {
 
   String note;
 
+  @Property(type: PropertyType.date)
+  DateTime updatedAt;
+
+  bool isDeleted;
+
   bool get isExpense => type == TransactionType.expense;
 
   Transaction copyWith({
@@ -56,6 +63,8 @@ class Transaction {
     String? categoryId,
     DateTime? date,
     String? note,
+    DateTime? updatedAt,
+    bool? isDeleted,
   }) {
     return Transaction(
       obxId: obxId ?? this.obxId,
@@ -65,6 +74,8 @@ class Transaction {
       categoryId: categoryId ?? this.categoryId,
       date: date ?? this.date,
       note: note ?? this.note,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 
@@ -76,6 +87,8 @@ class Transaction {
       'categoryId': categoryId,
       'date': date.toIso8601String(),
       'note': note,
+      'updatedAt': updatedAt.toIso8601String(),
+      'isDeleted': isDeleted,
     };
   }
 
@@ -87,6 +100,10 @@ class Transaction {
       categoryId: json['categoryId'] as String,
       date: DateTime.parse(json['date'] as String),
       note: json['note'] as String,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
+      isDeleted: json['isDeleted'] as bool? ?? false,
     );
   }
 }

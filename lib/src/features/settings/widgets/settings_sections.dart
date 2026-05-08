@@ -180,6 +180,80 @@ class _AuthSettingsRow extends ConsumerWidget {
   }
 }
 
+class _SyncDataRow extends ConsumerStatefulWidget {
+  const _SyncDataRow();
+
+  @override
+  ConsumerState<_SyncDataRow> createState() => _SyncDataRowState();
+}
+
+class _SyncDataRowState extends ConsumerState<_SyncDataRow> {
+  bool _isSyncing = false;
+
+  Future<void> _handleSync() async {
+    if (_isSyncing) return;
+
+    setState(() {
+      _isSyncing = true;
+    });
+
+    try {
+      final driveApi = await ref.read(authProvider.notifier).getDriveApi();
+      if (driveApi == null) {
+        throw Exception("Không thể kết nối với Google Drive");
+      }
+
+      final syncService = ref.read(syncServiceProvider(driveApi));
+      await syncService.syncData();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đồng bộ dữ liệu thành công!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi đồng bộ: $e'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSyncing = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _SettingsRow(
+      icon: Icons.cloud_sync_rounded,
+      iconColor: AppColors.primary,
+      title: 'Đồng bộ dữ liệu',
+      subtitle: 'Lưu trữ đám mây qua Google Drive',
+      trailing: _isSyncing 
+        ? SizedBox(
+            width: context.scaled(20),
+            height: context.scaled(20),
+            child: const CircularProgressIndicator(strokeWidth: 2),
+          )
+        : const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.textSecondary,
+          ),
+      onTap: _isSyncing ? null : _handleSync,
+    );
+  }
+}
+
 class _SettingsTipCard extends StatelessWidget {
   const _SettingsTipCard();
 

@@ -25,7 +25,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 493840073215639006),
     name: 'Category',
-    lastPropertyId: const obx_int.IdUid(6, 6351988202522147402),
+    lastPropertyId: const obx_int.IdUid(8, 8568673951023825635),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -65,6 +65,18 @@ final _entities = <obx_int.ModelEntity>[
         type: 9,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 4790256536881766510),
+        name: 'updatedAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 8568673951023825635),
+        name: 'isDeleted',
+        type: 1,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -72,7 +84,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 7804320392523648537),
     name: 'Transaction',
-    lastPropertyId: const obx_int.IdUid(7, 1291458765582326682),
+    lastPropertyId: const obx_int.IdUid(9, 1304849199539883312),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -116,6 +128,18 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(7, 1291458765582326682),
         name: 'note',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 6331285137163730624),
+        name: 'updatedAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 1304849199539883312),
+        name: 'isDeleted',
+        type: 1,
         flags: 0,
       ),
     ],
@@ -269,13 +293,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final idOffset = fbb.writeString(object.id);
         final nameOffset = fbb.writeString(object.name);
         final dbTypeOffset = fbb.writeString(object.dbType);
-        fbb.startTable(7);
+        fbb.startTable(9);
         fbb.addInt64(0, object.obxId);
         fbb.addOffset(1, idOffset);
         fbb.addOffset(2, nameOffset);
         fbb.addInt64(3, object.dbIconCodePoint);
         fbb.addInt64(4, object.colorHex);
         fbb.addOffset(5, dbTypeOffset);
+        fbb.addInt64(6, object.updatedAt.millisecondsSinceEpoch);
+        fbb.addBool(7, object.isDeleted);
         fbb.finish(fbb.endTable());
         return object.obxId;
       },
@@ -309,6 +335,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final dbTypeParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 14, '');
+        final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0),
+        );
+        final isDeletedParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          18,
+          false,
+        );
         final object = Category(
           obxId: obxIdParam,
           id: idParam,
@@ -316,6 +351,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           dbIconCodePoint: dbIconCodePointParam,
           colorHex: colorHexParam,
           dbType: dbTypeParam,
+          updatedAt: updatedAtParam,
+          isDeleted: isDeletedParam,
         );
 
         return object;
@@ -334,7 +371,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final dbTypeOffset = fbb.writeString(object.dbType);
         final categoryIdOffset = fbb.writeString(object.categoryId);
         final noteOffset = fbb.writeString(object.note);
-        fbb.startTable(8);
+        fbb.startTable(10);
         fbb.addInt64(0, object.obxId);
         fbb.addOffset(1, idOffset);
         fbb.addFloat64(2, object.amount);
@@ -342,6 +379,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(4, categoryIdOffset);
         fbb.addInt64(5, object.date.millisecondsSinceEpoch);
         fbb.addOffset(6, noteOffset);
+        fbb.addInt64(7, object.updatedAt.millisecondsSinceEpoch);
+        fbb.addBool(8, object.isDeleted);
         fbb.finish(fbb.endTable());
         return object.obxId;
       },
@@ -375,6 +414,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final noteParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 16, '');
+        final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0),
+        );
+        final isDeletedParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          20,
+          false,
+        );
         final object = Transaction(
           obxId: obxIdParam,
           id: idParam,
@@ -383,6 +431,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           categoryId: categoryIdParam,
           date: dateParam,
           note: noteParam,
+          updatedAt: updatedAtParam,
+          isDeleted: isDeletedParam,
         );
 
         return object;
@@ -527,6 +577,16 @@ class Category_ {
   static final dbType = obx.QueryStringProperty<Category>(
     _entities[0].properties[5],
   );
+
+  /// See [Category.updatedAt].
+  static final updatedAt = obx.QueryDateProperty<Category>(
+    _entities[0].properties[6],
+  );
+
+  /// See [Category.isDeleted].
+  static final isDeleted = obx.QueryBooleanProperty<Category>(
+    _entities[0].properties[7],
+  );
 }
 
 /// [Transaction] entity fields to define ObjectBox queries.
@@ -564,6 +624,16 @@ class Transaction_ {
   /// See [Transaction.note].
   static final note = obx.QueryStringProperty<Transaction>(
     _entities[1].properties[6],
+  );
+
+  /// See [Transaction.updatedAt].
+  static final updatedAt = obx.QueryDateProperty<Transaction>(
+    _entities[1].properties[7],
+  );
+
+  /// See [Transaction.isDeleted].
+  static final isDeleted = obx.QueryBooleanProperty<Transaction>(
+    _entities[1].properties[8],
   );
 }
 
