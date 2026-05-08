@@ -26,6 +26,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   late HomeSummaryScope _selectedScope;
+  TransactionType _selectedType = TransactionType.expense;
   bool _showQuickAddButton = true;
 
   @override
@@ -130,6 +131,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         SummaryCard(
                               summary: summary,
                               scope: _selectedScope,
+                              selectedType: _selectedType,
+                              onSelectedType: (type) {
+                                setState(() => _selectedType = type);
+                              },
                               onPreviousScope: _selectedScope.canGoPrevious
                                   ? _goToPreviousScope
                                   : null,
@@ -159,6 +164,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: RecentTransactions(
                       scope: _selectedScope,
                       transactions: transactions,
+                      selectedType: _selectedType,
                     )
                         .animate(delay: 150.ms)
                         .fadeIn(duration: 320.ms)

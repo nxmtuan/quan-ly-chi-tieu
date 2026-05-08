@@ -21,19 +21,14 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
   @override
   Widget build(BuildContext context) {
     final chartItems = _chartItems;
+    final colors = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(26),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x281B2338),
-            blurRadius: 15,
-            offset: Offset(0, 7),
-          ),
-        ],
+        boxShadow: appSurfaceShadow(context),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

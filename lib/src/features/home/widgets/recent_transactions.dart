@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/adaptive.dart';
 import '../../../core/utils/formatters.dart';
@@ -27,91 +28,92 @@ class RecentTransactions extends ConsumerStatefulWidget {
     super.key,
     required this.scope,
     required this.transactions,
+    required this.selectedType,
   });
 
   final HomeSummaryScope scope;
   final List<Transaction> transactions;
+  final TransactionType selectedType;
 
   @override
   ConsumerState<RecentTransactions> createState() => _RecentTransactionsState();
 }
 
 class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
-  TransactionType _selectedType = TransactionType.expense;
-
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(categoriesProvider);
     final items = _buildCategoryItems(categories);
     final total = items.fold<double>(0, (sum, item) => sum + item.amount);
-    const chartHeight = 350.0;
+    final chartHeight = context.scaled(350);
+    final chartLift = context.scaled(6);
+    final chartGap = context.scaled(16);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: chartHeight,
-          child: total == 0
-              ? const FlatCard(child: Center(child: Text('Chưa có dữ liệu')))
-              : _CategoryDonutChart(items: items, total: total),
-        ),
-        SizedBox(height: context.scaled(16)),
-        FlatCard(
-          radius: context.scaled(22),
-          padding: EdgeInsets.all(context.scaled(14)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _CategoryTabs(
-                selectedType: _selectedType,
-                onSelected: (type) {
-                  setState(() {
-                    _selectedType = type;
-                  });
-                },
-              ),
-              SizedBox(height: context.scaled(12)),
-              if (items.isEmpty)
-                Padding(
-                  padding: EdgeInsets.all(context.scaled(20)),
-                  child: Center(
-                    child: Text(
-                      _selectedType == TransactionType.expense
-                          ? 'Chưa có khoản chi nào'
-                          : 'Chưa có khoản thu nào',
-                      style: context.appText.bodyStrong.copyWith(
-                        color: AppColors.textSecondary,
+    return Padding(
+      padding: EdgeInsets.only(top: chartLift),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: chartHeight + chartGap - chartLift),
+            child: FlatCard(
+              radius: context.scaled(22),
+              padding: EdgeInsets.all(context.scaled(14)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (items.isEmpty)
+                    Padding(
+                      padding: EdgeInsets.all(context.scaled(20)),
+                      child: Center(
+                        child: Text(
+                          widget.selectedType == TransactionType.expense
+                              ? 'Chưa có khoản chi nào'
+                              : 'Chưa có khoản thu nào',
+                          style: context.appText.bodyStrong.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                )
-              else
-                for (final entry in items.indexed) ...[
-                  _CategoryAmountRow(
-                        item: entry.$2,
-                        total: total,
-                        scope: widget.scope,
-                        transactions: widget.transactions,
-                        showDivider: false,
-                      )
-                      .animate(delay: Duration(milliseconds: 38 * entry.$1))
-                      .fadeIn(duration: 240.ms)
-                      .slideX(
-                        begin: 0.04,
-                        end: 0,
-                        duration: 280.ms,
-                        curve: Curves.easeOutCubic,
-                      ),
-                  if (entry.$1 < items.length - 1)
-                    Divider(
-                      height: context.scaled(1),
-                      color: AppColors.border,
-                    ),
+                    )
+                  else
+                    for (final entry in items.indexed) ...[
+                      _CategoryAmountRow(
+                            item: entry.$2,
+                            total: total,
+                            scope: widget.scope,
+                            transactions: widget.transactions,
+                            showDivider: false,
+                          )
+                          .animate(delay: Duration(milliseconds: 38 * entry.$1))
+                          .fadeIn(duration: 240.ms)
+                          .slideX(
+                            begin: 0.04,
+                            end: 0,
+                            duration: 280.ms,
+                            curve: Curves.easeOutCubic,
+                          ),
+                      if (entry.$1 < items.length - 1)
+                        Divider(
+                          height: context.scaled(1),
+                          color: AppColors.border,
+                        ),
+                    ],
                 ],
-            ],
+              ),
+            ),
           ),
-        ),
-      ],
+          Transform.translate(
+            offset: Offset(0, -chartLift),
+            child: SizedBox(
+              height: chartHeight,
+              child: total == 0
+                  ? const FlatCard(child: Center(child: Text('Chưa có dữ liệu')))
+                  : _CategoryDonutChart(items: items, total: total),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -119,7 +121,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
     final totals = <String, double>{};
 
     for (final transaction in widget.transactions) {
-      if (transaction.type != _selectedType) {
+      if (transaction.type != widget.selectedType) {
         continue;
       }
 
@@ -140,7 +142,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
               name: 'Khác',
               iconData: Icons.category_rounded,
               colorHex: AppColors.textSecondary.toARGB32(),
-              type: _selectedType,
+              type: widget.selectedType,
             ),
           ),
           amount: entry.value,

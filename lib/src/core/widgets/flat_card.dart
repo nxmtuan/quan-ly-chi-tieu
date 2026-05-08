@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_shadows.dart';
 import '../utils/adaptive.dart';
 
 class FlatCard extends StatelessWidget {
@@ -19,7 +20,6 @@ class FlatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: padding is EdgeInsets
@@ -33,13 +33,7 @@ class FlatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color ?? colors.surface,
         borderRadius: BorderRadius.circular(context.scaled(radius)),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow.withValues(alpha: isDark ? 0.3 : 0.05),
-            blurRadius: context.scaled(isDark ? 8 : 12),
-            offset: Offset(0, context.scaled(4)),
-          ),
-        ],
+        boxShadow: appSurfaceShadow(context),
       ),
       child: child,
     );

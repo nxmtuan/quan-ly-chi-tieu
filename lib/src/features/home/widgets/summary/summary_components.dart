@@ -16,7 +16,6 @@ class _MonthSelectorBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final scale = context.adaptiveScale;
 
     return Container(
@@ -25,13 +24,7 @@ class _MonthSelectorBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(context.scaled(20)),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow.withValues(alpha: isDark ? 0.3 : 0.06),
-            blurRadius: context.scaled(isDark ? 12 : 18),
-            offset: Offset(0, context.scaled(9)),
-          ),
-        ],
+        boxShadow: appSurfaceShadow(context),
       ),
       child: Row(
         children: [
@@ -116,6 +109,8 @@ class _SummaryMetricCard extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.backgroundColor,
+    required this.isSelected,
+    required this.onTap,
   });
 
   final String label;
@@ -123,70 +118,73 @@ class _SummaryMetricCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final Color backgroundColor;
+  final bool isSelected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    return Container(
-      height: context.scaled(120),
-      padding: EdgeInsets.fromLTRB(
-        context.scaled(16),
-        context.scaled(16),
-        context.scaled(14),
-        context.scaled(14),
-      ),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [backgroundColor, colors.surface],
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        height: context.scaled(120),
+        padding: EdgeInsets.fromLTRB(
+          context.scaled(16),
+          context.scaled(16),
+          context.scaled(14),
+          context.scaled(14),
         ),
-        borderRadius: BorderRadius.circular(context.scaled(21)),
-        border: Border.all(color: Colors.white, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.08),
-            blurRadius: context.scaled(15),
-            offset: Offset(0, context.scaled(7)),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [backgroundColor, colors.surface],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: context.scaled(40),
-                height: context.scaled(40),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Icon(icon, size: context.scaled(23), color: color),
-              ),
-              SizedBox(width: context.scaled(10)),
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.appText.cardTitle.copyWith(color: color),
-                ),
-              ),
-            ],
+          borderRadius: BorderRadius.circular(context.scaled(21)),
+          border: Border.all(
+            color: isSelected ? color.withValues(alpha: 0.32) : Colors.white,
+            width: isSelected ? 2.2 : 2,
           ),
-          const Spacer(),
-          Text(
-            formatCurrency(amount),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: context.appText.amountSM.copyWith(
-              color: colors.onSurface,
+          boxShadow: appSurfaceShadow(context),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: context.scaled(40),
+                  height: context.scaled(40),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Icon(icon, size: context.scaled(23), color: color),
+                ),
+                SizedBox(width: context.scaled(10)),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.appText.cardTitle.copyWith(color: color),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+            const Spacer(),
+            Text(
+              formatCurrency(amount),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.appText.amountSM.copyWith(
+                color: color,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

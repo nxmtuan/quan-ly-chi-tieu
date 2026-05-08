@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/adaptive.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/app_bounce_builder.dart';
+import '../../../models/transaction.dart';
 import '../models/home_summary_scope.dart';
 import '../../../providers/transaction_provider.dart';
 
@@ -17,6 +19,8 @@ class SummaryCard extends StatelessWidget {
     super.key,
     required this.summary,
     required this.scope,
+    required this.selectedType,
+    required this.onSelectedType,
     required this.onPickScope,
     this.onPreviousScope,
     this.onNextScope,
@@ -24,6 +28,8 @@ class SummaryCard extends StatelessWidget {
 
   final TransactionSummary summary;
   final HomeSummaryScope scope;
+  final TransactionType selectedType;
+  final ValueChanged<TransactionType> onSelectedType;
   final VoidCallback onPickScope;
   final VoidCallback? onPreviousScope;
   final VoidCallback? onNextScope;
@@ -46,21 +52,25 @@ class SummaryCard extends StatelessWidget {
           children: [
             Expanded(
               child: _SummaryMetricCard(
-                label: 'Chi tiêu',
+                label: 'Chi',
                 amount: summary.expense,
                 icon: Icons.arrow_upward_rounded,
-                color: const Color(0xFFFF2F72),
+                color: AppColors.danger,
                 backgroundColor: const Color(0xFFFFF2F6),
+                isSelected: selectedType == TransactionType.expense,
+                onTap: () => onSelectedType(TransactionType.expense),
               ),
             ),
             SizedBox(width: cardSpacing),
             Expanded(
               child: _SummaryMetricCard(
-                label: 'Thu nhập',
+                label: 'Thu',
                 amount: summary.income,
                 icon: Icons.arrow_downward_rounded,
-                color: const Color(0xFF00D69B),
+                color: AppColors.success,
                 backgroundColor: const Color(0xFFF0FFF9),
+                isSelected: selectedType == TransactionType.income,
+                onTap: () => onSelectedType(TransactionType.income),
               ),
             ),
           ],
