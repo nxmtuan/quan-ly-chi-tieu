@@ -4,7 +4,7 @@ Future<bool> showTransactionConfirmationSheet(
   BuildContext context, {
   required Transaction transaction,
   required Category category,
-  required String source,
+  required MoneySource source,
 }) async {
   final result = await showAppBottomSheet<bool>(
     context: context,
@@ -27,7 +27,7 @@ class _TransactionConfirmationSheet extends StatelessWidget {
 
   final Transaction transaction;
   final Category category;
-  final String source;
+  final MoneySource source;
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +101,7 @@ class _TransactionConfirmationSheet extends StatelessWidget {
                     value: isExpense ? 'Chi tiêu' : 'Thu nhập',
                   ),
                   Divider(color: AppColors.border, height: context.scaled(24)),
-                  _buildRow(context, label: 'Nguồn tiền', value: source),
+                  _buildRow(context, label: 'Nguồn tiền', value: source.name),
                   Divider(color: AppColors.border, height: context.scaled(24)),
                   _buildRow(
                     context,

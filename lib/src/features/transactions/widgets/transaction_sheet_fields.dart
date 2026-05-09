@@ -373,48 +373,213 @@ class _NoteCard extends StatelessWidget {
   }
 }
 
-class _SourceTrigger extends StatelessWidget {
-  const _SourceTrigger({required this.source, required this.onTap});
+class _MoneySourcePicker extends StatelessWidget {
+  const _MoneySourcePicker({
+    required this.moneySources,
+    required this.selectedSourceId,
+    required this.actionColor,
+    required this.onSelected,
+    required this.onShowAll,
+    required this.promotedSourceId,
+  });
 
-  final String source;
+  final List<MoneySource> moneySources;
+  final String? selectedSourceId;
+  final Color actionColor;
+  final ValueChanged<MoneySource> onSelected;
+  final VoidCallback onShowAll;
+  final String? promotedSourceId;
+
+  @override
+  Widget build(BuildContext context) {
+    final orderedSources = _orderedSources();
+    final visibleSources = orderedSources.take(2).toList();
+    final shouldShowMoreButton = orderedSources.length > 2;
+
+    return _FormCard(
+      padding: EdgeInsets.fromLTRB(
+        context.scaled(14),
+        context.scaled(12),
+        context.scaled(14),
+        context.scaled(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _RequiredLabel(label: 'Nguồn tiền', color: actionColor),
+          SizedBox(height: context.scaled(10)),
+          if (moneySources.isEmpty)
+            Text(
+              'Chưa có nguồn tiền',
+              style: context.appText.bodyStrong.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            )
+          else
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final itemWidth =
+                    (constraints.maxWidth - context.scaled(16)) / 3;
+
+                return Wrap(
+                  spacing: context.scaled(8),
+                  runSpacing: context.scaled(8),
+                  children: [
+                    for (final source in visibleSources)
+                      SizedBox(
+                        width: itemWidth,
+                        child: _MoneySourceTile(
+                          source: source,
+                          selected: source.id == selectedSourceId,
+                          actionColor: actionColor,
+                          onTap: () => onSelected(source),
+                        ),
+                      ),
+                    if (shouldShowMoreButton)
+                      SizedBox(
+                        width: itemWidth,
+                        child: _MoreMoneySourcesTile(onTap: onShowAll),
+                      ),
+                  ],
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  List<MoneySource> _orderedSources() {
+    if (promotedSourceId == null) {
+      return moneySources;
+    }
+
+    final promotedSource = moneySources
+        .where((source) => source.id == promotedSourceId)
+        .firstOrNull;
+    if (promotedSource == null) {
+      return moneySources;
+    }
+
+    return [
+      promotedSource,
+      for (final source in moneySources)
+        if (source.id != promotedSource.id) source,
+    ];
+  }
+}
+
+class _MoneySourceTile extends StatelessWidget {
+  const _MoneySourceTile({
+    required this.source,
+    required this.selected,
+    required this.actionColor,
+    required this.onTap,
+  });
+
+  final MoneySource source;
+  final bool selected;
+  final Color actionColor;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return AppBounceBuilder(
       onTap: onTap,
-      child: _FormCard(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.scaled(14),
-          vertical: context.scaled(10),
-        ),
-        child: Row(
-          children: [
-            _LeadingIcon(
-              icon: Icons.account_balance_wallet_rounded,
-              color: AppColors.primary,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+      child: SizedBox(
+        height: context.scaled(120),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.scaled(8),
+            vertical: context.scaled(10),
+          ),
+          decoration: BoxDecoration(
+            color: selected
+                ? actionColor.withValues(alpha: 0.045)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(context.scaled(14)),
+            border: Border.all(
+              color: selected ? actionColor : AppColors.border,
+              width: selected ? 1.2 : 1,
             ),
-            SizedBox(width: context.scaled(10)),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _RequiredStaticLabel('Nguồn tiền'),
-                  SizedBox(height: context.scaled(6)),
-                  Text(
-                    source,
-                    style: context.appText.fieldValue.copyWith(
-                      color: AppColors.textPrimary,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: context.scaled(36),
+                height: context.scaled(36),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Icon(
+                  source.iconData,
+                  color: AppColors.primary,
+                  size: context.scaled(19),
+                ),
+              ),
+              SizedBox(height: context.scaled(8)),
+              SizedBox(
+                height: context.scaled(34),
+                child: Center(
+                  child: Text(
+                    source.name,
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    style: context.appText.captionStrong.copyWith(
+                      color: selected ? actionColor : AppColors.textPrimary,
+                      fontSize: context.scaledFont(11.5, min: 11),
+                      height: 1.15,
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: Color(0xFF4B5563),
-              size: context.scaled(18),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MoreMoneySourcesTile extends StatelessWidget {
+  const _MoreMoneySourcesTile({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: Container(
+        height: context.scaled(120),
+        padding: EdgeInsets.fromLTRB(
+          context.scaled(6),
+          context.scaled(10),
+          context.scaled(6),
+          context.scaled(8),
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(context.scaled(14)),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _MoreCategoriesIcon(),
+            SizedBox(height: context.scaled(10)),
+            Text(
+              'Khác',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: context.appText.captionStrong.copyWith(
+                color: AppColors.textPrimary,
+                fontSize: context.scaledFont(12, min: 12),
+              ),
             ),
           ],
         ),

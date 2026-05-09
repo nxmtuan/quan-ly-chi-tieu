@@ -4,6 +4,7 @@ import '../network/google_drive_service.dart';
 import '../storage/settings_storage.dart';
 import '../../models/transaction.dart';
 import '../../models/category.dart';
+import '../../models/money_source.dart';
 import '../../../objectbox.g.dart';
 
 class SyncService {
@@ -12,18 +13,21 @@ class SyncService {
     required this.settingsStorage,
     required this.transactionBox,
     required this.categoryBox,
+    required this.moneySourceBox,
   });
 
   final DriveSyncClient driveService;
   final SettingsStorage settingsStorage;
   final Box<Transaction> transactionBox;
   final Box<Category> categoryBox;
+  final Box<MoneySource> moneySourceBox;
 
   Future<void> syncData() async {
     final syncStartedAt = DateTime.now();
     final remoteJsonString = await driveService.downloadData();
     final Map<String, Transaction> remoteTransactions = {};
     final Map<String, Category> remoteCategories = {};
+    final Map<String, MoneySource> remoteMoneySources = {};
 
     if (remoteJsonString != null && remoteJsonString.isNotEmpty) {
       final decoded = jsonDecode(remoteJsonString) as Map<String, dynamic>;
@@ -39,6 +43,12 @@ class SyncService {
         final cat = Category.fromJson(catJson as Map<String, dynamic>);
         remoteCategories[cat.id] = cat;
       }
+
+      final sourceList = decoded['moneySources'] as List<dynamic>? ?? [];
+      for (final sourceJson in sourceList) {
+        final source = MoneySource.fromJson(sourceJson as Map<String, dynamic>);
+        remoteMoneySources[source.id] = source;
+      }
     }
 
     final shouldPurgeSoftDeleted = settingsStorage.isSoftDeletePurgeDue(
@@ -49,12 +59,15 @@ class SyncService {
       remoteCategories: remoteCategories.values,
       localTransactions: transactionBox.getAll(),
       remoteTransactions: remoteTransactions.values,
+      localMoneySources: moneySourceBox.getAll(),
+      remoteMoneySources: remoteMoneySources.values,
       syncStartedAt: syncStartedAt,
       shouldPurgeSoftDeleted: shouldPurgeSoftDeleted,
     );
 
     final exportData = {
       'categories': snapshot.categories.map((c) => c.toJson()).toList(),
+      'moneySources': snapshot.moneySources.map((s) => s.toJson()).toList(),
       'transactions': snapshot.transactions.map((t) => t.toJson()).toList(),
     };
 
@@ -63,6 +76,8 @@ class SyncService {
 
     categoryBox.removeAll();
     categoryBox.putMany(snapshot.categories);
+    moneySourceBox.removeAll();
+    moneySourceBox.putMany(snapshot.moneySources);
     transactionBox.removeAll();
     transactionBox.putMany(snapshot.transactions);
 
@@ -81,6 +96,8 @@ SyncSnapshot buildSyncSnapshot({
   required Iterable<Category> remoteCategories,
   required Iterable<Transaction> localTransactions,
   required Iterable<Transaction> remoteTransactions,
+  required Iterable<MoneySource> localMoneySources,
+  required Iterable<MoneySource> remoteMoneySources,
   required DateTime syncStartedAt,
   required bool shouldPurgeSoftDeleted,
 }) {
@@ -106,6 +123,19 @@ SyncSnapshot buildSyncSnapshot({
     }
   }
 
+  final localMoneySourceMap = {
+    for (final source in localMoneySources) source.id: source,
+  };
+  final mergedMoneySources = <String, MoneySource>{...localMoneySourceMap};
+
+  for (final remoteSource in remoteMoneySources) {
+    final localSource = mergedMoneySources[remoteSource.id];
+    if (localSource == null ||
+        remoteSource.updatedAt.isAfter(localSource.updatedAt)) {
+      mergedMoneySources[remoteSource.id] = remoteSource;
+    }
+  }
+
   var compactedCategories = [
     for (final category in mergedCategories.values)
       category.compactedForStorage().copyWith(obxId: 0),
@@ -113,6 +143,10 @@ SyncSnapshot buildSyncSnapshot({
   var compactedTransactions = [
     for (final transaction in mergedTransactions.values)
       transaction.compactedForStorage().copyWith(obxId: 0),
+  ];
+  var compactedMoneySources = [
+    for (final source in mergedMoneySources.values)
+      source.compactedForStorage().copyWith(obxId: 0),
   ];
 
   if (shouldPurgeSoftDeleted) {
@@ -137,10 +171,20 @@ SyncSnapshot buildSyncSnapshot({
         ))
           transaction,
     ];
+    compactedMoneySources = [
+      for (final source in compactedMoneySources)
+        if (!_shouldPurgeDeleted(
+          source.isDeleted,
+          source.updatedAt,
+          purgeCutoff,
+        ))
+          source,
+    ];
   }
 
   return SyncSnapshot(
     categories: compactedCategories,
+    moneySources: compactedMoneySources,
     transactions: compactedTransactions,
     purgedSoftDeleted: shouldPurgeSoftDeleted,
   );
@@ -153,11 +197,13 @@ bool _shouldPurgeDeleted(bool isDeleted, DateTime updatedAt, DateTime cutoff) {
 class SyncSnapshot {
   const SyncSnapshot({
     required this.categories,
+    required this.moneySources,
     required this.transactions,
     required this.purgedSoftDeleted,
   });
 
   final List<Category> categories;
+  final List<MoneySource> moneySources;
   final List<Transaction> transactions;
   final bool purgedSoftDeleted;
 }

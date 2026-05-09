@@ -12,6 +12,7 @@ class TransactionStorage {
     DateTime? fromDate,
     DateTime? toDate,
     String? categoryId,
+    String? sourceId,
     TransactionType? type,
   }) {
     Condition<Transaction>? condition;
@@ -41,6 +42,13 @@ class TransactionStorage {
       condition = _appendCondition(
         condition,
         Transaction_.categoryId.equals(categoryId),
+      );
+    }
+
+    if (sourceId != null) {
+      condition = _appendCondition(
+        condition,
+        Transaction_.sourceId.equals(sourceId),
       );
     }
 
@@ -176,6 +184,20 @@ class TransactionStorage {
       }
 
       return 0;
+    } finally {
+      query.close();
+    }
+  }
+
+  bool hasActiveTransactionsForSource(String sourceId) {
+    final query = _box
+        .query(
+          Transaction_.sourceId.equals(sourceId) &
+              Transaction_.isDeleted.equals(false),
+        )
+        .build();
+    try {
+      return query.count() > 0;
     } finally {
       query.close();
     }

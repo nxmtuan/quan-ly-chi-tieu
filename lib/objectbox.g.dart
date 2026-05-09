@@ -15,6 +15,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'src/models/category.dart';
+import 'src/models/money_source.dart';
 import 'src/models/transaction.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -88,7 +89,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 7804320392523648537),
     name: 'Transaction',
-    lastPropertyId: const obx_int.IdUid(10, 7162688059454464275),
+    lastPropertyId: const obx_int.IdUid(11, 3743505230492404707),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -155,6 +156,60 @@ final _entities = <obx_int.ModelEntity>[
         type: 2,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 3743505230492404707),
+        name: 'sourceId',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(9, 5507329943214301050),
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(5, 6814073455354518124),
+    name: 'MoneySource',
+    lastPropertyId: const obx_int.IdUid(6, 593030572791077501),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 7202591951073276106),
+        name: 'obxId',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 4685231358784153688),
+        name: 'id',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(8, 1626306486108024305),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 712825919219107123),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 4246415566177783395),
+        name: 'dbIconCodePoint',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 5110593064283057779),
+        name: 'updatedAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 593030572791077501),
+        name: 'isDeleted',
+        type: 1,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -204,8 +259,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(4, 7083601830508858313),
-    lastIndexId: const obx_int.IdUid(7, 9158010454404252001),
+    lastEntityId: const obx_int.IdUid(5, 6814073455354518124),
+    lastIndexId: const obx_int.IdUid(9, 5507329943214301050),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [2958872209723789033, 7083601830508858313],
@@ -332,7 +387,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final noteOffset = object.note == null
             ? null
             : fbb.writeString(object.note!);
-        fbb.startTable(11);
+        final sourceIdOffset = fbb.writeString(object.sourceId);
+        fbb.startTable(12);
         fbb.addInt64(0, object.obxId);
         fbb.addOffset(1, idOffset);
         fbb.addFloat64(2, object.amount);
@@ -343,6 +399,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(7, object.updatedAt.millisecondsSinceEpoch);
         fbb.addBool(8, object.isDeleted);
         fbb.addInt8(9, object.typeCode);
+        fbb.addOffset(10, sourceIdOffset);
         fbb.finish(fbb.endTable());
         return object.obxId;
       },
@@ -376,6 +433,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final categoryIdParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 12, '');
+        final sourceIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 24, '');
         final dateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0),
         );
@@ -398,8 +458,72 @@ obx_int.ModelDefinition getObjectBoxModel() {
           typeCode: typeCodeParam,
           dbType: dbTypeParam,
           categoryId: categoryIdParam,
+          sourceId: sourceIdParam,
           date: dateParam,
           note: noteParam,
+          updatedAt: updatedAtParam,
+          isDeleted: isDeletedParam,
+        );
+
+        return object;
+      },
+    ),
+    MoneySource: obx_int.EntityDefinition<MoneySource>(
+      model: _entities[2],
+      toOneRelations: (MoneySource object) => [],
+      toManyRelations: (MoneySource object) => {},
+      getId: (MoneySource object) => object.obxId,
+      setId: (MoneySource object, int id) {
+        object.obxId = id;
+      },
+      objectToFB: (MoneySource object, fb.Builder fbb) {
+        final idOffset = fbb.writeString(object.id);
+        final nameOffset = fbb.writeString(object.name);
+        fbb.startTable(7);
+        fbb.addInt64(0, object.obxId);
+        fbb.addOffset(1, idOffset);
+        fbb.addOffset(2, nameOffset);
+        fbb.addInt64(3, object.dbIconCodePoint);
+        fbb.addInt64(4, object.updatedAt.millisecondsSinceEpoch);
+        fbb.addBool(5, object.isDeleted);
+        fbb.finish(fbb.endTable());
+        return object.obxId;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final obxIdParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final idParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final dbIconCodePointParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0),
+        );
+        final isDeletedParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          false,
+        );
+        final object = MoneySource(
+          obxId: obxIdParam,
+          id: idParam,
+          name: nameParam,
+          dbIconCodePoint: dbIconCodePointParam,
           updatedAt: updatedAtParam,
           isDeleted: isDeletedParam,
         );
@@ -510,5 +634,43 @@ class Transaction_ {
   /// See [Transaction.typeCode].
   static final typeCode = obx.QueryIntegerProperty<Transaction>(
     _entities[1].properties[9],
+  );
+
+  /// See [Transaction.sourceId].
+  static final sourceId = obx.QueryStringProperty<Transaction>(
+    _entities[1].properties[10],
+  );
+}
+
+/// [MoneySource] entity fields to define ObjectBox queries.
+class MoneySource_ {
+  /// See [MoneySource.obxId].
+  static final obxId = obx.QueryIntegerProperty<MoneySource>(
+    _entities[2].properties[0],
+  );
+
+  /// See [MoneySource.id].
+  static final id = obx.QueryStringProperty<MoneySource>(
+    _entities[2].properties[1],
+  );
+
+  /// See [MoneySource.name].
+  static final name = obx.QueryStringProperty<MoneySource>(
+    _entities[2].properties[2],
+  );
+
+  /// See [MoneySource.dbIconCodePoint].
+  static final dbIconCodePoint = obx.QueryIntegerProperty<MoneySource>(
+    _entities[2].properties[3],
+  );
+
+  /// See [MoneySource.updatedAt].
+  static final updatedAt = obx.QueryDateProperty<MoneySource>(
+    _entities[2].properties[4],
+  );
+
+  /// See [MoneySource.isDeleted].
+  static final isDeleted = obx.QueryBooleanProperty<MoneySource>(
+    _entities[2].properties[5],
   );
 }

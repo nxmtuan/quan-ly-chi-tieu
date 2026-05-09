@@ -63,6 +63,25 @@ class _ManageCategoriesRow extends ConsumerWidget {
   }
 }
 
+class _ManageMoneySourcesRow extends ConsumerWidget {
+  const _ManageMoneySourcesRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _SettingsRow(
+      icon: Icons.account_balance_wallet_rounded,
+      iconColor: AppColors.primary,
+      title: 'Quản lý nguồn tiền',
+      subtitle: 'Thêm và chỉnh sửa danh sách nguồn tiền',
+      trailing: const Icon(
+        Icons.chevron_right_rounded,
+        color: AppColors.textSecondary,
+      ),
+      onTap: () => showMoneySourceManagementSheet(context, ref),
+    );
+  }
+}
+
 class _AuthSettingsRow extends ConsumerWidget {
   const _AuthSettingsRow({required this.authUser});
 

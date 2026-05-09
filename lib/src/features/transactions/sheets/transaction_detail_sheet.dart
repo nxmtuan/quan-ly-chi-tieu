@@ -31,6 +31,8 @@ class _TransactionDetailSheet extends ConsumerWidget {
     final color = isExpense ? const Color(0xFFFF1493) : AppColors.success;
     final sign = isExpense ? '-' : '+';
     final title = isExpense ? 'Giao dịch chi' : 'Giao dịch thu';
+    final source = ref.watch(moneySourceByIdProvider(transaction.sourceId)) ??
+        defaultMoneySources.first;
 
     return AppSheetScaffold(
       title: title,
@@ -98,7 +100,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
                     value: isExpense ? 'Chi tiêu' : 'Thu nhập',
                   ),
                   Divider(color: AppColors.border, height: context.scaled(24)),
-                  _buildRow(context, label: 'Nguồn tiền', value: 'Tiền mặt'),
+                  _buildRow(context, label: 'Nguồn tiền', value: source.name),
                   Divider(color: AppColors.border, height: context.scaled(24)),
                   _buildRow(
                     context,

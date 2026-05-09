@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quan_ly_chi_tieu/src/core/services/sync_service.dart';
 import 'package:quan_ly_chi_tieu/src/models/category.dart';
+import 'package:quan_ly_chi_tieu/src/models/money_source.dart';
 import 'package:quan_ly_chi_tieu/src/models/transaction.dart';
 
 void main() {
@@ -91,6 +92,32 @@ void main() {
             isDeleted: true,
           ),
         ],
+        localMoneySources: [
+          MoneySource(
+            id: defaultMoneySourceId,
+            name: 'Tiền mặt',
+            updatedAt: now.subtract(const Duration(days: 2)),
+          ),
+          MoneySource(
+            id: 'purge-source-local',
+            name: 'Old deleted source local',
+            updatedAt: expiredDeletedAt,
+            isDeleted: true,
+          ),
+        ],
+        remoteMoneySources: [
+          MoneySource(
+            id: 'bank',
+            name: 'Ngân hàng',
+            updatedAt: now.subtract(const Duration(days: 1)),
+          ),
+          MoneySource(
+            id: 'purge-source-remote',
+            name: 'Old deleted source remote',
+            updatedAt: expiredDeletedAt,
+            isDeleted: true,
+          ),
+        ],
         syncStartedAt: now,
         shouldPurgeSoftDeleted: true,
       );
@@ -106,6 +133,19 @@ void main() {
       expect(
         snapshot.categories.map((category) => category.id),
         isNot(contains('purge-category-remote')),
+      );
+
+      expect(
+        snapshot.moneySources.map((source) => source.id),
+        containsAll([defaultMoneySourceId, 'bank']),
+      );
+      expect(
+        snapshot.moneySources.map((source) => source.id),
+        isNot(contains('purge-source-local')),
+      );
+      expect(
+        snapshot.moneySources.map((source) => source.id),
+        isNot(contains('purge-source-remote')),
       );
 
       expect(

@@ -6,11 +6,13 @@ import '../core/network/google_drive_service.dart';
 
 import '../core/storage/auth_storage.dart';
 import '../core/storage/category_storage.dart';
+import '../core/storage/money_source_storage.dart';
 import '../core/storage/settings_storage.dart';
 import '../core/storage/transaction_storage.dart';
 import '../core/storage/objectbox_database.dart';
 import '../models/transaction.dart';
 import '../models/category.dart';
+import '../models/money_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final objectBoxProvider = Provider<ObjectBoxDatabase>((ref) {
@@ -29,6 +31,11 @@ final transactionStorageProvider = Provider<TransactionStorage>((ref) {
 final categoryStorageProvider = Provider<CategoryStorage>((ref) {
   final store = ref.watch(objectBoxProvider).store;
   return CategoryStorage(store.box<Category>());
+});
+
+final moneySourceStorageProvider = Provider<MoneySourceStorage>((ref) {
+  final store = ref.watch(objectBoxProvider).store;
+  return MoneySourceStorage(store.box<MoneySource>());
 });
 
 final settingsStorageProvider = Provider<SettingsStorage>((ref) {
@@ -50,5 +57,6 @@ final syncServiceProvider = Provider.family<SyncService, drive.DriveApi>((ref, d
     settingsStorage: settingsStorage,
     transactionBox: store.box<Transaction>(),
     categoryBox: store.box<Category>(),
+    moneySourceBox: store.box<MoneySource>(),
   );
 });

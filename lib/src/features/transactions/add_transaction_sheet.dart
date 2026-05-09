@@ -14,8 +14,10 @@ import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_toast.dart';
 import '../../core/widgets/transaction_marker_calendar.dart';
 import '../../models/category.dart';
+import '../../models/money_source.dart';
 import '../../models/transaction.dart';
 import '../../providers/category_provider.dart';
+import '../../providers/money_source_provider.dart';
 import '../../providers/transaction_provider.dart';
 
 part 'widgets/transaction_sheet_scaffold.dart';
@@ -53,9 +55,10 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   final _noteController = TextEditingController();
   TransactionType _type = TransactionType.expense;
   DateTime _date = DateTime.now();
-  String _source = 'Tiền mặt';
+  String? _sourceId;
   String? _categoryId;
   String? _promotedCategoryId;
+  String? _promotedSourceId;
 
   @override
   void initState() {
@@ -68,6 +71,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       _type = transaction.type;
       _date = transaction.date;
       _categoryId = transaction.categoryId;
+      _sourceId = transaction.sourceId;
     }
   }
 
@@ -81,8 +85,12 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(categoriesByTypeProvider(_type));
+    final moneySources = ref.watch(moneySourcesProvider);
     if (_categoryId == null && categories.isNotEmpty) {
       _categoryId = categories.first.id;
+    }
+    if (_sourceId == null && moneySources.isNotEmpty) {
+      _sourceId = moneySources.first.id;
     }
     final actionColor = _type == TransactionType.expense
         ? const Color(0xFFFF1493)
@@ -136,9 +144,15 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                               const SizedBox(height: 10),
                               _DateTrigger(date: _date, onTap: _pickDate),
                               const SizedBox(height: 10),
-                              _SourceTrigger(
-                                source: _source,
-                                onTap: _pickSource,
+                              _MoneySourcePicker(
+                                moneySources: moneySources,
+                                selectedSourceId: _sourceId,
+                                actionColor: actionColor,
+                                onSelected: (source) {
+                                  setState(() => _sourceId = source.id);
+                                },
+                                onShowAll: () => _showAllMoneySources(moneySources),
+                                promotedSourceId: _promotedSourceId,
                               ),
                               const SizedBox(height: 10),
                               _NoteCard(controller: _noteController),
@@ -183,17 +197,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     }
   }
 
-  Future<void> _pickSource() async {
-    final selectedSource = await showTransactionSourceSheet(
-      context,
-      selectedSource: _source,
-    );
-
-    if (selectedSource != null) {
-      setState(() => _source = selectedSource);
-    }
-  }
-
   Future<void> _showAllCategories(List<Category> categories) async {
     final selectedCategory = await showAllCategoriesSheet(
       context,
@@ -212,9 +215,30 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     }
   }
 
+  Future<void> _showAllMoneySources(List<MoneySource> moneySources) async {
+    final selectedSource = await showAllMoneySourcesSheet(
+      context,
+      moneySources: moneySources,
+      initialSelectedSourceId: _sourceId,
+      actionColor: _type == TransactionType.expense
+          ? const Color(0xFFFF1493)
+          : AppColors.success,
+    );
+
+    if (selectedSource != null && mounted) {
+      setState(() {
+        _sourceId = selectedSource.id;
+        _promotedSourceId = selectedSource.id;
+      });
+    }
+  }
+
   Future<void> _saveTransaction() async {
     final amount = parseAmountInput(_amountController.text);
-    if (amount == null || amount <= 0 || _categoryId == null) {
+    if (amount == null ||
+        amount <= 0 ||
+        _categoryId == null ||
+        _sourceId == null) {
       return;
     }
 
@@ -225,6 +249,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       amount: amount,
       type: _type,
       categoryId: _categoryId!,
+      sourceId: _sourceId!,
       date: _date,
       note: _noteController.text.trim(),
     );
@@ -240,12 +265,14 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         type: _type,
       ),
     );
+    final source = ref.read(moneySourceByIdProvider(_sourceId!)) ??
+        defaultMoneySources.first;
 
     final confirmed = await showTransactionConfirmationSheet(
       context,
       transaction: transaction,
       category: category,
-      source: _source,
+      source: source,
     );
 
     if (!confirmed) return;

@@ -61,7 +61,7 @@
     },
     {
       "id": "2:7804320392523648537",
-      "lastPropertyId": "10:7162688059454464275",
+      "lastPropertyId": "11:3743505230492404707",
       "name": "Transaction",
       "properties": [
         {
@@ -122,13 +122,61 @@
           "id": "10:7162688059454464275",
           "name": "typeCode",
           "type": 2
+        },
+        {
+          "id": "11:3743505230492404707",
+          "name": "sourceId",
+          "indexId": "9:5507329943214301050",
+          "type": 9,
+          "flags": 2048
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:6814073455354518124",
+      "lastPropertyId": "6:593030572791077501",
+      "name": "MoneySource",
+      "properties": [
+        {
+          "id": "1:7202591951073276106",
+          "name": "obxId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4685231358784153688",
+          "name": "id",
+          "indexId": "8:1626306486108024305",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:712825919219107123",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:4246415566177783395",
+          "name": "dbIconCodePoint",
+          "type": 6
+        },
+        {
+          "id": "5:5110593064283057779",
+          "name": "updatedAt",
+          "type": 10
+        },
+        {
+          "id": "6:593030572791077501",
+          "name": "isDeleted",
+          "type": 1
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "4:7083601830508858313",
-  "lastIndexId": "7:9158010454404252001",
+  "lastEntityId": "5:6814073455354518124",
+  "lastIndexId": "9:5507329943214301050",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

@@ -1,5 +1,7 @@
 import 'package:objectbox/objectbox.dart';
 
+import 'money_source.dart';
+
 enum TransactionType { income, expense }
 
 @Entity()
@@ -12,12 +14,14 @@ class Transaction {
     int? typeCode,
     String? dbType,
     required this.categoryId,
+    String? sourceId,
     required this.date,
     String? note,
     DateTime? updatedAt,
     this.isDeleted = false,
   }) : typeCode = type?.index ?? typeCode ?? _legacyTypeCode(dbType),
        dbType = type == null && typeCode == null ? dbType : null,
+       sourceId = sourceId ?? defaultMoneySourceId,
        note = _normalizeNote(note),
        updatedAt = updatedAt ?? DateTime.now();
 
@@ -36,6 +40,9 @@ class Transaction {
 
   @Index()
   String categoryId;
+
+  @Index()
+  String sourceId;
 
   @Index()
   @Property(type: PropertyType.date)
@@ -66,6 +73,7 @@ class Transaction {
       amount: amount,
       typeCode: type.index,
       categoryId: categoryId,
+      sourceId: sourceId,
       date: date,
       note: note,
       updatedAt: updatedAt,
@@ -79,6 +87,7 @@ class Transaction {
     double? amount,
     TransactionType? type,
     String? categoryId,
+    String? sourceId,
     DateTime? date,
     String? note,
     DateTime? updatedAt,
@@ -90,6 +99,7 @@ class Transaction {
       amount: amount ?? this.amount,
       type: type ?? this.type,
       categoryId: categoryId ?? this.categoryId,
+      sourceId: sourceId ?? this.sourceId,
       date: date ?? this.date,
       note: note ?? this.note,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -103,6 +113,7 @@ class Transaction {
       'amount': amount,
       'type': type.name,
       'categoryId': categoryId,
+      'sourceId': sourceId,
       'date': date.toIso8601String(),
       'note': note,
       'updatedAt': updatedAt.toIso8601String(),
@@ -116,6 +127,7 @@ class Transaction {
       amount: (json['amount'] as num).toDouble(),
       type: TransactionType.values.byName(json['type'] as String),
       categoryId: json['categoryId'] as String,
+      sourceId: json['sourceId'] as String? ?? defaultMoneySourceId,
       date: DateTime.parse(json['date'] as String),
       note: json['note'] as String?,
       updatedAt: json['updatedAt'] != null

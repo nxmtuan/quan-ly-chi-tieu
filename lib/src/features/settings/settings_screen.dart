@@ -22,6 +22,7 @@ import '../../providers/transaction_provider.dart';
 import '../../providers/category_provider.dart';
 import '../auth/google_web_sign_in_button.dart';
 import '../categories/category_management_sheet.dart';
+import 'money_source_management_sheet.dart';
 
 part 'widgets/settings_sections.dart';
 
@@ -54,6 +55,8 @@ class SettingsScreen extends ConsumerWidget {
                   _ThemeSettingsRow(themeMode: themeMode),
                   const _DividerIndent(),
                   const _ManageCategoriesRow(),
+                  const _DividerIndent(),
+                  const _ManageMoneySourcesRow(),
                   if (authUser != null) ...[
                     const _DividerIndent(),
                     const _SyncDataRow(),
