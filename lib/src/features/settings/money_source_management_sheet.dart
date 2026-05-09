@@ -242,6 +242,7 @@ class _MoneySourceEditorSheet extends ConsumerStatefulWidget {
 class _MoneySourceEditorSheetState
     extends ConsumerState<_MoneySourceEditorSheet> {
   late final TextEditingController _nameController;
+  late final FocusNode _nameFocusNode;
   late IconData _iconData;
 
   bool get _isEditing => widget.source != null;
@@ -250,13 +251,23 @@ class _MoneySourceEditorSheetState
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.source?.name ?? '');
+    _nameFocusNode = FocusNode()..addListener(_handleFocusChanged);
     _iconData =
         widget.source?.iconData ?? Icons.account_balance_wallet_rounded;
+  }
+
+  void _handleFocusChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _nameFocusNode
+      ..removeListener(_handleFocusChanged)
+      ..dispose();
     super.dispose();
   }
 
@@ -271,7 +282,11 @@ class _MoneySourceEditorSheetState
           children: [
             _SectionLabel(label: 'Tên nguồn tiền'),
             SizedBox(height: context.scaled(10)),
-            _NameField(controller: _nameController),
+            _NameField(
+              controller: _nameController,
+              focusNode: _nameFocusNode,
+              isFocused: _nameFocusNode.hasFocus,
+            ),
             SizedBox(height: context.scaled(18)),
             _SectionLabel(label: 'Biểu tượng'),
             SizedBox(height: context.scaled(10)),
@@ -351,26 +366,48 @@ class _SectionLabel extends StatelessWidget {
 }
 
 class _NameField extends StatelessWidget {
-  const _NameField({required this.controller});
+  const _NameField({
+    required this.controller,
+    required this.focusNode,
+    required this.isFocused,
+  });
 
   final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool isFocused;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(context.scaled(18)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(
+          color: isFocused ? AppColors.primary : AppColors.border,
+        ),
       ),
       padding: EdgeInsets.symmetric(horizontal: context.scaled(16)),
       child: TextField(
         controller: controller,
+        focusNode: focusNode,
         style: context.appText.bodyStrong.copyWith(
           color: AppColors.textPrimary,
         ),
+        cursorColor: AppColors.primary,
         decoration: InputDecoration(
+          filled: false,
+          fillColor: Colors.transparent,
           border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(
+            vertical: context.scaled(14),
+          ),
           hintText: 'Nhập tên nguồn tiền',
           hintStyle: context.appText.body.copyWith(
             color: const Color(0xFFB3BAC8),
