@@ -5,6 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction.dart';
 import 'storage_provider.dart';
 
+typedef TransactionQueryArgs = ({
+  String? categoryId,
+  DateTime? fromDate,
+  int? limit,
+  DateTime? toDate,
+  TransactionType? type,
+});
+
 class TransactionSummary {
   const TransactionSummary({required this.income, required this.expense});
 
@@ -14,94 +22,125 @@ class TransactionSummary {
   double get balance => income - expense;
 }
 
-class TransactionsNotifier extends Notifier<List<Transaction>> {
+class TransactionsNotifier extends Notifier<int> {
   @override
-  List<Transaction> build() {
-    final storedTransactions = ref
-        .read(transactionStorageProvider)
-        .readTransactions(includeDeleted: true);
-    final filteredTransactions = _removeSeedTransactions(storedTransactions);
-
-    if (filteredTransactions.length != storedTransactions.length) {
-      unawaited(
-        ref
-            .read(transactionStorageProvider)
-            .replaceAllTransactions(filteredTransactions),
-      );
-    }
-
-    return _visibleTransactions(filteredTransactions);
+  int build() {
+    unawaited(_purgeLegacySeedTransactions());
+    return 0;
   }
 
   Future<void> addTransaction(Transaction transaction) async {
-    final updatedTransactions = [transaction, ...state]
-      ..sort((a, b) => b.date.compareTo(a.date));
-
-    state = updatedTransactions;
     await ref.read(transactionStorageProvider).putTransaction(transaction);
+    state++;
   }
 
   Future<void> updateTransaction(Transaction transaction) async {
-    final updatedTransactions = [
-      for (final item in state)
-        if (item.id == transaction.id) transaction else item,
-    ]..sort((a, b) => b.date.compareTo(a.date));
-
-    state = updatedTransactions;
     await ref.read(transactionStorageProvider).putTransaction(transaction);
+    state++;
   }
 
   Future<void> deleteTransaction(String id) async {
-    state = state.where((transaction) => transaction.id != id).toList();
     await ref.read(transactionStorageProvider).markTransactionDeleted(id);
+    state++;
   }
 
   Future<void> deleteTransactionsByCategory(String categoryId) async {
-    state = state
-        .where((transaction) => transaction.categoryId != categoryId)
-        .toList();
     await ref
         .read(transactionStorageProvider)
         .markTransactionsDeletedByCategory(categoryId);
+    state++;
   }
 
-  static List<Transaction> _removeSeedTransactions(
-    List<Transaction> transactions,
-  ) {
-    return [
-      for (final transaction in transactions)
-        if (!_seedTransactionIds.contains(transaction.id)) transaction,
-    ];
-  }
-
-  static List<Transaction> _visibleTransactions(List<Transaction> transactions) {
-    return [
-      for (final transaction in transactions)
-        if (!transaction.isDeleted) transaction,
-    ]..sort((a, b) => b.date.compareTo(a.date));
+  Future<void> _purgeLegacySeedTransactions() async {
+    final removedCount = await ref
+        .read(transactionStorageProvider)
+        .removeTransactionsByIds(
+      _seedTransactionIds,
+    );
+    if (removedCount > 0) {
+      state++;
+    }
   }
 }
 
-const _seedTransactionIds = {'tx-1', 'tx-2', 'tx-3', 'tx-4'};
+final transactionsProvider = NotifierProvider<TransactionsNotifier, int>(
+  TransactionsNotifier.new,
+);
 
-final transactionsProvider =
-    NotifierProvider<TransactionsNotifier, List<Transaction>>(
-      TransactionsNotifier.new,
+final transactionsQueryProvider =
+    Provider.family<List<Transaction>, TransactionQueryArgs>((ref, args) {
+      ref.watch(transactionsProvider);
+
+      return ref.read(transactionStorageProvider).readTransactions(
+        categoryId: args.categoryId,
+        fromDate: args.fromDate,
+        limit: args.limit,
+        toDate: args.toDate,
+        type: args.type,
+      );
+    });
+
+final transactionDatesQueryProvider =
+    Provider.family<List<DateTime>, ({DateTime? fromDate, DateTime? toDate})>(
+      (ref, args) {
+        ref.watch(transactionsProvider);
+
+        return ref.read(transactionStorageProvider).readTransactionDates(
+          fromDate: args.fromDate,
+          toDate: args.toDate,
+        );
+      },
     );
 
-final transactionSummaryProvider = Provider<TransactionSummary>((ref) {
-  final transactions = ref.watch(transactionsProvider);
-
-  final income = transactions
-      .where((transaction) => transaction.type == TransactionType.income)
-      .fold<double>(0, (total, transaction) => total + transaction.amount);
-  final expense = transactions
-      .where((transaction) => transaction.type == TransactionType.expense)
-      .fold<double>(0, (total, transaction) => total + transaction.amount);
-
-  return TransactionSummary(income: income, expense: expense);
+final allTransactionDatesProvider = Provider<List<DateTime>>((ref) {
+  return ref.watch(
+    transactionDatesQueryProvider((fromDate: null, toDate: null)),
+  );
 });
+
+final transactionSummaryProvider =
+    Provider.family<TransactionSummary, TransactionQueryArgs>((ref, args) {
+      final transactions = ref.watch(transactionsQueryProvider(args));
+
+      final income = transactions
+          .where((transaction) => transaction.type == TransactionType.income)
+          .fold<double>(0, (total, transaction) => total + transaction.amount);
+      final expense = transactions
+          .where((transaction) => transaction.type == TransactionType.expense)
+          .fold<double>(0, (total, transaction) => total + transaction.amount);
+
+      return TransactionSummary(income: income, expense: expense);
+    });
 
 final recentTransactionsProvider = Provider<List<Transaction>>((ref) {
-  return ref.watch(transactionsProvider).take(8).toList();
+  return ref.watch(
+    transactionsQueryProvider((
+      categoryId: null,
+      fromDate: null,
+      limit: 8,
+      toDate: null,
+      type: null,
+    )),
+  );
 });
+
+final transactionEventsByDayProvider =
+    Provider.family<Map<DateTime, List<DateTime>>, ({DateTime? fromDate, DateTime? toDate})>(
+      (ref, args) {
+        final dates = ref.watch(transactionDatesQueryProvider(args));
+        return _buildDateEventIndex(dates);
+      },
+    );
+
+const _seedTransactionIds = {'tx-1', 'tx-2', 'tx-3', 'tx-4'};
+
+Map<DateTime, List<DateTime>> _buildDateEventIndex(Iterable<DateTime> dates) {
+  final eventsByDay = <DateTime, List<DateTime>>{};
+
+  for (final date in dates) {
+    final day = DateTime(date.year, date.month, date.day);
+    (eventsByDay[day] ??= <DateTime>[]).add(day);
+  }
+
+  return eventsByDay;
+}

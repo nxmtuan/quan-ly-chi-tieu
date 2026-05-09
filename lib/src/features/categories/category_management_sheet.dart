@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
+import '../../core/utils/local_id.dart';
 import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_sheet.dart';
@@ -437,7 +438,7 @@ class _CategoryEditorSheetState extends ConsumerState<_CategoryEditorSheet> {
     }
 
     final category = Category(
-      id: widget.category?.id ?? DateTime.now().microsecondsSinceEpoch.toString(),
+      id: widget.category?.id ?? generateLocalEntityId(),
       name: name,
       iconData: _iconData,
       colorHex: _colorHex,

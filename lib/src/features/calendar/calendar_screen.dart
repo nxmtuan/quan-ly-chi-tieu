@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/utils/date_range.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/widgets/app_page_header.dart';
 import '../../core/utils/formatters.dart';
@@ -33,12 +34,23 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final transactions = ref.watch(transactionsProvider);
-    final eventsByDay = buildCalendarEventIndex(
-      transactions,
-      (transaction) => transaction.date,
+    final focusedMonthRange = monthDateRange(_focusedDay);
+    final selectedDayRange = dayDateRange(_selectedDay);
+    final eventsByDay = ref.watch(
+      transactionEventsByDayProvider((
+        fromDate: focusedMonthRange.start,
+        toDate: focusedMonthRange.end,
+      )),
     );
-    final dailyTransactions = eventsByDay[_selectedDay] ?? const <Transaction>[];
+    final dailyTransactions = ref.watch(
+      transactionsQueryProvider((
+        categoryId: null,
+        fromDate: selectedDayRange.start,
+        limit: null,
+        toDate: selectedDayRange.end,
+        type: null,
+      )),
+    );
     final income = dailyTransactions
         .where((transaction) => transaction.type == TransactionType.income)
         .fold<double>(0, (total, transaction) => total + transaction.amount);

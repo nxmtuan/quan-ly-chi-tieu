@@ -99,7 +99,7 @@ class _CategoryFormSheetState extends ConsumerState<_CategoryFormSheet> {
     }
 
     final category = Category(
-      id: widget.category?.id ?? DateTime.now().microsecondsSinceEpoch.toString(),
+      id: widget.category?.id ?? generateLocalEntityId(),
       name: name,
       iconData: _iconData,
       colorHex: _colorHex,

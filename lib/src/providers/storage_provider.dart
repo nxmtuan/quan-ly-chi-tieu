@@ -44,8 +44,10 @@ final authStorageProvider = Provider<AuthStorage>((ref) {
 final syncServiceProvider = Provider.family<SyncService, drive.DriveApi>((ref, driveApi) {
   final store = ref.watch(objectBoxProvider).store;
   final driveService = GoogleDriveService(driveApi);
+  final settingsStorage = ref.watch(settingsStorageProvider);
   return SyncService(
     driveService: driveService,
+    settingsStorage: settingsStorage,
     transactionBox: store.box<Transaction>(),
     categoryBox: store.box<Category>(),
   );

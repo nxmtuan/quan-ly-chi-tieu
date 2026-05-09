@@ -3,12 +3,12 @@ part of '../statistics_screen.dart';
 class _RangeSelector extends StatelessWidget {
   const _RangeSelector({required this.selectedRange, required this.onChanged});
 
-  final String selectedRange;
-  final ValueChanged<String> onChanged;
+  final StatisticsRange selectedRange;
+  final ValueChanged<StatisticsRange> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    const ranges = ['Week', 'Month', 'Year'];
+    const ranges = StatisticsRange.values;
 
     return Container(
       padding: EdgeInsets.all(context.scaled(6)),
@@ -32,7 +32,11 @@ class _RangeSelector extends StatelessWidget {
                     borderRadius: BorderRadius.circular(context.scaled(18)),
                   ),
                   child: Text(
-                    range,
+                    switch (range) {
+                      StatisticsRange.week => 'Week',
+                      StatisticsRange.month => 'Month',
+                      StatisticsRange.year => 'Year',
+                    },
                     textAlign: TextAlign.center,
                     style: context.appText.bodyStrong.copyWith(
                       color: selectedRange == range

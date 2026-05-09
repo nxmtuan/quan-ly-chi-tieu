@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:493840073215639006",
-      "lastPropertyId": "8:8568673951023825635",
+      "lastPropertyId": "9:5355821334302738222",
       "name": "Category",
       "properties": [
         {
@@ -50,13 +50,18 @@
           "id": "8:8568673951023825635",
           "name": "isDeleted",
           "type": 1
+        },
+        {
+          "id": "9:5355821334302738222",
+          "name": "typeCode",
+          "type": 2
         }
       ],
       "relations": []
     },
     {
       "id": "2:7804320392523648537",
-      "lastPropertyId": "9:1304849199539883312",
+      "lastPropertyId": "10:7162688059454464275",
       "name": "Transaction",
       "properties": [
         {
@@ -85,12 +90,16 @@
         {
           "id": "5:794889022503360791",
           "name": "categoryId",
-          "type": 9
+          "indexId": "5:8670739179309655836",
+          "type": 9,
+          "flags": 2048
         },
         {
           "id": "6:3647100077234859793",
           "name": "date",
-          "type": 10
+          "indexId": "6:8079795347682836557",
+          "type": 10,
+          "flags": 8
         },
         {
           "id": "7:1291458765582326682",
@@ -100,19 +109,26 @@
         {
           "id": "8:6331285137163730624",
           "name": "updatedAt",
-          "type": 10
+          "indexId": "7:9158010454404252001",
+          "type": 10,
+          "flags": 8
         },
         {
           "id": "9:1304849199539883312",
           "name": "isDeleted",
           "type": 1
+        },
+        {
+          "id": "10:7162688059454464275",
+          "name": "typeCode",
+          "type": 2
         }
       ],
       "relations": []
     }
   ],
   "lastEntityId": "4:7083601830508858313",
-  "lastIndexId": "4:610653384527144065",
+  "lastIndexId": "7:9158010454404252001",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

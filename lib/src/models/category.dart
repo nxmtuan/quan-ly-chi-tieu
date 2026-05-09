@@ -101,25 +101,21 @@ class Category {
     int? dbIconCodePoint,
     required this.colorHex,
     TransactionType? type,
+    int? typeCode,
     String? dbType,
     DateTime? updatedAt,
     this.isDeleted = false,
   }) : updatedAt = updatedAt ?? DateTime.now() {
     if (iconData != null) {
-      _iconCodePoint = iconData.codePoint;
+      this.dbIconCodePoint = iconData.codePoint;
     } else if (dbIconCodePoint != null) {
-      _iconCodePoint = dbIconCodePoint;
+      this.dbIconCodePoint = dbIconCodePoint;
     } else {
-      _iconCodePoint = Icons.category_rounded.codePoint;
+      this.dbIconCodePoint = Icons.category_rounded.codePoint;
     }
-    
-    if (type != null) {
-      _type = type.name;
-    } else if (dbType != null) {
-      _type = dbType;
-    } else {
-      _type = TransactionType.expense.name;
-    }
+
+    this.typeCode = type?.index ?? typeCode ?? _legacyCategoryTypeCode(dbType);
+    this.dbType = type == null && typeCode == null ? dbType : null;
   }
 
   @Id()
@@ -130,22 +126,21 @@ class Category {
 
   String name;
 
-  int _iconCodePoint = 0;
-  String _type = 'expense';
+  int dbIconCodePoint = 0;
+  @Property(type: PropertyType.byte)
+  late int typeCode;
+
+  String? dbType;
 
   @Transient()
-  IconData get iconData => _iconFromCodePoint(_iconCodePoint);
-
-  int get dbIconCodePoint => _iconCodePoint;
-  set dbIconCodePoint(int value) => _iconCodePoint = value;
+  IconData get iconData => _iconFromCodePoint(dbIconCodePoint);
 
   int colorHex;
 
   @Transient()
-  TransactionType get type => TransactionType.values.byName(_type);
-
-  String get dbType => _type;
-  set dbType(String value) => _type = value;
+  TransactionType get type => dbType != null
+      ? TransactionType.values.byName(dbType!)
+      : TransactionType.values[_normalizedCategoryTypeCode(typeCode)];
 
   Color get color => Color(colorHex);
 
@@ -153,6 +148,20 @@ class Category {
   DateTime updatedAt;
 
   bool isDeleted;
+  bool get needsStorageCompaction => dbType != null;
+
+  Category compactedForStorage() {
+    return Category(
+      obxId: obxId,
+      id: id,
+      name: name,
+      dbIconCodePoint: dbIconCodePoint,
+      colorHex: colorHex,
+      typeCode: type.index,
+      updatedAt: updatedAt,
+      isDeleted: isDeleted,
+    );
+  }
 
   Category copyWith({
     int? obxId,
@@ -213,4 +222,20 @@ IconData _iconFromCodePoint(int codePoint) {
   }
 
   return Icons.category_rounded;
+}
+
+int _legacyCategoryTypeCode(String? dbType) {
+  if (dbType == TransactionType.income.name) {
+    return TransactionType.income.index;
+  }
+
+  return TransactionType.expense.index;
+}
+
+int _normalizedCategoryTypeCode(int typeCode) {
+  if (typeCode >= 0 && typeCode < TransactionType.values.length) {
+    return typeCode;
+  }
+
+  return TransactionType.expense.index;
 }

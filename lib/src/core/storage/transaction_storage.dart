@@ -6,17 +6,65 @@ class TransactionStorage {
 
   final Box<Transaction> _box;
 
-  List<Transaction> readTransactions({bool includeDeleted = false}) {
-    final transactions = _box.getAll();
-    final visibleTransactions = includeDeleted
-        ? transactions
-        : [
-            for (final transaction in transactions)
-              if (!transaction.isDeleted) transaction,
-          ];
+  List<Transaction> readTransactions({
+    bool includeDeleted = false,
+    int? limit,
+    DateTime? fromDate,
+    DateTime? toDate,
+    String? categoryId,
+    TransactionType? type,
+  }) {
+    Condition<Transaction>? condition;
 
-    visibleTransactions.sort((a, b) => b.date.compareTo(a.date));
-    return visibleTransactions;
+    if (!includeDeleted) {
+      condition = Transaction_.isDeleted.equals(false);
+    }
+
+    if (fromDate != null && toDate != null) {
+      condition = _appendCondition(
+        condition,
+        Transaction_.date.betweenDate(fromDate, toDate),
+      );
+    } else if (fromDate != null) {
+      condition = _appendCondition(
+        condition,
+        Transaction_.date.greaterOrEqualDate(fromDate),
+      );
+    } else if (toDate != null) {
+      condition = _appendCondition(
+        condition,
+        Transaction_.date.lessOrEqualDate(toDate),
+      );
+    }
+
+    if (categoryId != null) {
+      condition = _appendCondition(
+        condition,
+        Transaction_.categoryId.equals(categoryId),
+      );
+    }
+
+    if (type != null) {
+      condition = _appendCondition(
+        condition,
+        Transaction_.typeCode.equals(type.index) |
+            Transaction_.dbType.equals(type.name),
+      );
+    }
+
+    final query = _box
+        .query(condition)
+        .order(Transaction_.date, flags: Order.descending)
+        .build();
+    if (limit != null) {
+      query.limit = limit;
+    }
+
+    try {
+      return query.find();
+    } finally {
+      query.close();
+    }
   }
 
   Future<void> replaceAllTransactions(List<Transaction> transactions) async {
@@ -29,9 +77,9 @@ class TransactionStorage {
 
   Future<void> putTransaction(Transaction transaction) async {
     final existing = _findById(transaction.id);
-    final transactionToSave = transaction.copyWith(
-      obxId: existing?.obxId ?? transaction.obxId,
-    );
+    final transactionToSave = transaction
+        .copyWith(obxId: existing?.obxId ?? transaction.obxId)
+        .compactedForStorage();
     _box.put(transactionToSave);
   }
 
@@ -75,8 +123,75 @@ class TransactionStorage {
 
   Transaction? _findById(String id) {
     final query = _box.query(Transaction_.id.equals(id)).build();
-    final transaction = query.findFirst();
-    query.close();
-    return transaction;
+    try {
+      return query.findFirst();
+    } finally {
+      query.close();
+    }
+  }
+
+  List<DateTime> readTransactionDates({
+    DateTime? fromDate,
+    DateTime? toDate,
+  }) {
+    Condition<Transaction>? condition = Transaction_.isDeleted.equals(false);
+
+    if (fromDate != null && toDate != null) {
+      condition = _appendCondition(
+        condition,
+        Transaction_.date.betweenDate(fromDate, toDate),
+      );
+    } else if (fromDate != null) {
+      condition = _appendCondition(
+        condition,
+        Transaction_.date.greaterOrEqualDate(fromDate),
+      );
+    } else if (toDate != null) {
+      condition = _appendCondition(
+        condition,
+        Transaction_.date.lessOrEqualDate(toDate),
+      );
+    }
+
+    final query = _box.query(condition).build();
+    try {
+      final timestamps = query.property(Transaction_.date).find();
+      return [
+        for (final timestamp in timestamps)
+          DateTime.fromMillisecondsSinceEpoch(timestamp),
+      ];
+    } finally {
+      query.close();
+    }
+  }
+
+  Future<int> removeTransactionsByIds(Iterable<String> ids) async {
+    final idList = ids.toList();
+    if (idList.isEmpty) {
+      return 0;
+    }
+
+    final query = _box.query(Transaction_.id.oneOf(idList)).build();
+    try {
+      final obxIds = query.findIds();
+      if (obxIds.isNotEmpty) {
+        return _box.removeMany(obxIds);
+      }
+
+      return 0;
+    } finally {
+      query.close();
+    }
+  }
+
+  Condition<Transaction> _appendCondition(
+    Condition<Transaction>? current,
+    Condition<Transaction> next,
+  ) {
+    if (current == null) {
+      return next;
+    }
+
+    return current & next;
   }
 }

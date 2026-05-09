@@ -15,16 +15,24 @@ class CategoriesNotifier extends Notifier<List<Category>> {
         .readCategories(includeDeleted: true);
 
     final mergedCategories = _mergeWithDefaultCategories(storedCategories);
+    final compactedCategories = [
+      for (final category in mergedCategories) category.compactedForStorage(),
+    ];
+    final needsRewrite =
+        !_listEqualsByContent(storedCategories, mergedCategories) ||
+        mergedCategories.any((category) => category.needsStorageCompaction);
 
-    if (!_listEqualsByContent(storedCategories, mergedCategories)) {
+    if (needsRewrite) {
       unawaited(
         ref.read(categoryStorageProvider).replaceAllCategories([
-          for (final category in mergedCategories) category.copyWith(),
+          for (final category in compactedCategories) category.copyWith(),
         ]),
       );
     }
 
-    return _visibleCategories(mergedCategories);
+    return _visibleCategories(
+      needsRewrite ? compactedCategories : mergedCategories,
+    );
   }
 
   Future<void> addCategory(Category category) async {

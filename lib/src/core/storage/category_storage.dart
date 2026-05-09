@@ -7,15 +7,16 @@ class CategoryStorage {
   final Box<Category> _box;
 
   List<Category> readCategories({bool includeDeleted = false}) {
-    final categories = _box.getAll();
-    if (includeDeleted) {
-      return categories;
+    final query = _box
+        .query(
+          includeDeleted ? null : Category_.isDeleted.equals(false),
+        )
+        .build();
+    try {
+      return query.find();
+    } finally {
+      query.close();
     }
-
-    return [
-      for (final category in categories)
-        if (!category.isDeleted) category,
-    ];
   }
 
   Future<void> replaceAllCategories(List<Category> categories) async {
@@ -28,9 +29,9 @@ class CategoryStorage {
 
   Future<void> putCategory(Category category) async {
     final existing = _findById(category.id);
-    final categoryToSave = category.copyWith(
-      obxId: existing?.obxId ?? category.obxId,
-    );
+    final categoryToSave = category
+        .copyWith(obxId: existing?.obxId ?? category.obxId)
+        .compactedForStorage();
     _box.put(categoryToSave);
   }
 
@@ -50,8 +51,10 @@ class CategoryStorage {
 
   Category? _findById(String id) {
     final query = _box.query(Category_.id.equals(id)).build();
-    final category = query.findFirst();
-    query.close();
-    return category;
+    try {
+      return query.findFirst();
+    } finally {
+      query.close();
+    }
   }
 }

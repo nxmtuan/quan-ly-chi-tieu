@@ -27,14 +27,16 @@ class _CategoryTransactionsSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allTransactions = ref.watch(transactionsProvider);
-    final categoryTransactions = allTransactions
-        .where((t) =>
-            t.categoryId == category.id &&
-            t.type == category.type &&
-            scope.matches(t.date))
-        .toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
+    final scopeRange = scope.dateRange;
+    final categoryTransactions = ref.watch(
+      transactionsQueryProvider((
+        categoryId: category.id,
+        fromDate: scopeRange?.start,
+        limit: null,
+        toDate: scopeRange?.end,
+        type: category.type,
+      )),
+    );
 
     final total = categoryTransactions.fold<double>(
       0,

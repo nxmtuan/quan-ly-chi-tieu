@@ -7,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/local_id.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_bounce_builder.dart';
@@ -63,7 +64,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     final transaction = widget.transaction;
     if (transaction != null) {
       _amountController.text = formatAmountInput(transaction.amount);
-      _noteController.text = transaction.note;
+      _noteController.text = transaction.note ?? '';
       _type = transaction.type;
       _date = transaction.date;
       _categoryId = transaction.categoryId;
@@ -171,10 +172,10 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   }
 
   Future<void> _pickDate() async {
-    final transactions = ref.read(transactionsProvider);
+    final transactionDates = ref.read(allTransactionDatesProvider);
     final eventsByDay = buildCalendarEventIndex(
-      transactions,
-      (transaction) => transaction.date,
+      transactionDates,
+      (date) => date,
     );
 
     final selectedDate = await showAppCalendarSheet(
@@ -227,7 +228,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     final transaction = Transaction(
       id:
           widget.transaction?.id ??
-          DateTime.now().microsecondsSinceEpoch.toString(),
+          generateLocalEntityId(),
       amount: amount,
       type: _type,
       categoryId: _categoryId!,

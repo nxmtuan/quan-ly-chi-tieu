@@ -35,11 +35,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final allTransactions = ref.watch(transactionsProvider);
-    final filteredTransactions = [
-      for (final transaction in allTransactions)
-        if (_selectedScope.matches(transaction.date)) transaction,
-    ];
+    final scopeRange = _selectedScope.dateRange;
+    final filteredTransactions = ref.watch(
+      transactionsQueryProvider((
+        categoryId: null,
+        fromDate: scopeRange?.start,
+        limit: null,
+        toDate: scopeRange?.end,
+        type: null,
+      )),
+    );
     final summary = TransactionSummary(
       income: filteredTransactions
           .where((transaction) => transaction.type == TransactionType.income)
@@ -48,8 +53,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           .where((transaction) => transaction.type == TransactionType.expense)
           .fold<double>(0, (total, transaction) => total + transaction.amount),
     );
-    final transactions = [...filteredTransactions]
-      ..sort((a, b) => b.date.compareTo(a.date));
     final now = DateTime.now();
 
     return ColoredBox(
@@ -127,7 +130,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   sliver: SliverToBoxAdapter(
                     child: RecentTransactions(
                       scope: _selectedScope,
-                      transactions: transactions,
+                      transactions: filteredTransactions,
                       selectedType: _selectedType,
                     )
                         .animate(delay: 150.ms)

@@ -3,7 +3,13 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 
-class GoogleDriveService {
+abstract class DriveSyncClient {
+  Future<String?> downloadData();
+  Future<void> uploadData(String jsonString);
+  Future<bool> deleteData();
+}
+
+class GoogleDriveService implements DriveSyncClient {
   GoogleDriveService(this._driveApi);
 
   final drive.DriveApi _driveApi;
@@ -19,6 +25,7 @@ class GoogleDriveService {
     return fileList.files?.firstOrNull;
   }
 
+  @override
   Future<String?> downloadData() async {
     try {
       final file = await _getSyncFile();
@@ -48,6 +55,7 @@ class GoogleDriveService {
     }
   }
 
+  @override
   Future<void> uploadData(String jsonString) async {
     try {
       // Compress with GZIP
@@ -84,6 +92,7 @@ class GoogleDriveService {
     }
   }
 
+  @override
   Future<bool> deleteData() async {
     final file = await _getSyncFile();
     if (file == null || file.id == null) {

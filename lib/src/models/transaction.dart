@@ -9,21 +9,17 @@ class Transaction {
     required this.id,
     required this.amount,
     TransactionType? type,
+    int? typeCode,
     String? dbType,
     required this.categoryId,
     required this.date,
-    required this.note,
+    String? note,
     DateTime? updatedAt,
     this.isDeleted = false,
-  }) : updatedAt = updatedAt ?? DateTime.now() {
-    if (type != null) {
-      _type = type.name;
-    } else if (dbType != null) {
-      _type = dbType;
-    } else {
-      _type = TransactionType.expense.name;
-    }
-  }
+  }) : typeCode = type?.index ?? typeCode ?? _legacyTypeCode(dbType),
+       dbType = type == null && typeCode == null ? dbType : null,
+       note = _normalizeNote(note),
+       updatedAt = updatedAt ?? DateTime.now();
 
   @Id()
   int obxId;
@@ -33,27 +29,49 @@ class Transaction {
 
   double amount;
 
-  String _type = 'expense';
+  @Property(type: PropertyType.byte)
+  int typeCode;
 
-  @Transient()
-  TransactionType get type => TransactionType.values.byName(_type);
+  String? dbType;
 
-  String get dbType => _type;
-  set dbType(String value) => _type = value;
-
+  @Index()
   String categoryId;
 
+  @Index()
   @Property(type: PropertyType.date)
   DateTime date;
 
-  String note;
+  String? note;
 
+  @Index()
   @Property(type: PropertyType.date)
   DateTime updatedAt;
 
   bool isDeleted;
 
+  @Transient()
+  TransactionType get type => dbType != null
+      ? TransactionType.values.byName(dbType!)
+      : TransactionType.values[_normalizedTypeCode(typeCode)];
+
   bool get isExpense => type == TransactionType.expense;
+  bool get hasNote => note != null && note!.isNotEmpty;
+  bool get needsStorageCompaction =>
+      dbType != null || (note != null && note!.isEmpty);
+
+  Transaction compactedForStorage() {
+    return Transaction(
+      obxId: obxId,
+      id: id,
+      amount: amount,
+      typeCode: type.index,
+      categoryId: categoryId,
+      date: date,
+      note: note,
+      updatedAt: updatedAt,
+      isDeleted: isDeleted,
+    );
+  }
 
   Transaction copyWith({
     int? obxId,
@@ -99,11 +117,35 @@ class Transaction {
       type: TransactionType.values.byName(json['type'] as String),
       categoryId: json['categoryId'] as String,
       date: DateTime.parse(json['date'] as String),
-      note: json['note'] as String,
+      note: json['note'] as String?,
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
       isDeleted: json['isDeleted'] as bool? ?? false,
     );
   }
+}
+
+int _legacyTypeCode(String? dbType) {
+  if (dbType == TransactionType.income.name) {
+    return TransactionType.income.index;
+  }
+
+  return TransactionType.expense.index;
+}
+
+int _normalizedTypeCode(int typeCode) {
+  if (typeCode >= 0 && typeCode < TransactionType.values.length) {
+    return typeCode;
+  }
+
+  return TransactionType.expense.index;
+}
+
+String? _normalizeNote(String? note) {
+  if (note == null || note.isEmpty) {
+    return null;
+  }
+
+  return note;
 }

@@ -60,7 +60,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
                 fontSize: context.scaledFont(32, min: 28),
               ),
             ),
-            if (transaction.note.isNotEmpty) ...[
+            if (transaction.hasNote) ...[
               SizedBox(height: context.scaled(12)),
               Container(
                 padding: EdgeInsets.symmetric(
@@ -72,7 +72,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(context.scaled(8)),
                 ),
                 child: Text(
-                  transaction.note,
+                  transaction.note!,
                   textAlign: TextAlign.center,
                   style: context.appText.body.copyWith(
                     color: const Color(0xFF475569),

@@ -61,9 +61,9 @@ class _TransactionRow extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    transaction.note.isEmpty
+                    !transaction.hasNote
                         ? category?.name ?? 'Transaction'
-                        : transaction.note,
+                        : transaction.note!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: context.appText.fieldValue.copyWith(

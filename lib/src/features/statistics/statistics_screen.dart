@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
+import '../../core/utils/date_range.dart';
 import '../../core/widgets/app_page_header.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/flat_card.dart';
@@ -27,12 +28,21 @@ class StatisticsScreen extends ConsumerStatefulWidget {
 }
 
 class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
-  var _selectedRange = 'Month';
+  var _selectedRange = StatisticsRange.month;
 
   @override
   Widget build(BuildContext context) {
+    final selectedDateRange = _selectedRange.dateRange(DateTime.now());
     final breakdown = _buildBreakdown(
-      ref.watch(transactionsProvider),
+      ref.watch(
+        transactionsQueryProvider((
+          categoryId: null,
+          fromDate: selectedDateRange.start,
+          limit: null,
+          toDate: selectedDateRange.end,
+          type: null,
+        )),
+      ),
       ref.watch(categoriesProvider),
     );
     final totalExpense = breakdown.fold<double>(
@@ -134,5 +144,19 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
     items.sort((a, b) => b.amount.compareTo(a.amount));
     return items;
+  }
+}
+
+enum StatisticsRange {
+  week,
+  month,
+  year;
+
+  DateRange dateRange(DateTime anchor) {
+    return switch (this) {
+      StatisticsRange.week => weekDateRange(anchor),
+      StatisticsRange.month => monthDateRange(anchor),
+      StatisticsRange.year => yearDateRange(anchor.year),
+    };
   }
 }

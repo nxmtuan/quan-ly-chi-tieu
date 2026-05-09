@@ -1,3 +1,4 @@
+import '../../../core/utils/date_range.dart';
 import '../../../core/utils/formatters.dart';
 
 enum HomeSummaryScopeType { month, year, all }
@@ -75,6 +76,14 @@ class HomeSummaryScope {
       HomeSummaryScopeType.month => formatMonthYear(anchor!),
       HomeSummaryScopeType.year => 'Năm ${anchor!.year}',
       HomeSummaryScopeType.all => 'Tất cả',
+    };
+  }
+
+  DateRange? get dateRange {
+    return switch (type) {
+      HomeSummaryScopeType.month => monthDateRange(anchor!),
+      HomeSummaryScopeType.year => yearDateRange(anchor!.year),
+      HomeSummaryScopeType.all => null,
     };
   }
 }

@@ -5,12 +5,16 @@ import '../../models/auto_sync_settings.dart';
 class SettingsStorage {
   const SettingsStorage(this._prefs);
 
+  static const softDeletePurgeInterval = Duration(days: 30);
+  static const softDeleteRetention = Duration(days: 30);
+
   static const _themeModeKey = 'themeMode';
   static const _autoSyncEnabledKey = 'autoSyncEnabled';
   static const _autoSyncTypeKey = 'autoSyncType';
   static const _autoSyncHourKey = 'autoSyncHour';
   static const _autoSyncMinuteKey = 'autoSyncMinute';
   static const _autoSyncWeekdayKey = 'autoSyncWeekday';
+  static const _lastSoftDeletePurgeAtKey = 'lastSoftDeletePurgeAt';
 
   final SharedPreferences _prefs;
 
@@ -47,5 +51,28 @@ class SettingsStorage {
     await _prefs.setInt(_autoSyncHourKey, settings.hour);
     await _prefs.setInt(_autoSyncMinuteKey, settings.minute);
     await _prefs.setInt(_autoSyncWeekdayKey, settings.weekday);
+  }
+
+  DateTime? readLastSoftDeletePurgeAt() {
+    final rawValue = _prefs.getString(_lastSoftDeletePurgeAtKey);
+    if (rawValue == null) {
+      return null;
+    }
+
+    return DateTime.tryParse(rawValue);
+  }
+
+  bool isSoftDeletePurgeDue({DateTime? now}) {
+    final currentTime = now ?? DateTime.now();
+    final lastPurgeAt = readLastSoftDeletePurgeAt();
+    if (lastPurgeAt == null) {
+      return true;
+    }
+
+    return currentTime.difference(lastPurgeAt) >= softDeletePurgeInterval;
+  }
+
+  Future<void> saveLastSoftDeletePurgeAt(DateTime value) async {
+    await _prefs.setString(_lastSoftDeletePurgeAtKey, value.toIso8601String());
   }
 }
