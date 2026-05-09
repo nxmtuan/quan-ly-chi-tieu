@@ -32,9 +32,7 @@ class _BreakdownRow extends StatelessWidget {
               children: [
                 Text(
                   item.category.name,
-                  style: context.appText.bodyStrong.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+                  style: context.appText.bodyStrong,
                 ),
                 SizedBox(height: context.scaled(8)),
                 ClipRRect(
@@ -42,7 +40,7 @@ class _BreakdownRow extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: item.percentage / 100,
                     minHeight: 7,
-                    backgroundColor: AppColors.background,
+                    backgroundColor: context.appPalette.surfaceMuted,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       item.category.color,
                     ),
@@ -57,15 +55,13 @@ class _BreakdownRow extends StatelessWidget {
             children: [
               Text(
                 '${item.percentage.toStringAsFixed(0)}%',
-                style: context.appText.bodyStrong.copyWith(
-                  color: AppColors.textPrimary,
-                ),
+                style: context.appText.bodyStrong,
               ),
               SizedBox(height: context.scaled(5)),
               Text(
                 formatCurrency(item.amount),
                 style: context.appText.captionStrong.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.appPalette.textSecondary,
                 ),
               ),
             ],

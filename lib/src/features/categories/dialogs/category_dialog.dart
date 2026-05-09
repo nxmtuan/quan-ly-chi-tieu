@@ -134,9 +134,7 @@ class _SheetSectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: context.appText.fieldLabel.copyWith(
-        color: AppColors.textPrimary,
-      ),
+      style: context.appText.fieldLabel,
     );
   }
 }
@@ -148,23 +146,23 @@ class _CategoryNameField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(18)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: palette.border),
       ),
       padding: EdgeInsets.symmetric(horizontal: context.scaled(16)),
       child: TextField(
         controller: controller,
-        style: context.appText.bodyStrong.copyWith(
-          color: AppColors.textPrimary,
-        ),
+        style: context.appText.bodyStrong,
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: 'Nhập tên danh mục',
           hintStyle: context.appText.body.copyWith(
-            color: const Color(0xFFB3BAC8),
+            color: palette.textSecondary.withValues(alpha: 0.65),
           ),
         ),
       ),
@@ -235,10 +233,10 @@ class _TypeToggleButton extends StatelessWidget {
           vertical: context.scaled(14),
         ),
         decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.08) : Colors.white,
+          color: selected ? color.withValues(alpha: 0.08) : context.appPalette.surface,
           borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
-            color: selected ? color.withValues(alpha: 0.28) : AppColors.border,
+            color: selected ? color.withValues(alpha: 0.28) : context.appPalette.border,
           ),
         ),
         child: Row(
@@ -305,15 +303,15 @@ class _IconOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primary.withValues(alpha: 0.1)
-              : Colors.white,
+              : context.appPalette.surface,
           borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.border,
+            color: selected ? AppColors.primary : context.appPalette.border,
           ),
         ),
         child: Icon(
           icon,
-          color: selected ? AppColors.primary : AppColors.textPrimary,
+          color: selected ? AppColors.primary : context.appPalette.textPrimary,
           size: context.scaled(22),
         ),
       ),
@@ -370,7 +368,7 @@ class _ColorOption extends StatelessWidget {
           color: color,
           shape: BoxShape.circle,
           border: Border.all(
-            color: selected ? AppColors.textPrimary : Colors.transparent,
+            color: selected ? context.appPalette.textPrimary : Colors.transparent,
             width: context.scaled(selected ? 2 : 1),
           ),
           boxShadow: selected

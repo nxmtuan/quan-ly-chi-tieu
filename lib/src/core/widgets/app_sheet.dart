@@ -135,11 +135,13 @@ class AppSheetHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       width: context.scaled(40),
       height: context.scaled(4),
       decoration: BoxDecoration(
-        color: color ?? const Color(0xFFB8BCC8),
+        color: color ?? palette.handle,
         borderRadius: BorderRadius.circular(999),
       ),
     );
@@ -166,6 +168,8 @@ class AppSheetHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Padding(
       padding: padding,
       child: Column(
@@ -181,18 +185,14 @@ class AppSheetHeader extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style:
-                          titleStyle ??
-                          context.appText.sheetTitle.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
+                      style: titleStyle ?? context.appText.sheetTitle,
                     ),
                     if (subtitle != null) ...[
                       SizedBox(height: context.scaled(6)),
                       Text(
                         subtitle!,
                         style: context.appText.sheetSubtitle.copyWith(
-                          color: AppColors.textSecondary,
+                          color: palette.textSecondary,
                         ),
                       ),
                     ],
@@ -206,12 +206,14 @@ class AppSheetHeader extends StatelessWidget {
                     width: context.scaled(38),
                     height: context.scaled(38),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: palette.surfaceElevated,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: palette.border),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.shadow.withValues(alpha: 0.08),
+                          color: palette.shadow.withValues(
+                            alpha: context.isDarkMode ? 0.22 : 0.08,
+                          ),
                           blurRadius: context.scaled(7),
                           offset: Offset(0, context.scaled(3)),
                         ),
@@ -219,7 +221,7 @@ class AppSheetHeader extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.close_rounded,
-                      color: Color(0xFF374151),
+                      color: palette.iconStrong,
                       size: context.scaled(17),
                     ),
                   ),
@@ -239,6 +241,8 @@ class AppSheetFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       padding: EdgeInsets.fromLTRB(
         context.scaled(16),
@@ -250,7 +254,9 @@ class AppSheetFooter extends StatelessWidget {
         color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.06),
+            color: palette.shadow.withValues(
+              alpha: context.isDarkMode ? 0.22 : 0.06,
+            ),
             blurRadius: context.scaled(9),
             offset: Offset(0, -context.scaled(5)),
           ),

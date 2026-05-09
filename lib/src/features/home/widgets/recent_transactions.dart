@@ -71,7 +71,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
                               ? 'Chưa có khoản chi nào'
                               : 'Chưa có khoản thu nào',
                           style: context.appText.bodyStrong.copyWith(
-                            color: AppColors.textSecondary,
+                            color: context.appPalette.textSecondary,
                           ),
                         ),
                       ),
@@ -96,7 +96,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
                       if (entry.$1 < items.length - 1)
                         Divider(
                           height: context.scaled(1),
-                          color: AppColors.border,
+                          color: context.appPalette.border,
                         ),
                     ],
                 ],

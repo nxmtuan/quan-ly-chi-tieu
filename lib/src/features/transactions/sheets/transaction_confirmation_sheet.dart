@@ -31,6 +31,7 @@ class _TransactionConfirmationSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
     final isExpense = transaction.type == TransactionType.expense;
     final color = isExpense ? const Color(0xFFFF1493) : AppColors.success;
     final sign = isExpense ? '-' : '+';
@@ -71,14 +72,14 @@ class _TransactionConfirmationSheet extends StatelessWidget {
                   vertical: context.scaled(8),
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: palette.inputBackground,
                   borderRadius: BorderRadius.circular(context.scaled(8)),
                 ),
                 child: Text(
                   transaction.note!,
                   textAlign: TextAlign.center,
                   style: context.appText.body.copyWith(
-                    color: const Color(0xFF475569),
+                    color: palette.iconMuted,
                   ),
                 ),
               ),
@@ -87,22 +88,22 @@ class _TransactionConfirmationSheet extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(context.scaled(16)),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: palette.surfaceMuted,
                 borderRadius: BorderRadius.circular(context.scaled(16)),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: palette.border),
               ),
               child: Column(
                 children: [
                   _buildRow(context, label: 'Danh mục', value: category.name),
-                  Divider(color: AppColors.border, height: context.scaled(24)),
+                  Divider(color: palette.border, height: context.scaled(24)),
                   _buildRow(
                     context,
                     label: 'Loại',
                     value: isExpense ? 'Chi tiêu' : 'Thu nhập',
                   ),
-                  Divider(color: AppColors.border, height: context.scaled(24)),
+                  Divider(color: palette.border, height: context.scaled(24)),
                   _buildRow(context, label: 'Nguồn tiền', value: source.name),
-                  Divider(color: AppColors.border, height: context.scaled(24)),
+                  Divider(color: palette.border, height: context.scaled(24)),
                   _buildRow(
                     context,
                     label: 'Ngày giao dịch',
@@ -123,14 +124,14 @@ class _TransactionConfirmationSheet extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: palette.inputBackground,
                   borderRadius: BorderRadius.circular(context.scaled(16)),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   'Chỉnh sửa',
                   style: context.appText.buttonLabel.copyWith(
-                    color: const Color(0xFF475569),
+                    color: palette.iconMuted,
                   ),
                 ),
               ),
@@ -179,7 +180,7 @@ class _TransactionConfirmationSheet extends StatelessWidget {
           child: Text(
             label,
             style: context.appText.body.copyWith(
-              color: AppColors.textSecondary,
+              color: context.appPalette.textSecondary,
             ),
           ),
         ),
@@ -191,7 +192,7 @@ class _TransactionConfirmationSheet extends StatelessWidget {
                   value ?? '',
                   textAlign: TextAlign.right,
                   style: context.appText.bodyStrong.copyWith(
-                    color: valueColor ?? AppColors.textPrimary,
+                    color: valueColor ?? context.appPalette.textPrimary,
                     fontSize: valueSize != null
                         ? context.scaledFont(valueSize, min: valueSize - 2)
                         : null,

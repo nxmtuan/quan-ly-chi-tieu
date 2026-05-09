@@ -38,9 +38,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
               Expanded(
                 child: Text(
                   'Cơ cấu chi tiêu',
-                  style: context.appText.sectionTitle.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+                  style: context.appText.sectionTitle,
                 ),
               ),
               _ChartViewSwitch(
@@ -267,13 +265,6 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
               color: item.color,
               fontWeight: FontWeight.w700,
               fontSize: 16,
-              shadows: const [
-                Shadow(
-                  color: Colors.white,
-                  blurRadius: 6,
-                  offset: Offset(0, 1),
-                ),
-              ],
             ),
           ),
         ),
@@ -344,6 +335,8 @@ class _CategoryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return AnimatedScale(
       scale: selected ? 1.16 : 1,
       duration: const Duration(milliseconds: 180),
@@ -355,10 +348,10 @@ class _CategoryBadge extends StatelessWidget {
             width: selected ? 38.0 : 33.0,
             height: selected ? 38.0 : 33.0,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: palette.surfaceElevated,
               borderRadius: BorderRadius.circular(999),
-              border: const Border.fromBorderSide(
-                BorderSide(color: Colors.white, width: 2.2),
+              border: Border.fromBorderSide(
+                BorderSide(color: palette.surfaceElevated, width: 2.2),
               ),
               boxShadow: [
                 BoxShadow(
@@ -415,6 +408,8 @@ class _BarCategoryIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -422,10 +417,10 @@ class _BarCategoryIcon extends StatelessWidget {
           width: 33,
           height: 33,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: palette.surfaceElevated,
             borderRadius: BorderRadius.circular(999),
-            border: const Border.fromBorderSide(
-              BorderSide(color: Colors.white, width: 2.2),
+            border: Border.fromBorderSide(
+              BorderSide(color: palette.surfaceElevated, width: 2.2),
             ),
             boxShadow: [
               BoxShadow(
@@ -478,12 +473,12 @@ class _BarTooltipRow extends StatelessWidget {
       curve: Curves.easeOutCubic,
       alignment: Alignment.topCenter,
       child: showTooltip
-          ? _buildTooltipContent(chartItems[touchedBarIndex!])
+          ? _buildTooltipContent(context, chartItems[touchedBarIndex!])
           : const SizedBox(width: double.infinity, height: 0),
     );
   }
 
-  Widget _buildTooltipContent(_CategoryAmountItem item) {
+  Widget _buildTooltipContent(BuildContext context, _CategoryAmountItem item) {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
       switchInCurve: Curves.easeOutCubic,
@@ -533,8 +528,8 @@ class _BarTooltipRow extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               formatCurrency(item.amount),
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: context.appPalette.textPrimary,
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
               ),
@@ -557,10 +552,12 @@ class _ChartViewSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(13),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.28)),
       ),
@@ -612,7 +609,7 @@ class _ChartViewButton extends StatelessWidget {
         child: Icon(
           icon,
           size: 20,
-          color: isSelected ? AppColors.primary : AppColors.textSecondary,
+          color: isSelected ? AppColors.primary : context.appPalette.textSecondary,
         ),
       ),
     );

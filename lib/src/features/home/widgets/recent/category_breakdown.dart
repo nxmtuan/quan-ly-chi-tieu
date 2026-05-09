@@ -59,15 +59,13 @@ class _CategoryAmountRow extends StatelessWidget {
                     item.category.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: context.appText.fieldValue.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
+                    style: context.appText.fieldValue,
                   ),
                   SizedBox(height: context.scaled(6)),
                   Text(
                     'Chiếm $percent% tổng',
                     style: context.appText.caption.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.appPalette.textSecondary,
                     ),
                   ),
                 ],
@@ -86,7 +84,7 @@ class _CategoryAmountRow extends StatelessWidget {
                 SizedBox(height: context.scaled(4)),
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: AppColors.textSecondary,
+                  color: context.appPalette.textSecondary,
                   size: context.scaled(20),
                 ),
               ],

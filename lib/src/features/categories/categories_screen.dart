@@ -78,7 +78,7 @@ class _AddCategoryCard extends StatelessWidget {
               width: context.scaled(50),
               height: context.scaled(50),
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: context.appPalette.primarySoft,
                 borderRadius: BorderRadius.circular(context.scaled(18)),
               ),
               child: Icon(
@@ -94,15 +94,13 @@ class _AddCategoryCard extends StatelessWidget {
                 children: [
                   Text(
                     'Thêm danh mục mới',
-                    style: context.appText.cardTitle.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
+                    style: context.appText.cardTitle,
                   ),
                   SizedBox(height: context.scaled(4)),
                   Text(
                     'Tạo nhóm thu hoặc chi với icon và màu riêng.',
                     style: context.appText.secondary.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.appPalette.textSecondary,
                     ),
                   ),
                 ],
@@ -111,7 +109,7 @@ class _AddCategoryCard extends StatelessWidget {
             SizedBox(width: context.scaled(12)),
             Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.textSecondary,
+              color: context.appPalette.textSecondary,
               size: context.scaled(24),
             ),
           ],
@@ -175,15 +173,13 @@ class _CategorySection extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: context.appText.cardTitle.copyWith(
-                        color: AppColors.textPrimary,
-                      ),
+                      style: context.appText.cardTitle,
                     ),
                     SizedBox(height: context.scaled(4)),
                     Text(
                       subtitle,
                       style: context.appText.secondary.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.appPalette.textSecondary,
                       ),
                     ),
                   ],
@@ -192,14 +188,14 @@ class _CategorySection extends StatelessWidget {
             ],
           ),
           SizedBox(height: context.scaled(14)),
-          Divider(color: AppColors.border, height: 1),
+          Divider(color: context.appPalette.border, height: 1),
           if (categories.isEmpty)
             Padding(
               padding: EdgeInsets.symmetric(vertical: context.scaled(18)),
               child: Text(
                 'Chưa có danh mục nào',
                 style: context.appText.body.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.appPalette.textSecondary,
                 ),
               ),
             )
@@ -207,7 +203,7 @@ class _CategorySection extends StatelessWidget {
             for (var index = 0; index < categories.length; index++) ...[
               _CategoryRow(category: categories[index]),
               if (index != categories.length - 1)
-                Divider(color: AppColors.border, height: 1),
+                Divider(color: context.appPalette.border, height: 1),
             ],
         ],
       ),

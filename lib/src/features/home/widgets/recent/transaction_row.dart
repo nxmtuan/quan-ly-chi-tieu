@@ -66,15 +66,13 @@ class _TransactionRow extends ConsumerWidget {
                         : transaction.note!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: context.appText.fieldValue.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
+                    style: context.appText.fieldValue,
                   ),
                   SizedBox(height: context.scaled(6)),
                   Text(
                     '${category?.name ?? 'Other'} • ${formatShortDate(transaction.date)}',
                     style: context.appText.caption.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.appPalette.textSecondary,
                     ),
                   ),
                 ],
@@ -90,7 +88,7 @@ class _TransactionRow extends ConsumerWidget {
                 ),
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: AppColors.textSecondary,
+                  color: context.appPalette.textSecondary,
                   size: context.scaled(20),
                 ),
               ],

@@ -39,7 +39,7 @@ class _ExpenseOverviewCard extends StatelessWidget {
                     child: Text(
                       'No expense data yet',
                       style: context.appText.bodyStrong.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.appPalette.textSecondary,
                       ),
                     ),
                   )

@@ -41,7 +41,7 @@ Future<bool?> showAppConfirmDialog(
             Text(
               message,
               style: context.appText.body.copyWith(
-                color: AppColors.textSecondary,
+                color: context.appPalette.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -56,14 +56,14 @@ Future<bool?> showAppConfirmDialog(
                         vertical: context.scaled(16),
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
+                        color: context.appPalette.inputBackground,
                         borderRadius: BorderRadius.circular(context.scaled(16)),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         cancelText,
                         style: context.appText.buttonLabel.copyWith(
-                          color: const Color(0xFF475569),
+                          color: context.appPalette.iconMuted,
                         ),
                       ),
                     ),

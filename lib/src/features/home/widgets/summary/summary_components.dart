@@ -75,6 +75,7 @@ class _BalanceBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -86,12 +87,14 @@ class _BalanceBanner extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primaryLight.withValues(alpha: isDark ? 0.2 : 0.74),
-            AppColors.primaryLight.withValues(alpha: isDark ? 0.16 : 0.5),
+            palette.primarySoft.withValues(alpha: isDark ? 0.2 : 0.74),
+            palette.primarySoft.withValues(alpha: isDark ? 0.16 : 0.5),
           ],
         ),
         borderRadius: BorderRadius.circular(context.scaled(16)),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.8)),
+        border: Border.all(
+          color: palette.surfaceElevated.withValues(alpha: 0.8),
+        ),
       ),
       child: Text(
         'Dư: ${formatCurrency(balance)}',
@@ -123,7 +126,21 @@ class _SummaryMetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+    final isDark = context.isDarkMode;
     final colors = Theme.of(context).colorScheme;
+    final gradientStart = isDark
+        ? Color.alphaBlend(
+            backgroundColor.withValues(alpha: 0.18),
+            palette.surface,
+          )
+        : backgroundColor;
+    final gradientEnd = isDark
+        ? Color.alphaBlend(
+            color.withValues(alpha: 0.05),
+            palette.surfaceMuted,
+          )
+        : colors.surface;
 
     return AppBounceBuilder(
       onTap: onTap,
@@ -140,11 +157,13 @@ class _SummaryMetricCard extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [backgroundColor, colors.surface],
+            colors: [gradientStart, gradientEnd],
           ),
           borderRadius: BorderRadius.circular(context.scaled(21)),
           border: Border.all(
-            color: isSelected ? color.withValues(alpha: 0.32) : Colors.white,
+            color: isSelected
+                ? color.withValues(alpha: 0.32)
+                : context.appPalette.surfaceElevated,
             width: isSelected ? 2.2 : 2,
           ),
           boxShadow: appSurfaceShadow(context),

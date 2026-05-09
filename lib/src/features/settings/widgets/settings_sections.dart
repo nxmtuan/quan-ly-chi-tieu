@@ -12,9 +12,9 @@ class _ThemeSettingsRow extends ConsumerWidget {
       iconColor: AppColors.primary,
       title: 'Giao diện',
       subtitle: _themeLabel(themeMode),
-      trailing: const Icon(
+      trailing: Icon(
         Icons.chevron_right_rounded,
-        color: AppColors.textSecondary,
+        color: context.appPalette.textSecondary,
       ),
       onTap: () => _showThemeSheet(context, ref),
     );
@@ -54,9 +54,9 @@ class _ManageCategoriesRow extends ConsumerWidget {
       iconColor: AppColors.success,
       title: 'Quản lý danh mục',
       subtitle: 'Chỉnh sửa nhóm thu nhập và chi tiêu',
-      trailing: const Icon(
+      trailing: Icon(
         Icons.chevron_right_rounded,
-        color: AppColors.textSecondary,
+        color: context.appPalette.textSecondary,
       ),
       onTap: () => showCategoryManagementSheet(context, ref),
     );
@@ -73,9 +73,9 @@ class _ManageMoneySourcesRow extends ConsumerWidget {
       iconColor: AppColors.primary,
       title: 'Quản lý nguồn tiền',
       subtitle: 'Thêm và chỉnh sửa danh sách nguồn tiền',
-      trailing: const Icon(
+      trailing: Icon(
         Icons.chevron_right_rounded,
-        color: AppColors.textSecondary,
+        color: context.appPalette.textSecondary,
       ),
       onTap: () => showMoneySourceManagementSheet(context, ref),
     );
@@ -126,7 +126,6 @@ class _AuthSettingsRow extends ConsumerWidget {
                           Text(
                             'Tài khoản',
                             style: context.appText.bodyStrong.copyWith(
-                              color: AppColors.textPrimary,
                               fontSize: context.scaledFont(15, min: 14),
                             ),
                           ),
@@ -134,7 +133,7 @@ class _AuthSettingsRow extends ConsumerWidget {
                           Text(
                             'Kết nối tài khoản Google',
                             style: context.appText.caption.copyWith(
-                              color: AppColors.textSecondary,
+                              color: context.appPalette.textSecondary,
                             ),
                           ),
                         ],
@@ -206,7 +205,7 @@ class _AuthSettingsRow extends ConsumerWidget {
       title: 'Đăng xuất',
       message: 'Bạn có chắc muốn đăng xuất khỏi ứng dụng không?',
       confirmText: 'Đăng xuất',
-      confirmBackgroundColor: const Color(0xFFFEE2E2),
+      confirmBackgroundColor: context.appPalette.dangerSoft,
       confirmTextColor: const Color(0xFFDC2626),
     );
 
@@ -248,9 +247,9 @@ class _SyncDataRowState extends ConsumerState<_SyncDataRow> {
       iconColor: AppColors.primary,
       title: 'Đồng bộ dữ liệu',
       subtitle: _syncSummary(settings),
-      trailing: const Icon(
+      trailing: Icon(
         Icons.chevron_right_rounded,
-        color: AppColors.textSecondary,
+        color: context.appPalette.textSecondary,
       ),
       onTap: _showSyncSheet,
     );
@@ -306,14 +305,14 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
                   const _DividerIndent(),
                   _SettingsRow(
                     icon: Icons.schedule_rounded,
-                    iconColor: AppColors.textPrimary,
+                    iconColor: context.appPalette.textPrimary,
                     title: 'Thời gian tự động đồng bộ',
                     subtitle: _syncScheduleLabel(settings),
                     trailing: Icon(
                       Icons.chevron_right_rounded,
                       color: settings.enabled
-                          ? AppColors.textSecondary
-                          : AppColors.textSecondary.withValues(alpha: 0.35),
+                          ? context.appPalette.textSecondary
+                          : context.appPalette.textSecondary.withValues(alpha: 0.35),
                     ),
                     onTap: settings.enabled
                         ? () => _showScheduleSheet(settings)
@@ -341,9 +340,9 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Icon(
+                        : Icon(
                             Icons.chevron_right_rounded,
-                            color: AppColors.textSecondary,
+                            color: context.appPalette.textSecondary,
                           ),
                     onTap: _isSyncing ? null : _handleSyncNow,
                   ),
@@ -363,9 +362,9 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Icon(
+                        : Icon(
                             Icons.chevron_right_rounded,
-                            color: AppColors.textSecondary,
+                            color: context.appPalette.textSecondary,
                           ),
                     onTap: _isDeletingRemote ? null : _confirmDeleteRemoteData,
                   ),
@@ -444,7 +443,7 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
           'Bạn có chắc muốn xóa dữ liệu đã đồng bộ trên Google Drive không?',
       confirmText: 'Xóa',
       confirmTextColor: const Color(0xFFDC2626),
-      confirmBackgroundColor: const Color(0xFFFEE2E2),
+      confirmBackgroundColor: context.appPalette.dangerSoft,
     );
 
     if (confirmed != true || !mounted) {
@@ -591,11 +590,13 @@ class _SettingsActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(22)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: palette.border),
       ),
       child: child,
     );
@@ -645,7 +646,6 @@ class _InlineSettingsSwitchRow extends StatelessWidget {
                 Text(
                   title,
                   style: context.appText.bodyStrong.copyWith(
-                    color: AppColors.textPrimary,
                     fontSize: context.scaledFont(15, min: 14),
                   ),
                 ),
@@ -653,7 +653,7 @@ class _InlineSettingsSwitchRow extends StatelessWidget {
                 Text(
                   subtitle,
                   style: context.appText.caption.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.appPalette.textSecondary,
                   ),
                 ),
               ],
@@ -677,12 +677,14 @@ class _ScheduleTypeTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       padding: EdgeInsets.all(context.scaled(3)),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(18)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: palette.border),
       ),
       child: Row(
         children: [
@@ -738,7 +740,7 @@ class _ScheduleTypeTab extends StatelessWidget {
         child: Text(
           label,
           style: context.appText.bodyStrong.copyWith(
-            color: isActive ? AppColors.primary : AppColors.textSecondary,
+            color: isActive ? AppColors.primary : context.appPalette.textSecondary,
           ),
         ),
       ),
@@ -753,12 +755,14 @@ class _ScheduleInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       padding: EdgeInsets.all(context.scaled(14)),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(20)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: palette.border),
       ),
       child: child,
     );
@@ -790,14 +794,12 @@ class _TimeSelectorRow extends StatelessWidget {
         children: [
           Text(
             display,
-            style: context.appText.bodyStrong.copyWith(
-              color: AppColors.textPrimary,
-            ),
+            style: context.appText.bodyStrong,
           ),
           SizedBox(width: context.scaled(6)),
-          const Icon(
+          Icon(
             Icons.chevron_right_rounded,
-            color: AppColors.textSecondary,
+            color: context.appPalette.textSecondary,
           ),
         ],
       ),
@@ -822,9 +824,7 @@ class _WeekdaySelector extends StatelessWidget {
       children: [
         Text(
           'Ngày trong tuần',
-          style: context.appText.bodyStrong.copyWith(
-            color: AppColors.textPrimary,
-          ),
+          style: context.appText.bodyStrong,
         ),
         SizedBox(height: context.scaled(10)),
         Wrap(
@@ -869,18 +869,18 @@ class _WeekdayChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.12)
-              : Colors.white,
+              : context.appPalette.surface,
           borderRadius: BorderRadius.circular(context.scaled(14)),
           border: Border.all(
             color: isSelected
                 ? AppColors.primary.withValues(alpha: 0.35)
-                : AppColors.border,
+                : context.appPalette.border,
           ),
         ),
         child: Text(
           label,
           style: context.appText.bodyStrong.copyWith(
-            color: isSelected ? AppColors.primary : AppColors.textPrimary,
+            color: isSelected ? AppColors.primary : context.appPalette.textPrimary,
             fontSize: context.scaledFont(13, min: 12),
           ),
         ),
@@ -896,14 +896,14 @@ class _SettingsTipCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlatCard(
       radius: context.scaled(24),
-      color: AppColors.primaryLight,
+      color: context.appPalette.primarySoft,
       child: Row(
         children: [
           Container(
             width: context.scaled(48),
             height: context.scaled(48),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.85),
+              color: context.appPalette.surfaceElevated.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(context.scaled(15)),
             ),
             child: Icon(
@@ -918,7 +918,6 @@ class _SettingsTipCard extends StatelessWidget {
                 'Ghi lại các khoản chi nhỏ mỗi ngày để có bức tranh tài chính rõ hơn.',
                 style: context.appText.bodyStrong.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
                 ),
               ),
             ),
@@ -1009,20 +1008,19 @@ class _SettingsRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: context.appText.bodyStrong.copyWith(
-                      color: AppColors.textPrimary,
-                      fontSize: context.scaledFont(15, min: 14),
-                    ),
+                Text(
+                  title,
+                  style: context.appText.bodyStrong.copyWith(
+                    fontSize: context.scaledFont(15, min: 14),
                   ),
+                ),
                   SizedBox(height: context.scaled(5)),
-                  Text(
-                    subtitle,
-                    style: context.appText.caption.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                Text(
+                  subtitle,
+                  style: context.appText.caption.copyWith(
+                    color: context.appPalette.textSecondary,
                   ),
+                ),
                 ],
               ),
             ),
@@ -1042,7 +1040,7 @@ class _DividerIndent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(left: context.scaled(66)),
-      child: Divider(height: 1, color: AppColors.border),
+      child: Divider(height: 1, color: context.appPalette.border),
     );
   }
 }
@@ -1121,7 +1119,7 @@ class _ThemeModeOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? AppColors.primary : AppColors.textSecondary;
+    final color = isActive ? AppColors.primary : context.appPalette.textSecondary;
 
     return AppBounceBuilder(
       onTap: onTap,
@@ -1134,12 +1132,12 @@ class _ThemeModeOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: isActive
               ? AppColors.primary.withValues(alpha: 0.1)
-              : Colors.white,
+              : context.appPalette.surface,
           borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
             color: isActive
                 ? AppColors.primary.withValues(alpha: 0.55)
-                : AppColors.border,
+                : context.appPalette.border,
             width: isActive ? 1.4 : 1,
           ),
         ),

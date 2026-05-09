@@ -37,7 +37,7 @@ class _MoneySourceManagementSheet extends ConsumerWidget {
               child: Text(
                 'Chưa có nguồn tiền nào',
                 style: context.appText.body.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.appPalette.textSecondary,
                 ),
               ),
             )
@@ -99,7 +99,7 @@ class _MoneySourceManagementSheet extends ConsumerWidget {
       message: 'Nguồn tiền này sẽ bị xóa khỏi danh sách chọn.',
       confirmText: 'Xóa',
       confirmTextColor: const Color(0xFFDC2626),
-      confirmBackgroundColor: const Color(0xFFFEE2E2),
+      confirmBackgroundColor: context.appPalette.dangerSoft,
     );
 
     if (confirmed != true || !context.mounted) {
@@ -130,15 +130,17 @@ class _ManagedMoneySourceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.scaled(16),
         vertical: context.scaled(14),
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(22)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: palette.border),
       ),
       child: Row(
         children: [
@@ -162,16 +164,14 @@ class _ManagedMoneySourceRow extends StatelessWidget {
               children: [
                 Text(
                   source.name,
-                  style: context.appText.bodyStrong.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+                  style: context.appText.bodyStrong,
                 ),
                 if (isDefaultMoneySourceId(source.id)) ...[
                   SizedBox(height: context.scaled(3)),
                   Text(
                     'Nguồn tiền mặc định',
                     style: context.appText.caption.copyWith(
-                      color: AppColors.textSecondary,
+                      color: palette.textSecondary,
                     ),
                   ),
                 ],
@@ -202,28 +202,30 @@ class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.icon,
     required this.onTap,
-    this.color = AppColors.textPrimary,
-    this.backgroundColor = const Color(0xFFF8FAFC),
+    this.color,
+    this.backgroundColor,
   });
 
   final IconData icon;
-  final Color color;
-  final Color backgroundColor;
+  final Color? color;
+  final Color? backgroundColor;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return AppBounceBuilder(
       onTap: onTap,
       child: Container(
         width: context.scaled(38),
         height: context.scaled(38),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: backgroundColor ?? palette.surfaceMuted,
           borderRadius: BorderRadius.circular(context.scaled(14)),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: palette.border),
         ),
-        child: Icon(icon, color: color, size: context.scaled(18)),
+        child: Icon(icon, color: color ?? palette.textPrimary, size: context.scaled(18)),
       ),
     );
   }
@@ -358,9 +360,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: context.appText.fieldLabel.copyWith(
-        color: AppColors.textPrimary,
-      ),
+      style: context.appText.fieldLabel,
     );
   }
 }
@@ -384,16 +384,14 @@ class _NameField extends StatelessWidget {
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(context.scaled(18)),
         border: Border.all(
-          color: isFocused ? AppColors.primary : AppColors.border,
+          color: isFocused ? AppColors.primary : context.appPalette.border,
         ),
       ),
       padding: EdgeInsets.symmetric(horizontal: context.scaled(16)),
       child: TextField(
         controller: controller,
         focusNode: focusNode,
-        style: context.appText.bodyStrong.copyWith(
-          color: AppColors.textPrimary,
-        ),
+        style: context.appText.bodyStrong,
         cursorColor: AppColors.primary,
         decoration: InputDecoration(
           filled: false,
@@ -410,7 +408,7 @@ class _NameField extends StatelessWidget {
           ),
           hintText: 'Nhập tên nguồn tiền',
           hintStyle: context.appText.body.copyWith(
-            color: const Color(0xFFB3BAC8),
+            color: context.appPalette.textSecondary.withValues(alpha: 0.65),
           ),
         ),
       ),
@@ -440,15 +438,15 @@ class _IconOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primary.withValues(alpha: 0.1)
-              : Colors.white,
+              : context.appPalette.surface,
           borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.border,
+            color: selected ? AppColors.primary : context.appPalette.border,
           ),
         ),
         child: Icon(
           icon,
-          color: selected ? AppColors.primary : AppColors.textPrimary,
+          color: selected ? AppColors.primary : context.appPalette.textPrimary,
           size: context.scaled(22),
         ),
       ),

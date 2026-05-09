@@ -66,6 +66,8 @@ class _AppTimePickerSheetState extends State<_AppTimePickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -86,9 +88,7 @@ class _AppTimePickerSheetState extends State<_AppTimePickerSheet> {
               children: [
                 Text(
                   'Chọn thời gian',
-                  style: context.appText.sheetTitle.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+                  style: context.appText.sheetTitle,
                 ),
                 SizedBox(height: context.scaled(18)),
                 _SelectedTimePreview(
@@ -121,7 +121,6 @@ class _AppTimePickerSheetState extends State<_AppTimePickerSheet> {
                   child: Text(
                     ':',
                     style: context.appText.amountXL.copyWith(
-                      color: AppColors.textPrimary,
                       fontSize: context.scaledFont(28, min: 24),
                     ),
                   ),
@@ -155,7 +154,7 @@ class _AppTimePickerSheetState extends State<_AppTimePickerSheet> {
                         vertical: context.scaled(16),
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
+                        color: palette.inputBackground,
                         borderRadius: BorderRadius.circular(
                           context.scaled(16),
                         ),
@@ -164,7 +163,7 @@ class _AppTimePickerSheetState extends State<_AppTimePickerSheet> {
                       child: Text(
                         'Hủy',
                         style: context.appText.buttonLabel.copyWith(
-                          color: const Color(0xFF475569),
+                          color: palette.iconMuted,
                         ),
                       ),
                     ),
@@ -227,7 +226,6 @@ class _SelectedTimePreview extends StatelessWidget {
           child: Text(
             ':',
             style: context.appText.amountXL.copyWith(
-              color: AppColors.textPrimary,
               fontSize: context.scaledFont(30, min: 26),
             ),
           ),
@@ -248,7 +246,9 @@ class _TimeSegment extends StatelessWidget {
     return Container(
       height: context.scaled(92),
       decoration: BoxDecoration(
-        color: AppColors.primaryLight.withValues(alpha: 0.78),
+        color: context.appPalette.primarySoft.withValues(
+          alpha: context.isDarkMode ? 0.9 : 0.78,
+        ),
         borderRadius: BorderRadius.circular(context.scaled(22)),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.16)),
       ),
@@ -256,7 +256,6 @@ class _TimeSegment extends StatelessWidget {
       child: Text(
         value.toString().padLeft(2, '0'),
         style: context.appText.amountXL.copyWith(
-          color: AppColors.textPrimary,
           fontSize: context.scaledFont(34, min: 30),
         ),
       ),
@@ -277,17 +276,19 @@ class _PickerColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       height: context.scaled(228),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: palette.surfaceMuted,
         borderRadius: BorderRadius.circular(context.scaled(22)),
       ),
       child: CupertinoTheme(
         data: CupertinoThemeData(
           textTheme: CupertinoTextThemeData(
             pickerTextStyle: context.appText.amountLG.copyWith(
-              color: AppColors.textPrimary,
+              color: palette.textPrimary,
               fontSize: context.scaledFont(26, min: 22),
             ),
           ),

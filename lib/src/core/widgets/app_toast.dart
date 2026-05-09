@@ -133,6 +133,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
     final color = switch (widget.type) {
       AppToastType.success => AppColors.success,
       AppToastType.error => AppColors.danger,
@@ -173,7 +174,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
                         vertical: context.scaled(12),
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: palette.surface,
                         borderRadius: BorderRadius.circular(context.scaled(18)),
                         border: Border.all(
                           color: color.withValues(alpha: 0.18),
@@ -200,9 +201,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
                           Expanded(
                             child: Text(
                               widget.message,
-                              style: context.appText.bodyStrong.copyWith(
-                                color: AppColors.textPrimary,
-                              ),
+                              style: context.appText.bodyStrong,
                             ),
                           ),
                         ],

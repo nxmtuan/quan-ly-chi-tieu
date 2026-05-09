@@ -27,6 +27,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.appPalette;
     final isExpense = transaction.type == TransactionType.expense;
     final color = isExpense ? const Color(0xFFFF1493) : AppColors.success;
     final sign = isExpense ? '-' : '+';
@@ -70,14 +71,14 @@ class _TransactionDetailSheet extends ConsumerWidget {
                   vertical: context.scaled(8),
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: palette.inputBackground,
                   borderRadius: BorderRadius.circular(context.scaled(8)),
                 ),
                 child: Text(
                   transaction.note!,
                   textAlign: TextAlign.center,
                   style: context.appText.body.copyWith(
-                    color: const Color(0xFF475569),
+                    color: palette.iconMuted,
                   ),
                 ),
               ),
@@ -86,22 +87,22 @@ class _TransactionDetailSheet extends ConsumerWidget {
             Container(
               padding: EdgeInsets.all(context.scaled(16)),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: palette.surfaceMuted,
                 borderRadius: BorderRadius.circular(context.scaled(16)),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: palette.border),
               ),
               child: Column(
                 children: [
                   _buildRow(context, label: 'Danh mục', value: category.name),
-                  Divider(color: AppColors.border, height: context.scaled(24)),
+                  Divider(color: palette.border, height: context.scaled(24)),
                   _buildRow(
                     context,
                     label: 'Loại',
                     value: isExpense ? 'Chi tiêu' : 'Thu nhập',
                   ),
-                  Divider(color: AppColors.border, height: context.scaled(24)),
+                  Divider(color: palette.border, height: context.scaled(24)),
                   _buildRow(context, label: 'Nguồn tiền', value: source.name),
-                  Divider(color: AppColors.border, height: context.scaled(24)),
+                  Divider(color: palette.border, height: context.scaled(24)),
                   _buildRow(
                     context,
                     label: 'Ngày giao dịch',
@@ -122,7 +123,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFEE2E2),
+                  color: palette.dangerSoft,
                   borderRadius: BorderRadius.circular(context.scaled(16)),
                 ),
                 alignment: Alignment.center,
@@ -179,7 +180,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
       message: 'Bạn có chắc muốn xóa giao dịch này không?',
       confirmText: 'Xóa',
       confirmTextColor: const Color(0xFFDC2626),
-      confirmBackgroundColor: const Color(0xFFFEE2E2),
+      confirmBackgroundColor: context.appPalette.dangerSoft,
     );
 
     if (confirmed == true && context.mounted) {
@@ -209,7 +210,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
           child: Text(
             label,
             style: context.appText.body.copyWith(
-              color: AppColors.textSecondary,
+              color: context.appPalette.textSecondary,
             ),
           ),
         ),
@@ -221,7 +222,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
                   value ?? '',
                   textAlign: TextAlign.right,
                   style: context.appText.bodyStrong.copyWith(
-                    color: valueColor ?? AppColors.textPrimary,
+                    color: valueColor ?? context.appPalette.textPrimary,
                     fontSize: valueSize != null
                         ? context.scaledFont(valueSize, min: valueSize - 2)
                         : null,

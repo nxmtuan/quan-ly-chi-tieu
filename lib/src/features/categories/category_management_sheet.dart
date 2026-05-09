@@ -56,7 +56,7 @@ class _CategoryManagementSheetState
                     child: Text(
                       'Chưa có danh mục nào',
                       style: context.appText.body.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.appPalette.textSecondary,
                       ),
                     ),
                   )
@@ -102,7 +102,7 @@ class _CategoryManagementSheetState
       message: 'Các giao dịch trong danh mục này cũng sẽ bị xóa.',
       confirmText: 'Xóa',
       confirmTextColor: const Color(0xFFDC2626),
-      confirmBackgroundColor: const Color(0xFFFEE2E2),
+      confirmBackgroundColor: context.appPalette.dangerSoft,
     );
 
     if (confirmed != true || !mounted) {
@@ -135,12 +135,14 @@ class _CategoryTypeTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       padding: EdgeInsets.all(context.scaled(3)),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(18)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: palette.border),
       ),
       child: Row(
         children: [
@@ -198,7 +200,7 @@ class _CategoryTypeTab extends StatelessWidget {
         child: Text(
           label,
           style: context.appText.bodyStrong.copyWith(
-            color: isActive ? color : AppColors.textSecondary,
+            color: isActive ? color : context.appPalette.textSecondary,
           ),
         ),
       ),
@@ -220,6 +222,7 @@ class _ManagedCategoryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final canDelete = !isDefaultCategoryId(category.id);
+    final palette = context.appPalette;
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -227,9 +230,9 @@ class _ManagedCategoryRow extends StatelessWidget {
         vertical: context.scaled(14),
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(22)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: palette.border),
       ),
       child: Row(
         children: [
@@ -250,9 +253,7 @@ class _ManagedCategoryRow extends StatelessWidget {
           Expanded(
             child: Text(
               category.name,
-              style: context.appText.bodyStrong.copyWith(
-                color: AppColors.textPrimary,
-              ),
+              style: context.appText.bodyStrong,
             ),
           ),
           _CategoryActionButton(
@@ -278,30 +279,32 @@ class _CategoryActionButton extends StatelessWidget {
   const _CategoryActionButton({
     required this.icon,
     required this.onTap,
-    this.color = AppColors.textPrimary,
-    this.backgroundColor = const Color(0xFFF8FAFC),
+    this.color,
+    this.backgroundColor,
   });
 
   final IconData icon;
-  final Color color;
-  final Color backgroundColor;
+  final Color? color;
+  final Color? backgroundColor;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return AppBounceBuilder(
       onTap: onTap,
       child: Container(
         width: context.scaled(38),
         height: context.scaled(38),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: backgroundColor ?? palette.surfaceMuted,
           borderRadius: BorderRadius.circular(context.scaled(14)),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: palette.border),
         ),
         child: Icon(
           icon,
-          color: color,
+          color: color ?? palette.textPrimary,
           size: context.scaled(18),
         ),
       ),
@@ -473,9 +476,7 @@ class _EditorSectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: context.appText.fieldLabel.copyWith(
-        color: AppColors.textPrimary,
-      ),
+      style: context.appText.fieldLabel,
     );
   }
 }
@@ -501,7 +502,7 @@ class _EditorNameField extends StatelessWidget {
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(context.scaled(18)),
         border: Border.all(
-          color: isFocused ? AppColors.primary : AppColors.border,
+          color: isFocused ? AppColors.primary : context.appPalette.border,
         ),
       ),
       padding: EdgeInsets.symmetric(horizontal: context.scaled(16)),
@@ -510,9 +511,7 @@ class _EditorNameField extends StatelessWidget {
         focusNode: focusNode,
         readOnly: readOnly,
         cursorColor: AppColors.primary,
-        style: context.appText.bodyStrong.copyWith(
-          color: AppColors.textPrimary,
-        ),
+        style: context.appText.bodyStrong,
         decoration: InputDecoration(
           filled: false,
           fillColor: Colors.transparent,
@@ -528,7 +527,7 @@ class _EditorNameField extends StatelessWidget {
           ),
           hintText: 'Nhập tên danh mục',
           hintStyle: context.appText.body.copyWith(
-            color: const Color(0xFFB3BAC8),
+            color: context.appPalette.textSecondary.withValues(alpha: 0.65),
           ),
         ),
       ),
@@ -607,12 +606,12 @@ class _EditorTypeToggleButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? color.withValues(alpha: enabled ? 0.08 : 0.05)
-              : Colors.white,
+              : context.appPalette.surface,
           borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
             color: selected
                 ? color.withValues(alpha: enabled ? 0.24 : 0.16)
-                : AppColors.border,
+                : context.appPalette.border,
           ),
         ),
         child: Row(
@@ -659,15 +658,15 @@ class _EditorIconOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primary.withValues(alpha: 0.1)
-              : Colors.white,
+              : context.appPalette.surface,
           borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.border,
+            color: selected ? AppColors.primary : context.appPalette.border,
           ),
         ),
         child: Icon(
           icon,
-          color: selected ? AppColors.primary : AppColors.textPrimary,
+          color: selected ? AppColors.primary : context.appPalette.textPrimary,
           size: context.scaled(22),
         ),
       ),
@@ -690,6 +689,8 @@ class _EditorColorOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return AppBounceBuilder(
       onTap: enabled ? onTap : null,
       child: AnimatedContainer(
@@ -697,10 +698,10 @@ class _EditorColorOption extends StatelessWidget {
         width: context.scaled(52),
         height: context.scaled(52),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: palette.surface,
           borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
-            color: selected ? Colors.black : AppColors.border,
+            color: selected ? palette.textPrimary : palette.border,
             width: context.scaled(selected ? 3 : 1),
           ),
         ),

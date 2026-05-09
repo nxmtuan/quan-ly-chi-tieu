@@ -84,15 +84,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 children: [
                   Text(
                     _calendarHeadline(_selectedDay),
-                    style: context.appText.sectionTitle.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
+                    style: context.appText.sectionTitle,
                   ),
                   SizedBox(height: context.scaled(6)),
                   Text(
                     formatLongDate(_selectedDay),
                     style: context.appText.secondaryStrong.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.appPalette.textSecondary,
                     ),
                   ),
                   SizedBox(height: context.scaled(16)),
@@ -128,7 +126,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     child: Text(
                       'Ngày này chưa có giao dịch nào',
                       style: context.appText.bodyStrong.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.appPalette.textSecondary,
                       ),
                     ),
                   ),
@@ -143,7 +141,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     for (final entry in dailyTransactions.indexed) ...[
                       TransactionRow(transaction: entry.$2),
                       if (entry.$1 < dailyTransactions.length - 1)
-                        Divider(height: context.scaled(1), color: AppColors.border),
+                        Divider(
+                          height: context.scaled(1),
+                          color: context.appPalette.border,
+                        ),
                     ],
                   ],
                 ),
@@ -205,9 +206,7 @@ class _MetricPill extends StatelessWidget {
           SizedBox(height: context.scaled(6)),
           Text(
             formatCurrency(amount),
-            style: context.appText.amountMD.copyWith(
-              color: AppColors.textPrimary,
-            ),
+            style: context.appText.amountMD,
           ),
         ],
       ),

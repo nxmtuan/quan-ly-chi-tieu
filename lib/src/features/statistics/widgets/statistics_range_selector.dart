@@ -9,12 +9,14 @@ class _RangeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const ranges = StatisticsRange.values;
+    final palette = context.appPalette;
 
     return Container(
       padding: EdgeInsets.all(context.scaled(6)),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(24)),
+        border: Border.all(color: palette.border),
       ),
       child: Row(
         children: [
@@ -41,7 +43,7 @@ class _RangeSelector extends StatelessWidget {
                     style: context.appText.bodyStrong.copyWith(
                       color: selectedRange == range
                           ? Colors.white
-                          : AppColors.textSecondary,
+                          : palette.textSecondary,
                       fontSize: context.scaledFont(13, min: 12),
                     ),
                   ),

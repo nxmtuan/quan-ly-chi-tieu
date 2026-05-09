@@ -118,8 +118,8 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                       Icons.chevron_left_rounded,
                       size: context.scaled(26),
                       color: canGoPreviousYear
-                          ? AppColors.textPrimary
-                          : AppColors.textSecondary.withValues(alpha: 0.3),
+                          ? context.appPalette.textPrimary
+                          : context.appPalette.textSecondary.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -128,7 +128,6 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                     '$_displayedYear',
                     textAlign: TextAlign.center,
                     style: context.appText.sectionTitle.copyWith(
-                      color: AppColors.textPrimary,
                       fontSize: context.scaledFont(18, min: 16),
                     ),
                   ),
@@ -148,8 +147,8 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                       Icons.chevron_right_rounded,
                       size: context.scaled(26),
                       color: canGoNextYear
-                          ? AppColors.textPrimary
-                          : AppColors.textSecondary.withValues(alpha: 0.3),
+                          ? context.appPalette.textPrimary
+                          : context.appPalette.textSecondary.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -276,14 +275,14 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
       width: double.infinity,
       padding: EdgeInsets.all(context.scaled(16)),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: context.appPalette.surfaceMuted,
         borderRadius: BorderRadius.circular(context.scaled(18)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appPalette.border),
       ),
       child: Text(
         'Hiển thị giao dịch từ trước đến nay đã được lưu trên ứng dụng',
         style: context.appText.body.copyWith(
-          color: AppColors.textSecondary,
+          color: context.appPalette.textSecondary,
         ),
       ),
     );
@@ -371,12 +370,14 @@ class _PickerScopeTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       height: context.scaled(48),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(14)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: palette.border),
       ),
       child: Row(
         children: [
@@ -430,7 +431,7 @@ class _PickerScopeTab extends StatelessWidget {
           label,
           textAlign: TextAlign.center,
           style: context.appText.captionStrong.copyWith(
-            color: isSelected ? AppColors.primary : AppColors.textSecondary,
+            color: isSelected ? AppColors.primary : context.appPalette.textSecondary,
           ),
         ),
       ),
@@ -461,15 +462,15 @@ class _PickerGridOption extends StatelessWidget {
           color: isSelected
               ? AppColors.primary
               : isDisabled
-              ? const Color(0xFFF8FAFC)
-              : Colors.white,
+              ? context.appPalette.surfaceMuted
+              : context.appPalette.surface,
           borderRadius: BorderRadius.circular(context.scaled(16)),
           border: Border.all(
             color: isSelected
                 ? AppColors.primary
                 : isDisabled
-                ? AppColors.border.withValues(alpha: 0.6)
-                : AppColors.border,
+                ? context.appPalette.border.withValues(alpha: 0.6)
+                : context.appPalette.border,
           ),
         ),
         alignment: Alignment.center,
@@ -479,8 +480,8 @@ class _PickerGridOption extends StatelessWidget {
             color: isSelected
                 ? Colors.white
                 : isDisabled
-                ? AppColors.textSecondary.withValues(alpha: 0.4)
-                : AppColors.textPrimary,
+                ? context.appPalette.textSecondary.withValues(alpha: 0.4)
+                : context.appPalette.textPrimary,
             fontSize: context.scaledFont(12, min: 12),
             fontWeight: FontWeight.w800,
           ),
@@ -501,6 +502,8 @@ class _ScrollHintButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return AppBounceBuilder(
       onTap: onTap,
       scaleDown: 0.92,
@@ -510,12 +513,12 @@ class _ScrollHintButton extends StatelessWidget {
           width: context.scaled(36),
           height: context.scaled(36),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.96),
+            color: palette.surfaceElevated.withValues(alpha: 0.96),
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: palette.border),
             boxShadow: [
               BoxShadow(
-                color: AppColors.shadow.withValues(alpha: 0.1),
+                color: palette.shadow.withValues(alpha: context.isDarkMode ? 0.22 : 0.1),
                 blurRadius: context.scaled(10),
                 offset: Offset(0, context.scaled(4)),
               ),
@@ -523,7 +526,7 @@ class _ScrollHintButton extends StatelessWidget {
           ),
           child: Icon(
             icon,
-            color: AppColors.textPrimary,
+            color: palette.textPrimary,
             size: context.scaled(22),
           ),
         ),

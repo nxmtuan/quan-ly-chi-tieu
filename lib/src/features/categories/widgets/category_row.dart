@@ -33,15 +33,13 @@ class _CategoryRow extends ConsumerWidget {
               children: [
                 Text(
                   category.name,
-                  style: context.appText.bodyStrong.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+                  style: context.appText.bodyStrong,
                 ),
                 SizedBox(height: context.scaled(3)),
                 Text(
                   category.type == TransactionType.income ? 'Thu nhập' : 'Chi tiêu',
                   style: context.appText.caption.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.appPalette.textSecondary,
                   ),
                 ),
               ],
@@ -72,7 +70,7 @@ class _CategoryRow extends ConsumerWidget {
       message: 'Các giao dịch trong danh mục này cũng sẽ bị xóa.',
       confirmText: 'Xóa',
       confirmTextColor: const Color(0xFFDC2626),
-      confirmBackgroundColor: const Color(0xFFFEE2E2),
+      confirmBackgroundColor: context.appPalette.dangerSoft,
     );
 
     if (confirmed != true) {
@@ -97,30 +95,32 @@ class _ActionIconButton extends StatelessWidget {
   const _ActionIconButton({
     required this.icon,
     required this.onTap,
-    this.color = AppColors.textPrimary,
-    this.backgroundColor = const Color(0xFFF8FAFC),
+    this.color,
+    this.backgroundColor,
   });
 
   final IconData icon;
-  final Color color;
-  final Color backgroundColor;
+  final Color? color;
+  final Color? backgroundColor;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return AppBounceBuilder(
       onTap: onTap,
       child: Container(
         width: context.scaled(38),
         height: context.scaled(38),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: backgroundColor ?? palette.surfaceMuted,
           borderRadius: BorderRadius.circular(context.scaled(14)),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: palette.border),
         ),
         child: Icon(
           icon,
-          color: color,
+          color: color ?? palette.textPrimary,
           size: context.scaled(18),
         ),
       ),

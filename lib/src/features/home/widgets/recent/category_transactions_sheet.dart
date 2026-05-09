@@ -52,7 +52,7 @@ class _CategoryTransactionsSheet extends ConsumerWidget {
               child: Text(
                 'Không có giao dịch nào',
                 style: context.appText.bodyStrong.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.appPalette.textSecondary,
                 ),
               ),
             )

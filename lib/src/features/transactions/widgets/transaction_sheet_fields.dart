@@ -59,15 +59,17 @@ class _TypeToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       height: context.scaled(48),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(14)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: palette.border),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.06),
+            color: palette.shadow.withValues(alpha: context.isDarkMode ? 0.22 : 0.06),
             blurRadius: context.scaled(9),
             offset: Offset(0, context.scaled(3)),
           ),
@@ -116,6 +118,8 @@ class _TypeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return AppBounceBuilder(
       onTap: onTap,
       child: AnimatedContainer(
@@ -136,12 +140,12 @@ class _TypeButton extends StatelessWidget {
               width: context.scaled(26),
               height: context.scaled(26),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: palette.surfaceElevated,
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Icon(
                 icon,
-                color: selected ? color : const Color(0xFF4B5563),
+                color: selected ? color : palette.iconMuted,
                 size: context.scaled(16),
               ),
             ),
@@ -152,7 +156,7 @@ class _TypeButton extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: context.appText.captionStrong.copyWith(
-                  color: selected ? color : const Color(0xFF4B5563),
+                  color: selected ? color : palette.iconMuted,
                   fontSize: context.scaledFont(12, min: 12),
                   letterSpacing: -0.3,
                 ),
@@ -173,17 +177,19 @@ class _FormCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       width: double.infinity,
       padding: padding ??
           EdgeInsets.all(context.scaled(14)),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(14)),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: palette.border),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.025),
+            color: palette.shadow.withValues(alpha: context.isDarkMode ? 0.18 : 0.025),
             blurRadius: context.scaled(6),
             offset: Offset(0, context.scaled(2)),
           ),
@@ -213,7 +219,7 @@ class _RequiredLabel extends StatelessWidget {
         ],
       ),
       style: context.appText.fieldLabel.copyWith(
-        color: const Color(0xFF4B5563),
+        color: context.appPalette.iconMuted,
         fontWeight: FontWeight.w800,
       ),
     );
@@ -249,13 +255,12 @@ class _AmountCard extends StatelessWidget {
                   keyboardType: TextInputType.number,
                   inputFormatters: const [_AmountInputFormatter()],
                   style: context.appText.amountXL.copyWith(
-                    color: AppColors.textPrimary,
                     fontSize: context.scaledFont(28, min: 24),
                   ),
                   decoration: InputDecoration(
                     hintText: '0',
                     hintStyle: context.appText.amountXL.copyWith(
-                      color: AppColors.textPrimary,
+                      color: context.appPalette.textSecondary.withValues(alpha: 0.55),
                       fontSize: context.scaledFont(28, min: 24),
                     ),
                     filled: false,
@@ -274,7 +279,6 @@ class _AmountCard extends StatelessWidget {
                 child: Text(
                   'đ',
                   style: context.appText.amountXL.copyWith(
-                    color: AppColors.textPrimary,
                     fontSize: context.scaledFont(28, min: 24),
                   ),
                 ),
@@ -340,20 +344,18 @@ class _NoteCard extends StatelessWidget {
                 Text(
                   'Ghi chú',
                   style: context.appText.fieldLabel.copyWith(
-                    color: const Color(0xFF4B5563),
+                    color: context.appPalette.iconMuted,
                   ),
                 ),
                 SizedBox(height: context.scaled(4)),
                 TextField(
                   controller: controller,
                   textCapitalization: TextCapitalization.sentences,
-                  style: context.appText.fieldValue.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+                  style: context.appText.fieldValue,
                   decoration: InputDecoration(
                     hintText: 'Nhập mô tả giao dịch',
                     hintStyle: context.appText.fieldValue.copyWith(
-                      color: const Color(0xFFB3BAC8),
+                      color: context.appPalette.textSecondary.withValues(alpha: 0.65),
                     ),
                     filled: false,
                     fillColor: Colors.transparent,
@@ -412,7 +414,7 @@ class _MoneySourcePicker extends StatelessWidget {
             Text(
               'Chưa có nguồn tiền',
               style: context.appText.bodyStrong.copyWith(
-                color: AppColors.textSecondary,
+                color: context.appPalette.textSecondary,
               ),
             )
           else
@@ -497,10 +499,10 @@ class _MoneySourceTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: selected
                 ? actionColor.withValues(alpha: 0.045)
-                : Colors.white,
+                : context.appPalette.surface,
             borderRadius: BorderRadius.circular(context.scaled(14)),
             border: Border.all(
-              color: selected ? actionColor : AppColors.border,
+              color: selected ? actionColor : context.appPalette.border,
               width: selected ? 1.2 : 1,
             ),
           ),
@@ -529,7 +531,7 @@ class _MoneySourceTile extends StatelessWidget {
                     maxLines: 2,
                     textAlign: TextAlign.center,
                     style: context.appText.captionStrong.copyWith(
-                      color: selected ? actionColor : AppColors.textPrimary,
+                      color: selected ? actionColor : context.appPalette.textPrimary,
                       fontSize: context.scaledFont(11.5, min: 11),
                       height: 1.15,
                     ),
@@ -562,9 +564,9 @@ class _MoreMoneySourcesTile extends StatelessWidget {
           context.scaled(8),
         ),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: context.appPalette.surfaceMuted,
           borderRadius: BorderRadius.circular(context.scaled(14)),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.appPalette.border),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -577,7 +579,7 @@ class _MoreMoneySourcesTile extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: context.appText.captionStrong.copyWith(
-                color: AppColors.textPrimary,
+                color: context.appPalette.textPrimary,
                 fontSize: context.scaledFont(12, min: 12),
               ),
             ),
@@ -619,16 +621,14 @@ class _DateTrigger extends StatelessWidget {
                   SizedBox(height: context.scaled(6)),
                   Text(
                     _dateLabel(date),
-                    style: context.appText.fieldValue.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
+                    style: context.appText.fieldValue,
                   ),
                 ],
               ),
             ),
             Icon(
               Icons.chevron_right_rounded,
-              color: Color(0xFF4B5563),
+              color: context.appPalette.iconMuted,
               size: context.scaled(18),
             ),
           ],
@@ -666,7 +666,7 @@ class _RequiredStaticLabel extends StatelessWidget {
         ],
       ),
       style: context.appText.fieldLabel.copyWith(
-        color: const Color(0xFF4B5563),
+        color: context.appPalette.iconMuted,
       ),
     );
   }

@@ -7,6 +7,8 @@ class _SheetHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return Container(
       padding: EdgeInsets.fromLTRB(
         context.scaled(16),
@@ -15,7 +17,7 @@ class _SheetHeader extends StatelessWidget {
         context.scaled(10),
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(context.scaled(28)),
         ),
@@ -30,9 +32,7 @@ class _SheetHeader extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: context.appText.sheetTitle.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+                  style: context.appText.sheetTitle,
                 ),
               ),
               AppBounceBuilder(
@@ -41,12 +41,14 @@ class _SheetHeader extends StatelessWidget {
                   width: context.scaled(38),
                   height: context.scaled(38),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: palette.surfaceElevated,
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: palette.border),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.shadow.withValues(alpha: 0.08),
+                        color: palette.shadow.withValues(
+                          alpha: context.isDarkMode ? 0.22 : 0.08,
+                        ),
                         blurRadius: context.scaled(7),
                         offset: Offset(0, context.scaled(3)),
                       ),
@@ -54,7 +56,7 @@ class _SheetHeader extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.close_rounded,
-                    color: Color(0xFF374151),
+                    color: palette.iconStrong,
                     size: context.scaled(17),
                   ),
                 ),
