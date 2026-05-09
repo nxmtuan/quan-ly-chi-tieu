@@ -8,8 +8,8 @@ import '../../core/utils/date_range.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/widgets/app_page_header.dart';
 import '../../core/utils/formatters.dart';
-import '../../core/widgets/app_table_calendar.dart';
 import '../../core/widgets/flat_card.dart';
+import '../../core/widgets/transaction_marker_calendar.dart';
 import '../../models/transaction.dart';
 import '../../providers/transaction_provider.dart';
 import '../home/widgets/recent_transactions.dart';
@@ -23,25 +23,16 @@ class CalendarScreen extends ConsumerStatefulWidget {
 
 class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   late DateTime _selectedDay;
-  late DateTime _focusedDay;
 
   @override
   void initState() {
     super.initState();
-    _selectedDay = normalizeCalendarDay(DateTime.now());
-    _focusedDay = _selectedDay;
+    _selectedDay = _normalizeCalendarDay(DateTime.now());
   }
 
   @override
   Widget build(BuildContext context) {
-    final focusedMonthRange = monthDateRange(_focusedDay);
     final selectedDayRange = dayDateRange(_selectedDay);
-    final eventsByDay = ref.watch(
-      transactionEventsByDayProvider((
-        fromDate: focusedMonthRange.start,
-        toDate: focusedMonthRange.end,
-      )),
-    );
     final dailyTransactions = ref.watch(
       transactionsQueryProvider((
         categoryId: null,
@@ -71,18 +62,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               title: 'Thống kê giao dịch',
             ),
             SizedBox(height: context.scaled(22)),
-            AppTableCalendar(
-              focusedDay: _focusedDay,
+            TransactionMarkerCalendar(
               selectedDay: _selectedDay,
-              eventLoader: (day) =>
-                  eventsByDay[normalizeCalendarDay(day)] ?? const [],
               onDaySelected: (selectedDay) {
                 setState(
-                  () => _selectedDay = normalizeCalendarDay(selectedDay),
+                  () => _selectedDay = _normalizeCalendarDay(selectedDay),
                 );
-              },
-              onPageChanged: (focusedDay) {
-                setState(() => _focusedDay = normalizeCalendarDay(focusedDay));
               },
             ),
             SizedBox(height: context.scaled(18)),
@@ -181,6 +166,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     }
 
     return 'Ngày đã chọn';
+  }
+
+  DateTime _normalizeCalendarDay(DateTime day) {
+    return DateTime(day.year, day.month, day.day);
   }
 }
 

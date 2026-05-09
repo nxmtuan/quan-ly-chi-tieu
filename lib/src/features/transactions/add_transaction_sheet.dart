@@ -11,8 +11,8 @@ import '../../core/utils/local_id.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_bounce_builder.dart';
-import '../../core/widgets/app_table_calendar.dart';
 import '../../core/widgets/app_toast.dart';
+import '../../core/widgets/transaction_marker_calendar.dart';
 import '../../models/category.dart';
 import '../../models/transaction.dart';
 import '../../providers/category_provider.dart';
@@ -172,17 +172,10 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   }
 
   Future<void> _pickDate() async {
-    final transactionDates = ref.read(allTransactionDatesProvider);
-    final eventsByDay = buildCalendarEventIndex(
-      transactionDates,
-      (date) => date,
-    );
-
-    final selectedDate = await showAppCalendarSheet(
+    final selectedDate = await showTransactionCalendarSheet(
       context,
       initialDate: _date,
       title: 'Chọn ngày giao dịch',
-      eventLoader: (day) => eventsByDay[normalizeCalendarDay(day)] ?? const [],
     );
 
     if (selectedDate != null) {
