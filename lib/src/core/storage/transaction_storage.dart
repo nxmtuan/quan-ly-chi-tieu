@@ -155,11 +155,8 @@ class TransactionStorage {
 
     final query = _box.query(condition).build();
     try {
-      final timestamps = query.property(Transaction_.date).find();
-      return [
-        for (final timestamp in timestamps)
-          DateTime.fromMillisecondsSinceEpoch(timestamp),
-      ];
+      final transactions = query.find();
+      return [for (final transaction in transactions) transaction.date];
     } finally {
       query.close();
     }
