@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router/app_router.dart';
+import 'core/theme/app_scroll_behavior.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/settings_provider.dart';
@@ -21,6 +22,7 @@ class ExpenseManagerApp extends ConsumerWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
+      scrollBehavior: const AppScrollBehavior(),
       locale: const Locale('vi', 'VN'),
       supportedLocales: const [Locale('vi', 'VN'), Locale('en', 'US')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
