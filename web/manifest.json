@@ -1,11 +1,11 @@
 {
-    "name": "quan_ly_chi_tieu",
-    "short_name": "quan_ly_chi_tieu",
+    "name": "Quản lý tài chính",
+    "short_name": "Quản lý tài chính",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Ứng dụng quản lý tài chính cá nhân.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

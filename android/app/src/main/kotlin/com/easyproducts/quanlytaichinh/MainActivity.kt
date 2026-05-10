@@ -1,4 +1,4 @@
-package com.easypay.quan_ly_chi_tieu
+package com.easyproducts.quanlytaichinh
 
 import io.flutter.embedding.android.FlutterActivity
 
