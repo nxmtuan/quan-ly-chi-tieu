@@ -31,6 +31,7 @@ Future<T?> showAppBottomSheet<T>({
     useRootNavigator: useRootNavigator,
     isScrollControlled: true,
     useSafeArea: true,
+    requestFocus: false,
     backgroundColor: Colors.transparent,
     builder: (context) {
       return Padding(
