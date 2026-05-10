@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
@@ -24,6 +25,7 @@ class AuthNotifier extends Notifier<AuthUser?> {
     clientId: kIsWeb ? googleWebOAuthClientId : null,
   );
   StreamSubscription<GoogleSignInAccount?>? _accountSubscription;
+  Completer<drive.DriveApi?>? _driveApiCompleter;
 
   @override
   AuthUser? build() {
@@ -98,20 +100,85 @@ class AuthNotifier extends Notifier<AuthUser?> {
   }
 
   Future<drive.DriveApi?> getDriveApi() async {
+    final pendingRequest = _driveApiCompleter;
+    if (pendingRequest != null) {
+      return pendingRequest.future;
+    }
+
+    final completer = Completer<drive.DriveApi?>();
+    _driveApiCompleter = completer;
+    try {
+      final driveApi = await _resolveDriveApi();
+      completer.complete(driveApi);
+      return driveApi;
+    } catch (error, stackTrace) {
+      completer.completeError(error, stackTrace);
+      rethrow;
+    } finally {
+      _driveApiCompleter = null;
+    }
+  }
+
+  Future<drive.DriveApi?> _resolveDriveApi() async {
     if (state == null) {
       return null;
     }
 
-    if (_googleSignIn.currentUser == null) {
-      await _googleSignIn.signInSilently();
+    Object? lastError;
+
+    for (var attempt = 0; attempt < 3; attempt++) {
+      try {
+        GoogleSignInAccount? account = _googleSignIn.currentUser;
+        account ??= await _googleSignIn.signInSilently(
+          suppressErrors: attempt < 2,
+          reAuthenticate: attempt == 2,
+        );
+
+        if (account == null) {
+          await _delayBeforeRetry(attempt);
+          continue;
+        }
+
+        if (state?.id != account.id || state?.email != account.email) {
+          await _saveGoogleAccount(account);
+        }
+
+        final httpClient = await _googleSignIn.authenticatedClient();
+        if (httpClient != null) {
+          return drive.DriveApi(httpClient);
+        }
+      } on PlatformException catch (error) {
+        lastError = error;
+
+        if (error.code == GoogleSignIn.kSignInRequiredError) {
+          await ref.read(authStorageProvider).clearUser();
+          state = null;
+          return null;
+        }
+
+        if (error.code != GoogleSignIn.kNetworkError || attempt == 2) {
+          break;
+        }
+      } catch (error) {
+        lastError = error;
+      }
+
+      await _delayBeforeRetry(attempt);
     }
 
-    final httpClient = await _googleSignIn.authenticatedClient();
-    if (httpClient == null) {
-      return null;
+    if (lastError != null) {
+      debugPrint('getDriveApi failed: $lastError');
     }
+    return null;
+  }
 
-    return drive.DriveApi(httpClient);
+  Future<void> _delayBeforeRetry(int attempt) async {
+    if (attempt >= 2) {
+      return;
+    }
+    await Future<void>.delayed(
+      Duration(milliseconds: 250 * (attempt + 1)),
+    );
   }
 }
 

@@ -405,7 +405,14 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
     try {
       final driveApi = await ref.read(authProvider.notifier).getDriveApi();
       if (driveApi == null) {
-        throw Exception('Không thể kết nối với Google Drive');
+        if (mounted) {
+          AppToast.show(
+            context,
+            message: _driveConnectionErrorMessage(),
+            type: AppToastType.error,
+          );
+        }
+        return;
       }
 
       final syncService = ref.read(syncServiceProvider(driveApi));
@@ -424,7 +431,7 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
       if (mounted) {
         AppToast.show(
           context,
-          message: 'Lỗi đồng bộ: $e',
+          message: 'Đồng bộ thất bại. Vui lòng thử lại.',
           type: AppToastType.error,
         );
       }
@@ -454,7 +461,14 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
     try {
       final driveApi = await ref.read(authProvider.notifier).getDriveApi();
       if (driveApi == null) {
-        throw Exception('Không thể kết nối với Google Drive');
+        if (mounted) {
+          AppToast.show(
+            context,
+            message: _driveConnectionErrorMessage(),
+            type: AppToastType.error,
+          );
+        }
+        return;
       }
 
       final syncService = ref.read(syncServiceProvider(driveApi));
@@ -482,6 +496,15 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
         setState(() => _isDeletingRemote = false);
       }
     }
+  }
+
+  String _driveConnectionErrorMessage() {
+    final authUser = ref.read(authProvider);
+    if (authUser == null) {
+      return 'Phiên Google đã hết hạn. Vui lòng đăng nhập lại để tiếp tục đồng bộ.';
+    }
+
+    return 'Kết nối Google Drive đang tạm thời không ổn định. Vui lòng thử lại.';
   }
 }
 
