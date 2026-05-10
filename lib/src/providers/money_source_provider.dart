@@ -8,6 +8,10 @@ import 'storage_provider.dart';
 class MoneySourcesNotifier extends Notifier<List<MoneySource>> {
   @override
   List<MoneySource> build() {
+    return _loadVisibleMoneySources();
+  }
+
+  List<MoneySource> _loadVisibleMoneySources() {
     final storedSources = ref
         .read(moneySourceStorageProvider)
         .readMoneySources(includeDeleted: true);
@@ -27,6 +31,10 @@ class MoneySourcesNotifier extends Notifier<List<MoneySource>> {
     }
 
     return _visibleMoneySources(needsRewrite ? compactedSources : mergedSources);
+  }
+
+  void reload() {
+    state = _loadVisibleMoneySources();
   }
 
   Future<void> addMoneySource(MoneySource source) async {

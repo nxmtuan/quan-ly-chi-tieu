@@ -16,6 +16,7 @@ import '../../core/widgets/app_bounce_builder.dart';
 import '../../models/auth_user.dart';
 import '../../models/auto_sync_settings.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/money_source_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/storage_provider.dart';
 import '../../providers/transaction_provider.dart';

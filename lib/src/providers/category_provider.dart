@@ -10,6 +10,10 @@ import 'storage_provider.dart';
 class CategoriesNotifier extends Notifier<List<Category>> {
   @override
   List<Category> build() {
+    return _loadVisibleCategories();
+  }
+
+  List<Category> _loadVisibleCategories() {
     final storedCategories = ref
         .read(categoryStorageProvider)
         .readCategories(includeDeleted: true);
@@ -33,6 +37,10 @@ class CategoriesNotifier extends Notifier<List<Category>> {
     return _visibleCategories(
       needsRewrite ? compactedCategories : mergedCategories,
     );
+  }
+
+  void reload() {
+    state = _loadVisibleCategories();
   }
 
   Future<void> addCategory(Category category) async {

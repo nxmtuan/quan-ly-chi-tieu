@@ -417,8 +417,9 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
 
       final syncService = ref.read(syncServiceProvider(driveApi));
       await syncService.syncData();
-      ref.invalidate(transactionsProvider);
-      ref.invalidate(categoriesProvider);
+      ref.read(transactionsProvider.notifier).reload();
+      ref.read(categoriesProvider.notifier).reload();
+      ref.read(moneySourcesProvider.notifier).reload();
 
       if (mounted) {
         AppToast.show(

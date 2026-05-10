@@ -51,6 +51,10 @@ class TransactionsNotifier extends Notifier<int> {
     state++;
   }
 
+  void reload() {
+    state++;
+  }
+
   Future<void> _purgeLegacySeedTransactions() async {
     final removedCount = await ref
         .read(transactionStorageProvider)
