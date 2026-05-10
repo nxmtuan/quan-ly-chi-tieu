@@ -102,6 +102,10 @@ class AuthNotifier extends Notifier<AuthUser?> {
       return null;
     }
 
+    if (_googleSignIn.currentUser == null) {
+      await _googleSignIn.signInSilently();
+    }
+
     final httpClient = await _googleSignIn.authenticatedClient();
     if (httpClient == null) {
       return null;
