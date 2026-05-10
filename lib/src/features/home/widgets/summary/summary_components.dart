@@ -129,18 +129,14 @@ class _SummaryMetricCard extends StatelessWidget {
     final palette = context.appPalette;
     final isDark = context.isDarkMode;
     final colors = Theme.of(context).colorScheme;
-    final gradientStart = isDark
+    final backgroundFill = isDark
         ? Color.alphaBlend(
-            backgroundColor.withValues(alpha: 0.18),
+            backgroundColor.withValues(alpha: isSelected ? 0.1 : 0.06),
             palette.surface,
           )
-        : backgroundColor;
-    final gradientEnd = isDark
-        ? Color.alphaBlend(
-            color.withValues(alpha: 0.05),
-            palette.surfaceMuted,
-          )
-        : colors.surface;
+        : (isSelected
+              ? backgroundColor
+              : colors.surface);
 
     return AppBounceBuilder(
       onTap: onTap,
@@ -154,11 +150,7 @@ class _SummaryMetricCard extends StatelessWidget {
           context.scaled(14),
         ),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [gradientStart, gradientEnd],
-          ),
+          color: backgroundFill,
           borderRadius: BorderRadius.circular(context.scaled(21)),
           border: Border.all(
             color: isSelected
