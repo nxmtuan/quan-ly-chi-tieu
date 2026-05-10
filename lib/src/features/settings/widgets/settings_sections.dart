@@ -304,9 +304,10 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
                     icon: Icons.sync_rounded,
                     iconColor: AppColors.primary,
                     title: 'Tự động đồng bộ',
-                    subtitle: settings.enabled
-                        ? _autoSyncSwitchSubtitle(syncStatus)
-                        : 'Mặc định đang tắt',
+                    subtitle: _autoSyncSwitchSubtitle(
+                      syncStatus,
+                      enabled: settings.enabled,
+                    ),
                     value: settings.enabled,
                     onChanged: (value) async {
                       await ref
@@ -982,13 +983,17 @@ String _themeLabel(ThemeMode themeMode) {
 }
 
 String _syncSummary(AutoSyncSettings settings, AutoSyncStatus status) {
-  if (!settings.enabled) {
-    return 'Tự động đồng bộ đang tắt';
+  final syncSubtitle = _autoSyncSwitchSubtitle(
+    status,
+    enabled: settings.enabled,
+  );
+  if (syncSubtitle !=
+      (settings.enabled ? 'Đang bật đồng bộ theo lịch' : 'Tự động đồng bộ đang tắt')) {
+    return syncSubtitle;
   }
 
-  final syncSubtitle = _autoSyncSwitchSubtitle(status);
-  if (syncSubtitle != 'Đang bật đồng bộ theo lịch') {
-    return syncSubtitle;
+  if (!settings.enabled) {
+    return 'Tự động đồng bộ đang tắt';
   }
 
   return _syncScheduleLabel(settings);
@@ -1005,7 +1010,7 @@ String _syncScheduleLabel(AutoSyncSettings settings) {
   };
 }
 
-String _autoSyncSwitchSubtitle(AutoSyncStatus status) {
+String _autoSyncSwitchSubtitle(AutoSyncStatus status, {required bool enabled}) {
   if (status.type == AutoSyncStatusType.success && status.lastSuccessAt != null) {
     final formatted = DateFormat(
       'HH:mm dd/MM/yyyy',
@@ -1020,7 +1025,7 @@ String _autoSyncSwitchSubtitle(AutoSyncStatus status) {
     }
   }
 
-  return 'Đang bật đồng bộ theo lịch';
+  return enabled ? 'Đang bật đồng bộ theo lịch' : 'Tự động đồng bộ đang tắt';
 }
 
 int? _remainingRetryMinutes(DateTime retryAt) {
