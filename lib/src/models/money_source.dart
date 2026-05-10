@@ -14,6 +14,22 @@ const moneySourceIconOptions = [
   Icons.sell_rounded,
   Icons.phone_android_rounded,
   Icons.shopping_bag_rounded,
+  Icons.wallet_rounded,
+  Icons.currency_bitcoin_rounded,
+  Icons.request_quote_rounded,
+  Icons.receipt_long_rounded,
+  Icons.point_of_sale_rounded,
+  Icons.price_check_rounded,
+  Icons.storefront_rounded,
+  Icons.paid_rounded,
+  Icons.shopping_cart_checkout_rounded,
+  Icons.qr_code_scanner_rounded,
+  Icons.qr_code_rounded,
+  Icons.compare_arrows_rounded,
+  Icons.swap_horiz_rounded,
+  Icons.sync_alt_rounded,
+  Icons.send_rounded,
+  Icons.account_balance_wallet_outlined,
 ];
 
 const defaultMoneySourceId = 'cash';
