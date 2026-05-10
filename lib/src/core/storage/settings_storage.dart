@@ -18,6 +18,7 @@ class SettingsStorage {
   static const _autoSyncStatusKey = 'autoSyncStatus';
   static const _autoSyncLastSuccessAtKey = 'autoSyncLastSuccessAt';
   static const _autoSyncRetryAtKey = 'autoSyncRetryAt';
+  static const _autoSyncNextRunAtKey = 'autoSyncNextRunAt';
   static const _lastSoftDeletePurgeAtKey = 'lastSoftDeletePurgeAt';
 
   final SharedPreferences _prefs;
@@ -48,9 +49,7 @@ class SettingsStorage {
     await _prefs.setBool(_autoSyncEnabledKey, settings.enabled);
     await _prefs.setString(
       _autoSyncTypeKey,
-      settings.scheduleType == AutoSyncScheduleType.weekly
-          ? 'weekly'
-          : 'daily',
+      settings.scheduleType == AutoSyncScheduleType.weekly ? 'weekly' : 'daily',
     );
     await _prefs.setInt(_autoSyncHourKey, settings.hour);
     await _prefs.setInt(_autoSyncMinuteKey, settings.minute);
@@ -103,6 +102,24 @@ class SettingsStorage {
     } else {
       await _prefs.remove(_autoSyncRetryAtKey);
     }
+  }
+
+  DateTime? readAutoSyncNextRunAt() {
+    final rawValue = _prefs.getString(_autoSyncNextRunAtKey);
+    if (rawValue == null) {
+      return null;
+    }
+
+    return DateTime.tryParse(rawValue);
+  }
+
+  Future<void> saveAutoSyncNextRunAt(DateTime? value) async {
+    if (value == null) {
+      await _prefs.remove(_autoSyncNextRunAtKey);
+      return;
+    }
+
+    await _prefs.setString(_autoSyncNextRunAtKey, value.toIso8601String());
   }
 
   DateTime? readLastSoftDeletePurgeAt() {

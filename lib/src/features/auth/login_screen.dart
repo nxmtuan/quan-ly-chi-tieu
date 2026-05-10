@@ -111,29 +111,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       await ref.read(authProvider.notifier).signInWithGoogle();
       if (mounted && ref.read(authProvider) != null) {
-        var synced = false;
+        AppToast.show(
+          context,
+          message: 'Đăng nhập thành công',
+          type: AppToastType.success,
+        );
+
         try {
-          synced = await ref.read(authProvider.notifier).syncAfterSignIn();
+          final synced = await ref.read(authProvider.notifier).syncAfterSignIn();
           if (synced) {
             ref.read(transactionsProvider.notifier).reload();
             ref.read(categoriesProvider.notifier).reload();
             ref.read(moneySourcesProvider.notifier).reload();
+
+            if (!mounted) {
+              return;
+            }
+
+            AppToast.show(
+              context,
+              message: 'Đồng bộ dữ liệu thành công',
+              type: AppToastType.success,
+            );
           }
         } catch (_) {
-          synced = false;
         }
-
-        if (!mounted) {
-          return;
-        }
-
-        AppToast.show(
-          context,
-          message: synced
-              ? 'Đăng nhập và đồng bộ dữ liệu thành công'
-              : 'Đăng nhập thành công',
-          type: AppToastType.success,
-        );
       }
     } catch (_) {
       if (mounted) {
