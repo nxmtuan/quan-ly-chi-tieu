@@ -24,6 +24,20 @@ Future<void> showCategoryManagementSheet(
   );
 }
 
+Future<Category?> showCategoryEditorSheet(
+  BuildContext context, {
+  required TransactionType initialType,
+  Category? category,
+}) {
+  return showAppBottomSheet<Category>(
+    context: context,
+    builder: (_) => _CategoryEditorSheet(
+      initialType: initialType,
+      category: category,
+    ),
+  );
+}
+
 class _CategoryManagementSheet extends ConsumerStatefulWidget {
   const _CategoryManagementSheet();
 
@@ -86,12 +100,10 @@ class _CategoryManagementSheetState
   }
 
   Future<void> _openEditor({Category? category}) async {
-    await showAppBottomSheet<void>(
-      context: context,
-      builder: (_) => _CategoryEditorSheet(
-        initialType: category?.type ?? _selectedType,
-        category: category,
-      ),
+    await showCategoryEditorSheet(
+      context,
+      initialType: category?.type ?? _selectedType,
+      category: category,
     );
   }
 
@@ -458,7 +470,7 @@ class _CategoryEditorSheetState extends ConsumerState<_CategoryEditorSheet> {
       return;
     }
 
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(category);
     AppToast.show(
       context,
       message: _isEditing ? 'Đã cập nhật danh mục' : 'Đã tạo danh mục',

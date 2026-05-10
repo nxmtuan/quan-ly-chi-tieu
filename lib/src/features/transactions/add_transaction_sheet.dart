@@ -13,6 +13,8 @@ import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_toast.dart';
 import '../../core/widgets/transaction_marker_calendar.dart';
+import '../categories/category_management_sheet.dart';
+import '../settings/money_source_management_sheet.dart';
 import '../../models/category.dart';
 import '../../models/money_source.dart';
 import '../../models/transaction.dart';
@@ -53,6 +55,8 @@ class AddTransactionSheet extends ConsumerStatefulWidget {
 class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
+  late final FocusNode _amountFocusNode;
+  late final FocusNode _noteFocusNode;
   TransactionType _type = TransactionType.expense;
   DateTime _date = DateTime.now();
   String? _sourceId;
@@ -63,6 +67,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   @override
   void initState() {
     super.initState();
+    _amountFocusNode = FocusNode()..addListener(_handleFocusChanged);
+    _noteFocusNode = FocusNode()..addListener(_handleFocusChanged);
 
     final transaction = widget.transaction;
     if (transaction != null) {
@@ -79,7 +85,19 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   void dispose() {
     _amountController.dispose();
     _noteController.dispose();
+    _amountFocusNode
+      ..removeListener(_handleFocusChanged)
+      ..dispose();
+    _noteFocusNode
+      ..removeListener(_handleFocusChanged)
+      ..dispose();
     super.dispose();
+  }
+
+  void _handleFocusChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -129,6 +147,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                               _AmountCard(
                                 controller: _amountController,
                                 actionColor: actionColor,
+                                focusNode: _amountFocusNode,
+                                isFocused: _amountFocusNode.hasFocus,
                               ),
                               const SizedBox(height: 10),
                               _CategoryPicker(
@@ -155,7 +175,11 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                                 promotedSourceId: _promotedSourceId,
                               ),
                               const SizedBox(height: 10),
-                              _NoteCard(controller: _noteController),
+                              _NoteCard(
+                                controller: _noteController,
+                                focusNode: _noteFocusNode,
+                                isFocused: _noteFocusNode.hasFocus,
+                              ),
                             ],
                           ),
                         ),
@@ -202,6 +226,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       context,
       categories: categories,
       initialSelectedCategoryId: _categoryId,
+      transactionType: _type,
       actionColor: _type == TransactionType.expense
           ? const Color(0xFFFF1493)
           : AppColors.success,

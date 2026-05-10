@@ -23,6 +23,16 @@ Future<void> showMoneySourceManagementSheet(
   );
 }
 
+Future<MoneySource?> showMoneySourceEditorSheet(
+  BuildContext context, {
+  MoneySource? source,
+}) {
+  return showAppBottomSheet<MoneySource>(
+    context: context,
+    builder: (_) => _MoneySourceEditorSheet(source: source),
+  );
+}
+
 class _MoneySourceManagementSheet extends ConsumerWidget {
   const _MoneySourceManagementSheet();
 
@@ -70,10 +80,7 @@ class _MoneySourceManagementSheet extends ConsumerWidget {
     BuildContext context, {
     MoneySource? source,
   }) async {
-    await showAppBottomSheet<void>(
-      context: context,
-      builder: (_) => _MoneySourceEditorSheet(source: source),
-    );
+    await showMoneySourceEditorSheet(context, source: source);
   }
 
   Future<void> _deleteSource(
@@ -342,7 +349,7 @@ class _MoneySourceEditorSheetState
       return;
     }
 
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(source);
     AppToast.show(
       context,
       message: _isEditing ? 'Đã cập nhật nguồn tiền' : 'Đã tạo nguồn tiền',

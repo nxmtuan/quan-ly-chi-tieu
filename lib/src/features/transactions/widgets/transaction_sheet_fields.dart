@@ -170,10 +170,17 @@ class _TypeButton extends StatelessWidget {
 }
 
 class _FormCard extends StatelessWidget {
-  const _FormCard({required this.child, this.padding});
+  const _FormCard({
+    required this.child,
+    this.padding,
+    this.borderColor,
+    this.borderWidth,
+  });
 
   final Widget child;
   final EdgeInsetsGeometry? padding;
+  final Color? borderColor;
+  final double? borderWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +193,10 @@ class _FormCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(14)),
-        border: Border.all(color: palette.border),
+        border: Border.all(
+          color: borderColor ?? palette.border,
+          width: borderWidth ?? 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: palette.shadow.withValues(alpha: context.isDarkMode ? 0.18 : 0.025),
@@ -227,14 +237,23 @@ class _RequiredLabel extends StatelessWidget {
 }
 
 class _AmountCard extends StatelessWidget {
-  const _AmountCard({required this.controller, required this.actionColor});
+  const _AmountCard({
+    required this.controller,
+    required this.actionColor,
+    required this.focusNode,
+    required this.isFocused,
+  });
 
   final TextEditingController controller;
   final Color actionColor;
+  final FocusNode focusNode;
+  final bool isFocused;
 
   @override
   Widget build(BuildContext context) {
     return _FormCard(
+      borderColor: isFocused ? actionColor : null,
+      borderWidth: isFocused ? 1.4 : 1,
       padding: EdgeInsets.fromLTRB(
         context.scaled(14),
         context.scaled(12),
@@ -252,6 +271,7 @@ class _AmountCard extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: controller,
+                  focusNode: focusNode,
                   keyboardType: TextInputType.number,
                   inputFormatters: const [_AmountInputFormatter()],
                   style: context.appText.amountXL.copyWith(
@@ -317,13 +337,21 @@ class _LeadingIcon extends StatelessWidget {
 }
 
 class _NoteCard extends StatelessWidget {
-  const _NoteCard({required this.controller});
+  const _NoteCard({
+    required this.controller,
+    required this.focusNode,
+    required this.isFocused,
+  });
 
   final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool isFocused;
 
   @override
   Widget build(BuildContext context) {
     return _FormCard(
+      borderColor: isFocused ? AppColors.primary : null,
+      borderWidth: isFocused ? 1.4 : 1,
       padding: EdgeInsets.symmetric(
         horizontal: context.scaled(14),
         vertical: context.scaled(10),
@@ -350,6 +378,7 @@ class _NoteCard extends StatelessWidget {
                 SizedBox(height: context.scaled(4)),
                 TextField(
                   controller: controller,
+                  focusNode: focusNode,
                   textCapitalization: TextCapitalization.sentences,
                   style: context.appText.fieldValue,
                   decoration: InputDecoration(
@@ -396,7 +425,6 @@ class _MoneySourcePicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final orderedSources = _orderedSources();
     final visibleSources = orderedSources.take(2).toList();
-    final shouldShowMoreButton = orderedSources.length > 2;
 
     return _FormCard(
       padding: EdgeInsets.fromLTRB(
@@ -437,11 +465,10 @@ class _MoneySourcePicker extends StatelessWidget {
                           onTap: () => onSelected(source),
                         ),
                       ),
-                    if (shouldShowMoreButton)
-                      SizedBox(
-                        width: itemWidth,
-                        child: _MoreMoneySourcesTile(onTap: onShowAll),
-                      ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: _MoreMoneySourcesTile(onTap: onShowAll),
+                    ),
                   ],
                 );
               },

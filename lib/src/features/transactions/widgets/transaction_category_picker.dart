@@ -21,7 +21,6 @@ class _CategoryPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final orderedCategories = _orderedCategories();
     final visibleCategories = orderedCategories.take(3).toList();
-    final shouldShowMoreButton = orderedCategories.length > 3;
 
     return _FormCard(
       padding: EdgeInsets.fromLTRB(
@@ -62,11 +61,10 @@ class _CategoryPicker extends StatelessWidget {
                           onTap: () => onSelected(category),
                         ),
                       ),
-                    if (shouldShowMoreButton)
-                      SizedBox(
-                        width: itemWidth,
-                        child: _MoreCategoriesTile(onTap: onShowAll),
-                      ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: _MoreCategoriesTile(onTap: onShowAll),
+                    ),
                   ],
                 );
               },
