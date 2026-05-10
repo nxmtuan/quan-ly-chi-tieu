@@ -182,9 +182,27 @@ class _AuthSettingsRow extends ConsumerWidget {
     try {
       await ref.read(authProvider.notifier).signInWithGoogle();
       if (context.mounted && ref.read(authProvider) != null) {
+        var synced = false;
+        try {
+          synced = await ref.read(authProvider.notifier).syncAfterSignIn();
+          if (synced) {
+            ref.read(transactionsProvider.notifier).reload();
+            ref.read(categoriesProvider.notifier).reload();
+            ref.read(moneySourcesProvider.notifier).reload();
+          }
+        } catch (_) {
+          synced = false;
+        }
+
+        if (!context.mounted) {
+          return;
+        }
+
         AppToast.show(
           context,
-          message: 'Đăng nhập thành công',
+          message: synced
+              ? 'Đăng nhập và đồng bộ dữ liệu thành công'
+              : 'Đăng nhập thành công',
           type: AppToastType.success,
         );
       }

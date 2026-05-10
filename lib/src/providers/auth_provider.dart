@@ -99,6 +99,21 @@ class AuthNotifier extends Notifier<AuthUser?> {
     state = null;
   }
 
+  Future<bool> syncAfterSignIn() async {
+    if (state == null) {
+      return false;
+    }
+
+    final driveApi = await getDriveApi();
+    if (driveApi == null) {
+      return false;
+    }
+
+    final syncService = ref.read(syncServiceProvider(driveApi));
+    await syncService.syncData();
+    return true;
+  }
+
   Future<drive.DriveApi?> getDriveApi() async {
     final pendingRequest = _driveApiCompleter;
     if (pendingRequest != null) {

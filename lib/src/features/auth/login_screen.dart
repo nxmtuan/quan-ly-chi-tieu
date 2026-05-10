@@ -8,6 +8,9 @@ import '../../core/theme/app_typography.dart';
 import '../../core/widgets/app_toast.dart';
 import '../../core/widgets/gradient_button.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/category_provider.dart';
+import '../../providers/money_source_provider.dart';
+import '../../providers/transaction_provider.dart';
 import 'google_web_sign_in_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -108,9 +111,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       await ref.read(authProvider.notifier).signInWithGoogle();
       if (mounted && ref.read(authProvider) != null) {
+        var synced = false;
+        try {
+          synced = await ref.read(authProvider.notifier).syncAfterSignIn();
+          if (synced) {
+            ref.read(transactionsProvider.notifier).reload();
+            ref.read(categoriesProvider.notifier).reload();
+            ref.read(moneySourcesProvider.notifier).reload();
+          }
+        } catch (_) {
+          synced = false;
+        }
+
+        if (!mounted) {
+          return;
+        }
+
         AppToast.show(
           context,
-          message: 'Đăng nhập thành công',
+          message: synced
+              ? 'Đăng nhập và đồng bộ dữ liệu thành công'
+              : 'Đăng nhập thành công',
           type: AppToastType.success,
         );
       }
