@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../../models/auto_sync_settings.dart';
+import '../../models/auto_sync_status.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/storage_provider.dart';
 import '../services/sync_notification_service.dart';
@@ -59,13 +60,31 @@ void callbackDispatcher() {
       final syncService = container.read(syncServiceProvider(driveApi));
       await syncService.syncData();
 
+      final settingsStorage = SettingsStorage(prefs);
+      await settingsStorage.saveAutoSyncStatus(
+        AutoSyncStatus(
+          type: AutoSyncStatusType.success,
+          lastSuccessAt: DateTime.now(),
+        ),
+      );
+
       await SyncNotificationService.showSuccess();
-      final settings = SettingsStorage(prefs).readAutoSyncSettings();
+      final settings = settingsStorage.readAutoSyncSettings();
       await _scheduleBackgroundSync(settings);
 
       return Future.value(true);
     } catch (e) {
       debugPrint('Background sync failed: $e');
+      final prefs = await SharedPreferences.getInstance();
+      final settingsStorage = SettingsStorage(prefs);
+      final currentStatus = settingsStorage.readAutoSyncStatus();
+      await settingsStorage.saveAutoSyncStatus(
+        AutoSyncStatus(
+          type: AutoSyncStatusType.failure,
+          lastSuccessAt: currentStatus.lastSuccessAt,
+          retryAt: DateTime.now().add(_autoSyncRetryDelay),
+        ),
+      );
       await SyncNotificationService.showFailure(
         'Đồng bộ thất bại. Sẽ thử lại sau.',
       );
@@ -81,6 +100,7 @@ void callbackDispatcher() {
 const _autoSyncTaskName = 'configured_auto_sync_task';
 const _autoSyncTaskId = 'sync_to_drive';
 const _autoSyncTaskTag = 'auto_sync_schedule';
+const _autoSyncRetryDelay = Duration(minutes: 15);
 
 Future<void> cancelBackgroundSync() async {
   await Workmanager().cancelByTag(_autoSyncTaskTag);

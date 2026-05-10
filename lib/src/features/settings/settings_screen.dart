@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
@@ -15,6 +16,7 @@ import '../../core/widgets/flat_card.dart';
 import '../../core/widgets/app_bounce_builder.dart';
 import '../../models/auth_user.dart';
 import '../../models/auto_sync_settings.dart';
+import '../../models/auto_sync_status.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/money_source_provider.dart';
 import '../../providers/settings_provider.dart';

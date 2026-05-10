@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/background/background_sync.dart';
 import '../models/auto_sync_settings.dart';
+import '../models/auto_sync_status.dart';
 import 'storage_provider.dart';
 
 class ThemeModeNotifier extends Notifier<ThemeMode> {
@@ -63,4 +64,45 @@ class AutoSyncSettingsNotifier extends Notifier<AutoSyncSettings> {
 final autoSyncSettingsProvider =
     NotifierProvider<AutoSyncSettingsNotifier, AutoSyncSettings>(
       AutoSyncSettingsNotifier.new,
+    );
+
+class AutoSyncStatusNotifier extends Notifier<AutoSyncStatus> {
+  @override
+  AutoSyncStatus build() {
+    return ref.read(settingsStorageProvider).readAutoSyncStatus();
+  }
+
+  void reload() {
+    state = ref.read(settingsStorageProvider).readAutoSyncStatus();
+  }
+
+  Future<void> markSuccess(DateTime at) async {
+    final nextState = AutoSyncStatus(
+      type: AutoSyncStatusType.success,
+      lastSuccessAt: at,
+    );
+    state = nextState;
+    await ref.read(settingsStorageProvider).saveAutoSyncStatus(nextState);
+  }
+
+  Future<void> markFailure({required DateTime retryAt}) async {
+    final nextState = AutoSyncStatus(
+      type: AutoSyncStatusType.failure,
+      lastSuccessAt: state.lastSuccessAt,
+      retryAt: retryAt,
+    );
+    state = nextState;
+    await ref.read(settingsStorageProvider).saveAutoSyncStatus(nextState);
+  }
+
+  Future<void> reset() async {
+    const nextState = AutoSyncStatus.idle();
+    state = nextState;
+    await ref.read(settingsStorageProvider).saveAutoSyncStatus(nextState);
+  }
+}
+
+final autoSyncStatusProvider =
+    NotifierProvider<AutoSyncStatusNotifier, AutoSyncStatus>(
+      AutoSyncStatusNotifier.new,
     );

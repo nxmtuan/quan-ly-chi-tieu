@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/auto_sync_settings.dart';
+import '../../models/auto_sync_status.dart';
 
 class SettingsStorage {
   const SettingsStorage(this._prefs);
@@ -14,6 +15,9 @@ class SettingsStorage {
   static const _autoSyncHourKey = 'autoSyncHour';
   static const _autoSyncMinuteKey = 'autoSyncMinute';
   static const _autoSyncWeekdayKey = 'autoSyncWeekday';
+  static const _autoSyncStatusKey = 'autoSyncStatus';
+  static const _autoSyncLastSuccessAtKey = 'autoSyncLastSuccessAt';
+  static const _autoSyncRetryAtKey = 'autoSyncRetryAt';
   static const _lastSoftDeletePurgeAtKey = 'lastSoftDeletePurgeAt';
 
   final SharedPreferences _prefs;
@@ -51,6 +55,54 @@ class SettingsStorage {
     await _prefs.setInt(_autoSyncHourKey, settings.hour);
     await _prefs.setInt(_autoSyncMinuteKey, settings.minute);
     await _prefs.setInt(_autoSyncWeekdayKey, settings.weekday);
+  }
+
+  AutoSyncStatus readAutoSyncStatus() {
+    final statusValue = _prefs.getString(_autoSyncStatusKey) ?? 'idle';
+    final lastSuccessAt = DateTime.tryParse(
+      _prefs.getString(_autoSyncLastSuccessAtKey) ?? '',
+    );
+    final retryAt = DateTime.tryParse(
+      _prefs.getString(_autoSyncRetryAtKey) ?? '',
+    );
+
+    return AutoSyncStatus(
+      type: switch (statusValue) {
+        'success' => AutoSyncStatusType.success,
+        'failure' => AutoSyncStatusType.failure,
+        _ => AutoSyncStatusType.idle,
+      },
+      lastSuccessAt: lastSuccessAt,
+      retryAt: retryAt,
+    );
+  }
+
+  Future<void> saveAutoSyncStatus(AutoSyncStatus status) async {
+    final statusValue = switch (status.type) {
+      AutoSyncStatusType.success => 'success',
+      AutoSyncStatusType.failure => 'failure',
+      AutoSyncStatusType.idle => 'idle',
+    };
+
+    await _prefs.setString(_autoSyncStatusKey, statusValue);
+
+    if (status.lastSuccessAt != null) {
+      await _prefs.setString(
+        _autoSyncLastSuccessAtKey,
+        status.lastSuccessAt!.toIso8601String(),
+      );
+    } else {
+      await _prefs.remove(_autoSyncLastSuccessAtKey);
+    }
+
+    if (status.retryAt != null) {
+      await _prefs.setString(
+        _autoSyncRetryAtKey,
+        status.retryAt!.toIso8601String(),
+      );
+    } else {
+      await _prefs.remove(_autoSyncRetryAtKey);
+    }
   }
 
   DateTime? readLastSoftDeletePurgeAt() {

@@ -232,6 +232,7 @@ class _SyncDataRow extends ConsumerStatefulWidget {
 
 class _SyncDataRowState extends ConsumerState<_SyncDataRow> {
   Future<void> _showSyncSheet() async {
+    ref.read(autoSyncStatusProvider.notifier).reload();
     await showAppBottomSheet<void>(
       context: context,
       builder: (context) => const _SyncSettingsSheet(),
@@ -241,12 +242,13 @@ class _SyncDataRowState extends ConsumerState<_SyncDataRow> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(autoSyncSettingsProvider);
+    final syncStatus = ref.watch(autoSyncStatusProvider);
 
     return _SettingsRow(
       icon: Icons.cloud_sync_rounded,
       iconColor: AppColors.primary,
       title: 'Đồng bộ dữ liệu',
-      subtitle: _syncSummary(settings),
+      subtitle: _syncSummary(settings, syncStatus),
       trailing: Icon(
         Icons.chevron_right_rounded,
         color: context.appPalette.textSecondary,
@@ -270,6 +272,7 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(autoSyncSettingsProvider);
+    final syncStatus = ref.watch(autoSyncStatusProvider);
 
     return AppSheetScaffold(
       title: 'Cài đặt đồng bộ',
@@ -284,7 +287,7 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
                     iconColor: AppColors.primary,
                     title: 'Tự động đồng bộ',
                     subtitle: settings.enabled
-                        ? 'Đang bật đồng bộ theo lịch'
+                        ? _autoSyncSwitchSubtitle(syncStatus)
                         : 'Mặc định đang tắt',
                     value: settings.enabled,
                     onChanged: (value) async {
@@ -417,6 +420,7 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
 
       final syncService = ref.read(syncServiceProvider(driveApi));
       await syncService.syncData();
+      await ref.read(autoSyncStatusProvider.notifier).markSuccess(DateTime.now());
       ref.read(transactionsProvider.notifier).reload();
       ref.read(categoriesProvider.notifier).reload();
       ref.read(moneySourcesProvider.notifier).reload();
@@ -959,9 +963,14 @@ String _themeLabel(ThemeMode themeMode) {
   };
 }
 
-String _syncSummary(AutoSyncSettings settings) {
+String _syncSummary(AutoSyncSettings settings, AutoSyncStatus status) {
   if (!settings.enabled) {
     return 'Tự động đồng bộ đang tắt';
+  }
+
+  final syncSubtitle = _autoSyncSwitchSubtitle(status);
+  if (syncSubtitle != 'Đang bật đồng bộ theo lịch') {
+    return syncSubtitle;
   }
 
   return _syncScheduleLabel(settings);
@@ -976,6 +985,33 @@ String _syncScheduleLabel(AutoSyncSettings settings) {
     AutoSyncScheduleType.weekly =>
       'Mỗi ${_weekdayLabel(settings.weekday).toLowerCase()} lúc $time',
   };
+}
+
+String _autoSyncSwitchSubtitle(AutoSyncStatus status) {
+  if (status.type == AutoSyncStatusType.success && status.lastSuccessAt != null) {
+    final formatted = DateFormat(
+      'HH:mm dd/MM/yyyy',
+    ).format(status.lastSuccessAt!.toLocal());
+    return 'Đã đồng bộ thành công lúc $formatted';
+  }
+
+  if (status.type == AutoSyncStatusType.failure && status.retryAt != null) {
+    final remainingMinutes = _remainingRetryMinutes(status.retryAt!);
+    if (remainingMinutes != null) {
+      return 'Đồng bộ thất bại, thử lại sau $remainingMinutes phút';
+    }
+  }
+
+  return 'Đang bật đồng bộ theo lịch';
+}
+
+int? _remainingRetryMinutes(DateTime retryAt) {
+  final difference = retryAt.difference(DateTime.now());
+  if (difference.isNegative || difference.inSeconds <= 0) {
+    return null;
+  }
+
+  return ((difference.inSeconds / 60).ceil()).clamp(1, 9999).toInt();
 }
 
 String _weekdayLabel(int weekday) {
