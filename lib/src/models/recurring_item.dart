@@ -167,6 +167,10 @@ DateTime normalizeRecurringDate(DateTime date) {
   return DateTime(date.year, date.month, date.day, date.hour, date.minute);
 }
 
+DateTime normalizeRecurringTransactionDate(DateTime date) {
+  return DateTime(date.year, date.month, date.day, 22);
+}
+
 String recurringOccurrenceKey(DateTime date) {
   final month = date.month.toString().padLeft(2, '0');
   final day = date.day.toString().padLeft(2, '0');

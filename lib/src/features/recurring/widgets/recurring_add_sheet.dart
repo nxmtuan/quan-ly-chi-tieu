@@ -268,7 +268,9 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
     }
 
     final existing = widget.item;
-    final normalizedStart = normalizeRecurringDate(_startDate);
+    final normalizedStart = widget.kind == RecurringItemKind.transaction
+        ? normalizeRecurringTransactionDate(_startDate)
+        : normalizeRecurringDate(_startDate);
     final nextRunAt =
         existing != null &&
             existing.frequency == _frequency &&
