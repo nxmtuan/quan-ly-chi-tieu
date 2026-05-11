@@ -18,6 +18,7 @@ class SettingsStorage {
   static const _autoSyncStatusKey = 'autoSyncStatus';
   static const _autoSyncLastSuccessAtKey = 'autoSyncLastSuccessAt';
   static const _autoSyncRetryAtKey = 'autoSyncRetryAt';
+  static const _autoSyncRetryAttemptKey = 'autoSyncRetryAttempt';
   static const _autoSyncNextRunAtKey = 'autoSyncNextRunAt';
   static const _lastSoftDeletePurgeAtKey = 'lastSoftDeletePurgeAt';
 
@@ -73,6 +74,7 @@ class SettingsStorage {
       },
       lastSuccessAt: lastSuccessAt,
       retryAt: retryAt,
+      retryAttempt: _prefs.getInt(_autoSyncRetryAttemptKey) ?? 0,
     );
   }
 
@@ -101,6 +103,12 @@ class SettingsStorage {
       );
     } else {
       await _prefs.remove(_autoSyncRetryAtKey);
+    }
+
+    if (status.retryAttempt > 0) {
+      await _prefs.setInt(_autoSyncRetryAttemptKey, status.retryAttempt);
+    } else {
+      await _prefs.remove(_autoSyncRetryAttemptKey);
     }
   }
 

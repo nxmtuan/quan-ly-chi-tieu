@@ -10,6 +10,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/storage_provider.dart';
 import '../storage/recurring_storage.dart';
 import '../services/sync_notification_service.dart';
+import '../storage/auth_storage.dart';
 import '../storage/objectbox_database.dart';
 import '../storage/settings_storage.dart';
 import '../storage/transaction_storage.dart';
@@ -19,6 +20,7 @@ const _autoSyncTaskName = 'configured_auto_sync_task';
 const _autoSyncTaskId = 'sync_to_drive';
 const _autoSyncTaskTag = 'auto_sync_schedule';
 const _autoSyncRetryDelay = Duration(minutes: 15);
+const _autoSyncMaxRetryAttempts = 3;
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
@@ -29,10 +31,10 @@ void callbackDispatcher() {
     try {
       WidgetsFlutterBinding.ensureInitialized();
 
-      objectBoxDb = await ObjectBoxDatabase.create();
       final prefs = await SharedPreferences.getInstance();
 
       if (task == recurringTaskName) {
+        objectBoxDb = await ObjectBoxDatabase.create();
         await processRecurringItems(
           recurringStorage: RecurringStorage(prefs),
           transactionStorage: TransactionStorage(
@@ -42,7 +44,29 @@ void callbackDispatcher() {
         return Future.value(true);
       }
 
-      await SyncNotificationService.showPreparing();
+      final settingsStorage = SettingsStorage(prefs);
+      final settings = settingsStorage.readAutoSyncSettings();
+      final authStorage = AuthStorage(prefs);
+      final storedUser = authStorage.readUser();
+      final now = DateTime.now();
+      if (storedUser == null) {
+        await _scheduleAutoSyncAfterSkippedAuth(
+          settings,
+          settingsStorage: settingsStorage,
+        );
+        return Future.value(true);
+      }
+
+      if (now.difference(storedUser.lastLoginAt) > authSessionDuration) {
+        await authStorage.clearUser();
+        await _scheduleAutoSyncAfterSkippedAuth(
+          settings,
+          settingsStorage: settingsStorage,
+        );
+        return Future.value(true);
+      }
+
+      objectBoxDb = await ObjectBoxDatabase.create();
 
       container = ProviderContainer(
         overrides: [
@@ -51,20 +75,6 @@ void callbackDispatcher() {
         ],
       );
 
-      final authUser = container.read(authProvider);
-      if (authUser == null) {
-        await SyncNotificationService.showInfo(
-          'Không thể đồng bộ: chưa đăng nhập Google.',
-        );
-        final settingsStorage = SettingsStorage(prefs);
-        final settings = settingsStorage.readAutoSyncSettings();
-        await _scheduleBackgroundSync(
-          settings,
-          settingsStorage: settingsStorage,
-        );
-        return Future.value(true);
-      }
-
       final driveApi = await container
           .read(authProvider.notifier)
           .getDriveApi();
@@ -72,21 +82,19 @@ void callbackDispatcher() {
         await SyncNotificationService.showInfo(
           'Không thể đồng bộ: phiên Google đã hết hạn. Mở ứng dụng để đăng nhập lại.',
         );
-        final settingsStorage = SettingsStorage(prefs);
-        final settings = settingsStorage.readAutoSyncSettings();
-        await _scheduleBackgroundSync(
+        await _scheduleAutoSyncAfterSkippedAuth(
           settings,
           settingsStorage: settingsStorage,
         );
         return Future.value(true);
       }
 
+      await SyncNotificationService.showPreparing();
       await SyncNotificationService.showSyncing();
 
       final syncService = container.read(syncServiceProvider(driveApi));
       await syncService.syncData();
 
-      final settingsStorage = SettingsStorage(prefs);
       await settingsStorage.saveAutoSyncStatus(
         AutoSyncStatus(
           type: AutoSyncStatusType.success,
@@ -95,34 +103,78 @@ void callbackDispatcher() {
       );
 
       await SyncNotificationService.showSuccess();
-      final settings = settingsStorage.readAutoSyncSettings();
-      await _scheduleBackgroundSync(settings, settingsStorage: settingsStorage);
+      final updatedSettings = settingsStorage.readAutoSyncSettings();
+      await _scheduleBackgroundSync(
+        updatedSettings,
+        settingsStorage: settingsStorage,
+      );
 
       return Future.value(true);
     } catch (e) {
+      if (task == recurringTaskName) {
+        debugPrint('Recurring background task failed: $e');
+        return Future.value(false);
+      }
+
       debugPrint('Background sync failed: $e');
       final prefs = await SharedPreferences.getInstance();
       final settingsStorage = SettingsStorage(prefs);
       final currentStatus = settingsStorage.readAutoSyncStatus();
-      final retryAt = DateTime.now().add(_autoSyncRetryDelay);
+      final settings = settingsStorage.readAutoSyncSettings();
+      final nextRetryAttempt = currentStatus.retryAttempt + 1;
+      final shouldRetry = nextRetryAttempt <= _autoSyncMaxRetryAttempts;
+      final now = DateTime.now();
 
       await settingsStorage.saveAutoSyncStatus(
         AutoSyncStatus(
           type: AutoSyncStatusType.failure,
           lastSuccessAt: currentStatus.lastSuccessAt,
-          retryAt: retryAt,
+          retryAt: shouldRetry ? now.add(_autoSyncRetryDelay) : null,
+          retryAttempt: shouldRetry ? nextRetryAttempt : 0,
         ),
       );
-      await settingsStorage.saveAutoSyncNextRunAt(retryAt);
+      if (shouldRetry) {
+        final retryAt = now.add(_autoSyncRetryDelay);
+        await _scheduleBackgroundSync(
+          settings,
+          now: now,
+          scheduledFor: retryAt,
+          settingsStorage: settingsStorage,
+        );
+      } else {
+        await _scheduleBackgroundSync(
+          settings,
+          now: now,
+          settingsStorage: settingsStorage,
+        );
+      }
       await SyncNotificationService.showFailure(
-        'Đồng bộ thất bại. Sẽ thử lại sau.',
+        shouldRetry
+            ? 'Đồng bộ thất bại. Sẽ thử lại sau 15 phút ($nextRetryAttempt/$_autoSyncMaxRetryAttempts).'
+            : 'Đồng bộ thất bại sau $_autoSyncMaxRetryAttempts lần thử. Sẽ đợi đến kỳ tiếp theo.',
       );
-      return Future.value(false);
+      return Future.value(true);
     } finally {
       container?.dispose();
       objectBoxDb?.store.close();
     }
   });
+}
+
+Future<void> _scheduleAutoSyncAfterSkippedAuth(
+  AutoSyncSettings settings, {
+  required SettingsStorage settingsStorage,
+}) async {
+  final currentStatus = settingsStorage.readAutoSyncStatus();
+  await settingsStorage.saveAutoSyncStatus(
+    AutoSyncStatus(
+      type: currentStatus.lastSuccessAt == null
+          ? AutoSyncStatusType.idle
+          : AutoSyncStatusType.success,
+      lastSuccessAt: currentStatus.lastSuccessAt,
+    ),
+  );
+  await _scheduleBackgroundSync(settings, settingsStorage: settingsStorage);
 }
 
 Future<void> cancelBackgroundSync() async {

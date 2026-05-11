@@ -85,11 +85,15 @@ class AutoSyncStatusNotifier extends Notifier<AutoSyncStatus> {
     await ref.read(settingsStorageProvider).saveAutoSyncStatus(nextState);
   }
 
-  Future<void> markFailure({required DateTime retryAt}) async {
+  Future<void> markFailure({
+    required DateTime retryAt,
+    required int retryAttempt,
+  }) async {
     final nextState = AutoSyncStatus(
       type: AutoSyncStatusType.failure,
       lastSuccessAt: state.lastSuccessAt,
       retryAt: retryAt,
+      retryAttempt: retryAttempt,
     );
     state = nextState;
     await ref.read(settingsStorageProvider).saveAutoSyncStatus(nextState);
