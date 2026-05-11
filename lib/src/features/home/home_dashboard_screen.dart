@@ -33,8 +33,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final scopeRange = _selectedScope.dateRange;
     final filteredTransactions = ref.watch(
       transactionsQueryProvider((
@@ -56,7 +54,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final now = DateTime.now();
 
     return ColoredBox(
-      color: isDark ? colors.surface : const Color(0xFFFAF7FF),
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: Stack(
         children: [
           NotificationListener<UserScrollNotification>(
