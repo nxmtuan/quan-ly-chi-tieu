@@ -5,11 +5,15 @@ import 'package:workmanager/workmanager.dart';
 
 import '../../models/auto_sync_settings.dart';
 import '../../models/auto_sync_status.dart';
+import '../../models/transaction.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/storage_provider.dart';
+import '../storage/recurring_storage.dart';
 import '../services/sync_notification_service.dart';
 import '../storage/objectbox_database.dart';
 import '../storage/settings_storage.dart';
+import '../storage/transaction_storage.dart';
+import 'background_recurring.dart';
 
 const _autoSyncTaskName = 'configured_auto_sync_task';
 const _autoSyncTaskId = 'sync_to_drive';
@@ -24,10 +28,21 @@ void callbackDispatcher() {
 
     try {
       WidgetsFlutterBinding.ensureInitialized();
-      await SyncNotificationService.showPreparing();
 
       objectBoxDb = await ObjectBoxDatabase.create();
       final prefs = await SharedPreferences.getInstance();
+
+      if (task == recurringTaskName) {
+        await processRecurringItems(
+          recurringStorage: RecurringStorage(prefs),
+          transactionStorage: TransactionStorage(
+            objectBoxDb.store.box<Transaction>(),
+          ),
+        );
+        return Future.value(true);
+      }
+
+      await SyncNotificationService.showPreparing();
 
       container = ProviderContainer(
         overrides: [

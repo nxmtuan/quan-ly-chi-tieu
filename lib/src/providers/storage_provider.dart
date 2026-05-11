@@ -7,6 +7,7 @@ import '../core/network/google_drive_service.dart';
 import '../core/storage/auth_storage.dart';
 import '../core/storage/category_storage.dart';
 import '../core/storage/money_source_storage.dart';
+import '../core/storage/recurring_storage.dart';
 import '../core/storage/settings_storage.dart';
 import '../core/storage/transaction_storage.dart';
 import '../core/storage/objectbox_database.dart';
@@ -38,6 +39,11 @@ final moneySourceStorageProvider = Provider<MoneySourceStorage>((ref) {
   return MoneySourceStorage(store.box<MoneySource>());
 });
 
+final recurringStorageProvider = Provider<RecurringStorage>((ref) {
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return RecurringStorage(prefs);
+});
+
 final settingsStorageProvider = Provider<SettingsStorage>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
   return SettingsStorage(prefs);
@@ -48,7 +54,10 @@ final authStorageProvider = Provider<AuthStorage>((ref) {
   return AuthStorage(prefs);
 });
 
-final syncServiceProvider = Provider.family<SyncService, drive.DriveApi>((ref, driveApi) {
+final syncServiceProvider = Provider.family<SyncService, drive.DriveApi>((
+  ref,
+  driveApi,
+) {
   final store = ref.watch(objectBoxProvider).store;
   final driveService = GoogleDriveService(driveApi);
   final settingsStorage = ref.watch(settingsStorageProvider);

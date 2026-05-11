@@ -5,11 +5,14 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'src/app.dart';
 import 'src/core/services/sync_notification_service.dart';
+import 'src/core/services/recurring_notification_service.dart';
 import 'src/providers/storage_provider.dart';
 import 'src/core/storage/objectbox_database.dart';
 
 import 'package:workmanager/workmanager.dart';
+import 'src/core/background/background_recurring.dart';
 import 'src/core/background/background_sync.dart';
+import 'src/core/storage/recurring_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,9 +21,14 @@ Future<void> main() async {
   await Workmanager().initialize(callbackDispatcher);
   final prefs = await SharedPreferences.getInstance();
   await configureBackgroundSyncFromPreferences(prefs);
+  await configureRecurringBackgroundProcessingFromStorage(
+    RecurringStorage(prefs),
+  );
 
   await SyncNotificationService.initialize();
   await SyncNotificationService.requestPermission();
+  await RecurringNotificationService.initialize();
+  await RecurringNotificationService.requestPermission();
 
   final objectBoxDb = await ObjectBoxDatabase.create();
 
