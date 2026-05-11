@@ -1,10 +1,13 @@
 import 'dart:convert';
 
 import '../network/google_drive_service.dart';
+import '../background/background_recurring.dart';
+import '../storage/recurring_storage.dart';
 import '../storage/settings_storage.dart';
 import '../../models/transaction.dart';
 import '../../models/category.dart';
 import '../../models/money_source.dart';
+import '../../models/recurring_item.dart';
 import '../../../objectbox.g.dart';
 
 class SyncService {
@@ -14,6 +17,7 @@ class SyncService {
     required this.transactionBox,
     required this.categoryBox,
     required this.moneySourceBox,
+    required this.recurringStorage,
   });
 
   final DriveSyncClient driveService;
@@ -21,6 +25,7 @@ class SyncService {
   final Box<Transaction> transactionBox;
   final Box<Category> categoryBox;
   final Box<MoneySource> moneySourceBox;
+  final RecurringStorage recurringStorage;
 
   Future<void> syncData() async {
     final syncStartedAt = DateTime.now();
@@ -28,6 +33,7 @@ class SyncService {
     final Map<String, Transaction> remoteTransactions = {};
     final Map<String, Category> remoteCategories = {};
     final Map<String, MoneySource> remoteMoneySources = {};
+    final Map<String, RecurringItem> remoteRecurringItems = {};
 
     if (remoteJsonString != null && remoteJsonString.isNotEmpty) {
       final decoded = jsonDecode(remoteJsonString) as Map<String, dynamic>;
@@ -49,6 +55,14 @@ class SyncService {
         final source = MoneySource.fromJson(sourceJson as Map<String, dynamic>);
         remoteMoneySources[source.id] = source;
       }
+
+      final recurringList = decoded['recurringItems'] as List<dynamic>? ?? [];
+      for (final recurringJson in recurringList) {
+        final recurring = RecurringItem.fromJson(
+          recurringJson as Map<String, dynamic>,
+        );
+        remoteRecurringItems[recurring.id] = recurring;
+      }
     }
 
     final shouldPurgeSoftDeleted = settingsStorage.isSoftDeletePurgeDue(
@@ -61,6 +75,8 @@ class SyncService {
       remoteTransactions: remoteTransactions.values,
       localMoneySources: moneySourceBox.getAll(),
       remoteMoneySources: remoteMoneySources.values,
+      localRecurringItems: recurringStorage.readItems(),
+      remoteRecurringItems: remoteRecurringItems.values,
       syncStartedAt: syncStartedAt,
       shouldPurgeSoftDeleted: shouldPurgeSoftDeleted,
     );
@@ -69,6 +85,9 @@ class SyncService {
       'categories': snapshot.categories.map((c) => c.toJson()).toList(),
       'moneySources': snapshot.moneySources.map((s) => s.toJson()).toList(),
       'transactions': snapshot.transactions.map((t) => t.toJson()).toList(),
+      'recurringItems': snapshot.recurringItems
+          .map((item) => item.compactedForStorage().toJson())
+          .toList(),
     };
 
     final exportJsonString = jsonEncode(exportData);
@@ -80,6 +99,8 @@ class SyncService {
     moneySourceBox.putMany(snapshot.moneySources);
     transactionBox.removeAll();
     transactionBox.putMany(snapshot.transactions);
+    await recurringStorage.saveItems(snapshot.recurringItems);
+    await configureRecurringBackgroundProcessingFromStorage(recurringStorage);
 
     if (snapshot.purgedSoftDeleted) {
       await settingsStorage.saveLastSoftDeletePurgeAt(syncStartedAt);
@@ -98,6 +119,8 @@ SyncSnapshot buildSyncSnapshot({
   required Iterable<Transaction> remoteTransactions,
   required Iterable<MoneySource> localMoneySources,
   required Iterable<MoneySource> remoteMoneySources,
+  required Iterable<RecurringItem> localRecurringItems,
+  required Iterable<RecurringItem> remoteRecurringItems,
   required DateTime syncStartedAt,
   required bool shouldPurgeSoftDeleted,
 }) {
@@ -136,6 +159,21 @@ SyncSnapshot buildSyncSnapshot({
     }
   }
 
+  final localRecurringItemMap = {
+    for (final item in localRecurringItems) item.id: item,
+  };
+  final mergedRecurringItems = <String, RecurringItem>{
+    ...localRecurringItemMap,
+  };
+
+  for (final remoteItem in remoteRecurringItems) {
+    final localItem = mergedRecurringItems[remoteItem.id];
+    if (localItem == null ||
+        remoteItem.updatedAt.isAfter(localItem.updatedAt)) {
+      mergedRecurringItems[remoteItem.id] = remoteItem;
+    }
+  }
+
   var compactedCategories = [
     for (final category in mergedCategories.values)
       category.compactedForStorage().copyWith(obxId: 0),
@@ -147,6 +185,9 @@ SyncSnapshot buildSyncSnapshot({
   var compactedMoneySources = [
     for (final source in mergedMoneySources.values)
       source.compactedForStorage().copyWith(obxId: 0),
+  ];
+  var mergedRecurringItemList = [
+    for (final item in mergedRecurringItems.values) item,
   ];
 
   if (shouldPurgeSoftDeleted) {
@@ -180,12 +221,18 @@ SyncSnapshot buildSyncSnapshot({
         ))
           source,
     ];
+    mergedRecurringItemList = [
+      for (final item in mergedRecurringItemList)
+        if (!_shouldPurgeDeleted(item.isDeleted, item.updatedAt, purgeCutoff))
+          item,
+    ];
   }
 
   return SyncSnapshot(
     categories: compactedCategories,
     moneySources: compactedMoneySources,
     transactions: compactedTransactions,
+    recurringItems: mergedRecurringItemList,
     purgedSoftDeleted: shouldPurgeSoftDeleted,
   );
 }
@@ -199,11 +246,13 @@ class SyncSnapshot {
     required this.categories,
     required this.moneySources,
     required this.transactions,
+    required this.recurringItems,
     required this.purgedSoftDeleted,
   });
 
   final List<Category> categories;
   final List<MoneySource> moneySources;
   final List<Transaction> transactions;
+  final List<RecurringItem> recurringItems;
   final bool purgedSoftDeleted;
 }

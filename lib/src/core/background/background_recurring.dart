@@ -51,7 +51,7 @@ Future<bool> processRecurringItems({
   final reminders = <RecurringItem>[];
 
   for (final item in items) {
-    if (!item.isActive) {
+    if (!item.isActive || item.isDeleted) {
       updatedItems.add(item);
       continue;
     }
@@ -89,7 +89,7 @@ DateTime? resolveNextRecurringProcessingTime({
   DateTime? nextRun;
 
   for (final item in items) {
-    if (!item.isActive) {
+    if (!item.isActive || item.isDeleted) {
       continue;
     }
 
@@ -134,7 +134,10 @@ Future<RecurringItem> _processRecurringTransaction(
     nextRunAt = nextRecurringDate(nextRunAt, item.frequency);
   }
 
-  return item.copyWith(nextRunAt: nextRunAt);
+  return item.copyWith(
+    nextRunAt: nextRunAt,
+    updatedAt: nextRunAt == item.nextRunAt ? item.updatedAt : now,
+  );
 }
 
 Future<List<RecurringItem>> _processRecurringReminders(
@@ -166,6 +169,7 @@ Future<List<RecurringItem>> _processRecurringReminders(
       if (occurrenceDate.isBefore(today) || dueNotified) {
         current = current.copyWith(
           nextRunAt: nextRecurringDate(current.nextRunAt, current.frequency),
+          updatedAt: now,
         );
         continue;
       }
@@ -179,6 +183,7 @@ Future<List<RecurringItem>> _processRecurringReminders(
               occurrenceKey,
             ],
             nextRunAt: nextRecurringDate(current.nextRunAt, current.frequency),
+            updatedAt: now,
           );
           continue;
         }

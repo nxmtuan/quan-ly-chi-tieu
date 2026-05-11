@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quan_ly_chi_tieu/src/core/services/sync_service.dart';
 import 'package:quan_ly_chi_tieu/src/models/category.dart';
 import 'package:quan_ly_chi_tieu/src/models/money_source.dart';
+import 'package:quan_ly_chi_tieu/src/models/recurring_item.dart';
 import 'package:quan_ly_chi_tieu/src/models/transaction.dart';
 
 void main() {
@@ -118,6 +119,69 @@ void main() {
             isDeleted: true,
           ),
         ],
+        localRecurringItems: [
+          RecurringItem(
+            id: 'keep-recurring-local',
+            kind: RecurringItemKind.transaction,
+            type: TransactionType.expense,
+            amount: 120000,
+            categoryId: 'keep-category',
+            sourceId: defaultMoneySourceId,
+            startDate: now,
+            frequency: RecurrenceFrequency.monthly,
+            nextRunAt: now,
+            createdAt: now.subtract(const Duration(days: 3)),
+            updatedAt: now.subtract(const Duration(days: 2)),
+            note: 'Monthly bill',
+            completedOccurrenceKeys: const ['local-state'],
+          ),
+          RecurringItem(
+            id: 'purge-recurring-local',
+            kind: RecurringItemKind.reminder,
+            type: TransactionType.expense,
+            amount: 50000,
+            categoryId: 'keep-category',
+            sourceId: defaultMoneySourceId,
+            startDate: expiredDeletedAt,
+            frequency: RecurrenceFrequency.weekly,
+            nextRunAt: expiredDeletedAt,
+            createdAt: expiredDeletedAt,
+            updatedAt: expiredDeletedAt,
+            reminderText: 'Old reminder',
+            isDeleted: true,
+          ),
+        ],
+        remoteRecurringItems: [
+          RecurringItem(
+            id: 'keep-recurring-remote',
+            kind: RecurringItemKind.reminder,
+            type: TransactionType.expense,
+            amount: 0,
+            categoryId: 'keep-category',
+            sourceId: defaultMoneySourceId,
+            startDate: now,
+            frequency: RecurrenceFrequency.daily,
+            nextRunAt: now,
+            createdAt: now.subtract(const Duration(days: 2)),
+            updatedAt: now.subtract(const Duration(hours: 6)),
+            reminderText: 'Daily reminder',
+          ),
+          RecurringItem(
+            id: 'purge-recurring-remote',
+            kind: RecurringItemKind.transaction,
+            type: TransactionType.income,
+            amount: 300000,
+            categoryId: 'keep-category',
+            sourceId: defaultMoneySourceId,
+            startDate: expiredDeletedAt,
+            frequency: RecurrenceFrequency.monthly,
+            nextRunAt: expiredDeletedAt,
+            createdAt: expiredDeletedAt,
+            updatedAt: expiredDeletedAt,
+            note: 'Old recurring',
+            isDeleted: true,
+          ),
+        ],
         syncStartedAt: now,
         shouldPurgeSoftDeleted: true,
       );
@@ -161,6 +225,19 @@ void main() {
         isNot(contains('purge-remote')),
       );
 
+      expect(
+        snapshot.recurringItems.map((item) => item.id),
+        containsAll(['keep-recurring-local', 'keep-recurring-remote']),
+      );
+      expect(
+        snapshot.recurringItems.map((item) => item.id),
+        isNot(contains('purge-recurring-local')),
+      );
+      expect(
+        snapshot.recurringItems.map((item) => item.id),
+        isNot(contains('purge-recurring-remote')),
+      );
+
       final keepLocal = snapshot.transactions.firstWhere(
         (transaction) => transaction.id == 'keep-local',
       );
@@ -173,6 +250,14 @@ void main() {
       );
       expect(keepCategory.dbType, isNull);
       expect(keepCategory.type, TransactionType.income);
+
+      final recurringJson = snapshot.recurringItems
+          .firstWhere((item) => item.id == 'keep-recurring-local')
+          .compactedForStorage()
+          .toJson();
+      expect(recurringJson['completedOccurrenceKeys'], isEmpty);
+      expect(recurringJson['preNotifiedOccurrenceKeys'], isEmpty);
+      expect(recurringJson['dueNotifiedOccurrenceKeys'], isEmpty);
 
       expect(snapshot.purgedSoftDeleted, isTrue);
     });

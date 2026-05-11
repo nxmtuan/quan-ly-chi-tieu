@@ -26,13 +26,15 @@ class RecurringItem {
     required this.frequency,
     required this.nextRunAt,
     required this.createdAt,
+    DateTime? updatedAt,
     this.note,
     this.reminderText,
     this.isActive = true,
+    this.isDeleted = false,
     this.completedOccurrenceKeys = const [],
     this.preNotifiedOccurrenceKeys = const [],
     this.dueNotifiedOccurrenceKeys = const [],
-  });
+  }) : updatedAt = updatedAt ?? createdAt;
 
   final String id;
   final RecurringItemKind kind;
@@ -44,9 +46,11 @@ class RecurringItem {
   final RecurrenceFrequency frequency;
   final DateTime nextRunAt;
   final DateTime createdAt;
+  final DateTime updatedAt;
   final String? note;
   final String? reminderText;
   final bool isActive;
+  final bool isDeleted;
   final List<String> completedOccurrenceKeys;
   final List<String> preNotifiedOccurrenceKeys;
   final List<String> dueNotifiedOccurrenceKeys;
@@ -72,9 +76,11 @@ class RecurringItem {
     RecurrenceFrequency? frequency,
     DateTime? nextRunAt,
     DateTime? createdAt,
+    DateTime? updatedAt,
     String? note,
     String? reminderText,
     bool? isActive,
+    bool? isDeleted,
     List<String>? completedOccurrenceKeys,
     List<String>? preNotifiedOccurrenceKeys,
     List<String>? dueNotifiedOccurrenceKeys,
@@ -90,15 +96,37 @@ class RecurringItem {
       frequency: frequency ?? this.frequency,
       nextRunAt: nextRunAt ?? this.nextRunAt,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       note: note ?? this.note,
       reminderText: reminderText ?? this.reminderText,
       isActive: isActive ?? this.isActive,
+      isDeleted: isDeleted ?? this.isDeleted,
       completedOccurrenceKeys:
           completedOccurrenceKeys ?? this.completedOccurrenceKeys,
       preNotifiedOccurrenceKeys:
           preNotifiedOccurrenceKeys ?? this.preNotifiedOccurrenceKeys,
       dueNotifiedOccurrenceKeys:
           dueNotifiedOccurrenceKeys ?? this.dueNotifiedOccurrenceKeys,
+    );
+  }
+
+  RecurringItem compactedForStorage() {
+    return RecurringItem(
+      id: id,
+      kind: kind,
+      type: type,
+      amount: amount,
+      categoryId: categoryId,
+      sourceId: sourceId,
+      startDate: startDate,
+      frequency: frequency,
+      nextRunAt: nextRunAt,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      note: note,
+      reminderText: reminderText,
+      isActive: isActive,
+      isDeleted: isDeleted,
     );
   }
 
@@ -114,9 +142,11 @@ class RecurringItem {
       'frequency': frequency.name,
       'nextRunAt': nextRunAt.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
       'note': note,
       'reminderText': reminderText,
       'isActive': isActive,
+      'isDeleted': isDeleted,
       'completedOccurrenceKeys': completedOccurrenceKeys,
       'preNotifiedOccurrenceKeys': preNotifiedOccurrenceKeys,
       'dueNotifiedOccurrenceKeys': dueNotifiedOccurrenceKeys,
@@ -135,9 +165,13 @@ class RecurringItem {
       frequency: RecurrenceFrequency.values.byName(json['frequency'] as String),
       nextRunAt: DateTime.parse(json['nextRunAt'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
       note: json['note'] as String?,
       reminderText: json['reminderText'] as String?,
       isActive: json['isActive'] as bool? ?? true,
+      isDeleted: json['isDeleted'] as bool? ?? false,
       completedOccurrenceKeys: _stringList(json['completedOccurrenceKeys']),
       preNotifiedOccurrenceKeys: _stringList(json['preNotifiedOccurrenceKeys']),
       dueNotifiedOccurrenceKeys: _stringList(json['dueNotifiedOccurrenceKeys']),

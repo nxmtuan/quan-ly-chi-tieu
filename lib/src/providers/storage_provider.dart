@@ -67,5 +67,6 @@ final syncServiceProvider = Provider.family<SyncService, drive.DriveApi>((
     transactionBox: store.box<Transaction>(),
     categoryBox: store.box<Category>(),
     moneySourceBox: store.box<MoneySource>(),
+    recurringStorage: ref.watch(recurringStorageProvider),
   );
 });

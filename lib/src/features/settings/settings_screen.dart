@@ -23,6 +23,7 @@ import '../../providers/settings_provider.dart';
 import '../../providers/storage_provider.dart';
 import '../../providers/transaction_provider.dart';
 import '../../providers/category_provider.dart';
+import '../../providers/recurring_provider.dart';
 import '../auth/google_web_sign_in_button.dart';
 import '../categories/category_management_sheet.dart';
 import 'money_source_management_sheet.dart';

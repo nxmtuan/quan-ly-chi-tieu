@@ -288,6 +288,7 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
       frequency: _frequency,
       nextRunAt: nextRunAt,
       createdAt: existing?.createdAt ?? DateTime.now(),
+      updatedAt: DateTime.now(),
       note: widget.kind == RecurringItemKind.transaction
           ? _noteController.text.trim()
           : null,
@@ -295,6 +296,7 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
           ? _noteController.text.trim()
           : null,
       isActive: existing?.isActive ?? true,
+      isDeleted: existing?.isDeleted ?? false,
       completedOccurrenceKeys: existing?.completedOccurrenceKeys ?? const [],
       preNotifiedOccurrenceKeys:
           existing?.preNotifiedOccurrenceKeys ?? const [],

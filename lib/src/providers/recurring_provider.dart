@@ -7,7 +7,7 @@ import 'storage_provider.dart';
 class RecurringItemsNotifier extends Notifier<List<RecurringItem>> {
   @override
   List<RecurringItem> build() {
-    return _sorted(ref.read(recurringStorageProvider).readItems());
+    return _visibleSorted(ref.read(recurringStorageProvider).readItems());
   }
 
   Future<void> addItem(RecurringItem item) async {
@@ -31,18 +31,33 @@ class RecurringItemsNotifier extends Notifier<List<RecurringItem>> {
   }
 
   Future<void> deleteItem(String id) async {
+    final deletedAt = DateTime.now();
+    final existingItems = ref.read(recurringStorageProvider).readItems();
+    final deletedItem = existingItems
+        .where((item) => item.id == id)
+        .firstOrNull
+        ?.copyWith(isDeleted: true, updatedAt: deletedAt);
     state = [
       for (final item in state)
         if (item.id != id) item,
     ];
-    await ref.read(recurringStorageProvider).deleteItem(id);
+    if (deletedItem != null) {
+      await ref.read(recurringStorageProvider).upsertItem(deletedItem);
+    }
     await configureRecurringBackgroundProcessingFromStorage(
       ref.read(recurringStorageProvider),
     );
   }
 
   void reload() {
-    state = _sorted(ref.read(recurringStorageProvider).readItems());
+    state = _visibleSorted(ref.read(recurringStorageProvider).readItems());
+  }
+
+  List<RecurringItem> _visibleSorted(List<RecurringItem> items) {
+    return _sorted([
+      for (final item in items)
+        if (!item.isDeleted) item,
+    ]);
   }
 
   List<RecurringItem> _sorted(List<RecurringItem> items) {
@@ -58,13 +73,17 @@ final recurringItemsProvider =
 final recurringTransactionsProvider = Provider<List<RecurringItem>>((ref) {
   return ref
       .watch(recurringItemsProvider)
-      .where((item) => item.kind == RecurringItemKind.transaction)
+      .where(
+        (item) => !item.isDeleted && item.kind == RecurringItemKind.transaction,
+      )
       .toList();
 });
 
 final recurringRemindersProvider = Provider<List<RecurringItem>>((ref) {
   return ref
       .watch(recurringItemsProvider)
-      .where((item) => item.kind == RecurringItemKind.reminder)
+      .where(
+        (item) => !item.isDeleted && item.kind == RecurringItemKind.reminder,
+      )
       .toList();
 });
