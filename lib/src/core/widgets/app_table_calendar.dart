@@ -20,6 +20,7 @@ class AppTableCalendar extends StatelessWidget {
     required this.onDaySelected,
     this.onPageChanged,
     this.eventLoader,
+    this.showShadow = true,
   });
 
   final DateTime focusedDay;
@@ -27,6 +28,7 @@ class AppTableCalendar extends StatelessWidget {
   final ValueChanged<DateTime> onDaySelected;
   final ValueChanged<DateTime>? onPageChanged;
   final CalendarEventLoader? eventLoader;
+  final bool showShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +46,7 @@ class AppTableCalendar extends StatelessWidget {
 
     return FlatCard(
       radius: context.scaled(26),
+      showShadow: showShadow,
       padding: EdgeInsets.fromLTRB(
         context.scaled(16),
         context.scaled(18),
@@ -125,13 +128,6 @@ class AppTableCalendar extends StatelessWidget {
           selectedDecoration: BoxDecoration(
             color: colors.primary,
             borderRadius: BorderRadius.circular(context.scaled(16)),
-            boxShadow: [
-              BoxShadow(
-                color: colors.primary.withValues(alpha: isDark ? 0.28 : 0.18),
-                blurRadius: context.scaled(12),
-                offset: Offset(0, context.scaled(5)),
-              ),
-            ],
           ),
           markerDecoration: BoxDecoration(
             color: markerColor,

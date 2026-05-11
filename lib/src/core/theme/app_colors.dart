@@ -8,7 +8,7 @@ class AppColors {
   static const success = Color(0xFF10B981);
   static const danger = Color(0xFFEF4444);
   static const warning = Color(0xFFF59E0B);
-  static const background = Color(0xFFF8FAFC);
+  static const background = Color(0xFFF3F4F6);
   static const surface = Colors.white;
   static const inputBackground = Color(0xFFF1F5F9);
   static const textPrimary = Color(0xFF0F172A);

@@ -10,12 +10,14 @@ class FlatCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(20),
     this.radius = 24,
     this.color,
+    this.showShadow = true,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
   final double radius;
   final Color? color;
+  final bool showShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,7 @@ class FlatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color ?? colors.surface,
         borderRadius: BorderRadius.circular(context.scaled(radius)),
-        boxShadow: appSurfaceShadow(context),
+        boxShadow: showShadow ? appSurfaceShadow(context) : null,
       ),
       child: child,
     );

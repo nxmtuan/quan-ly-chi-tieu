@@ -52,6 +52,7 @@ class SettingsScreen extends ConsumerWidget {
             SizedBox(height: context.scaled(24)),
             FlatCard(
               radius: context.scaled(24),
+              showShadow: false,
               padding: EdgeInsets.all(context.scaled(10)),
               child: Column(
                 children: [
@@ -72,12 +73,9 @@ class SettingsScreen extends ConsumerWidget {
             SizedBox(height: context.scaled(24)),
             FlatCard(
               radius: context.scaled(24),
+              showShadow: false,
               padding: EdgeInsets.all(context.scaled(10)),
-              child: Column(
-                children: [
-                  _AuthSettingsRow(authUser: authUser),
-                ],
-              ),
+              child: Column(children: [_AuthSettingsRow(authUser: authUser)]),
             ),
           ],
         )

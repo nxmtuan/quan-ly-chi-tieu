@@ -57,13 +57,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             context.scaled(120) + MediaQuery.paddingOf(context).bottom,
           ),
           children: [
-            const AppPageHeader(
-              subtitle: 'Lịch',
-              title: 'Thống kê giao dịch',
-            ),
+            const AppPageHeader(subtitle: 'Lịch', title: 'Thống kê giao dịch'),
             SizedBox(height: context.scaled(22)),
             TransactionMarkerCalendar(
               selectedDay: _selectedDay,
+              showShadow: false,
               onDaySelected: (selectedDay) {
                 setState(
                   () => _selectedDay = _normalizeCalendarDay(selectedDay),
@@ -73,6 +71,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             SizedBox(height: context.scaled(18)),
             FlatCard(
               radius: context.scaled(26),
+              showShadow: false,
               padding: EdgeInsets.fromLTRB(
                 context.scaled(18),
                 context.scaled(18),
@@ -120,6 +119,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             if (dailyTransactions.isEmpty)
               FlatCard(
                 radius: context.scaled(26),
+                showShadow: false,
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: context.scaled(10)),
                   child: Center(
@@ -135,6 +135,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             else
               FlatCard(
                 radius: context.scaled(22),
+                showShadow: false,
                 padding: EdgeInsets.all(context.scaled(14)),
                 child: Column(
                   children: [
@@ -204,10 +205,7 @@ class _MetricPill extends StatelessWidget {
             style: context.appText.captionStrong.copyWith(color: color),
           ),
           SizedBox(height: context.scaled(6)),
-          Text(
-            formatCurrency(amount),
-            style: context.appText.amountMD,
-          ),
+          Text(formatCurrency(amount), style: context.appText.amountMD),
         ],
       ),
     );

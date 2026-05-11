@@ -4,7 +4,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/adaptive.dart';
 import '../../../core/utils/formatters.dart';
@@ -59,6 +58,7 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
             child: FlatCard(
               radius: context.scaled(22),
               padding: EdgeInsets.all(context.scaled(14)),
+              showShadow: false,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -108,7 +108,10 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
             child: SizedBox(
               height: chartHeight,
               child: total == 0
-                  ? const FlatCard(child: Center(child: Text('Chưa có dữ liệu')))
+                  ? const FlatCard(
+                      showShadow: false,
+                      child: Center(child: Text('Chưa có dữ liệu')),
+                    )
                   : _CategoryDonutChart(items: items, total: total),
             ),
           ),

@@ -126,19 +126,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     context.scaled(176) + MediaQuery.paddingOf(context).bottom,
                   ),
                   sliver: SliverToBoxAdapter(
-                    child: RecentTransactions(
-                      scope: _selectedScope,
-                      transactions: filteredTransactions,
-                      selectedType: _selectedType,
-                    )
-                        .animate(delay: 150.ms)
-                        .fadeIn(duration: 320.ms)
-                        .slideY(
-                          begin: 0.06,
-                          end: 0,
-                          duration: 360.ms,
-                          curve: Curves.easeOutCubic,
-                        ),
+                    child:
+                        RecentTransactions(
+                              scope: _selectedScope,
+                              transactions: filteredTransactions,
+                              selectedType: _selectedType,
+                            )
+                            .animate(delay: 150.ms)
+                            .fadeIn(duration: 320.ms)
+                            .slideY(
+                              begin: 0.06,
+                              end: 0,
+                              duration: 360.ms,
+                              curve: Curves.easeOutCubic,
+                            ),
                   ),
                 ),
               ],
@@ -226,7 +227,6 @@ class _QuickAddButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AppBounceBuilder(
       onTap: onTap,
@@ -237,23 +237,10 @@ class _QuickAddButton extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              colors.primary.withValues(alpha: 0.72),
-              colors.primary,
-            ],
+            colors: [colors.primary.withValues(alpha: 0.72), colors.primary],
           ),
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: Colors.white,
-            width: context.scaled(2.4),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: colors.primary.withValues(alpha: isDark ? 0.28 : 0.34),
-              blurRadius: context.scaled(16),
-              offset: Offset(0, context.scaled(8)),
-            ),
-          ],
+          border: Border.all(color: Colors.white, width: context.scaled(2.4)),
         ),
         child: Icon(
           Icons.add_rounded,

@@ -108,9 +108,7 @@ class _AuthSettingsRow extends ConsumerWidget {
                       height: context.scaled(46),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.13),
-                        borderRadius: BorderRadius.circular(
-                          context.scaled(16),
-                        ),
+                        borderRadius: BorderRadius.circular(context.scaled(16)),
                       ),
                       child: Icon(
                         Icons.login_rounded,
@@ -170,10 +168,7 @@ class _AuthSettingsRow extends ConsumerWidget {
       iconColor: AppColors.danger,
       title: 'Đăng xuất',
       subtitle: authUser!.email,
-      trailing: const Icon(
-        Icons.logout_rounded,
-        color: AppColors.danger,
-      ),
+      trailing: const Icon(Icons.logout_rounded, color: AppColors.danger),
       onTap: () => _confirmSignOut(context, ref),
     );
   }
@@ -189,7 +184,9 @@ class _AuthSettingsRow extends ConsumerWidget {
         );
 
         try {
-          final synced = await ref.read(authProvider.notifier).syncAfterSignIn();
+          final synced = await ref
+              .read(authProvider.notifier)
+              .syncAfterSignIn();
           if (synced) {
             ref.read(transactionsProvider.notifier).reload();
             ref.read(categoriesProvider.notifier).reload();
@@ -205,14 +202,14 @@ class _AuthSettingsRow extends ConsumerWidget {
               type: AppToastType.success,
             );
           }
-        } catch (_) {
-        }
+        } catch (_) {}
       }
     } catch (_) {
       if (context.mounted) {
         AppToast.show(
           context,
-          message: 'Không thể đăng nhập Google. Vui lòng kiểm tra cấu hình OAuth.',
+          message:
+              'Không thể đăng nhập Google. Vui lòng kiểm tra cấu hình OAuth.',
           type: AppToastType.error,
         );
       }
@@ -336,7 +333,9 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
                       Icons.chevron_right_rounded,
                       color: settings.enabled
                           ? context.appPalette.textSecondary
-                          : context.appPalette.textSecondary.withValues(alpha: 0.35),
+                          : context.appPalette.textSecondary.withValues(
+                              alpha: 0.35,
+                            ),
                     ),
                     onTap: settings.enabled
                         ? () => _showScheduleSheet(settings)
@@ -441,7 +440,9 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
 
       final syncService = ref.read(syncServiceProvider(driveApi));
       await syncService.syncData();
-      await ref.read(autoSyncStatusProvider.notifier).markSuccess(DateTime.now());
+      await ref
+          .read(autoSyncStatusProvider.notifier)
+          .markSuccess(DateTime.now());
       ref.read(transactionsProvider.notifier).reload();
       ref.read(categoriesProvider.notifier).reload();
       ref.read(moneySourcesProvider.notifier).reload();
@@ -586,8 +587,7 @@ class _AutoSyncScheduleSheetState
                 children: [
                   _WeekdaySelector(
                     selectedWeekday: _weekday,
-                    onSelected: (weekday) =>
-                        setState(() => _weekday = weekday),
+                    onSelected: (weekday) => setState(() => _weekday = weekday),
                   ),
                   SizedBox(height: context.scaled(14)),
                   _TimeSelectorRow(
@@ -789,7 +789,9 @@ class _ScheduleTypeTab extends StatelessWidget {
         child: Text(
           label,
           style: context.appText.bodyStrong.copyWith(
-            color: isActive ? AppColors.primary : context.appPalette.textSecondary,
+            color: isActive
+                ? AppColors.primary
+                : context.appPalette.textSecondary,
           ),
         ),
       ),
@@ -831,7 +833,8 @@ class _TimeSelectorRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final display = '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+    final display =
+        '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
 
     return _SettingsRow(
       icon: Icons.access_time_rounded,
@@ -841,10 +844,7 @@ class _TimeSelectorRow extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            display,
-            style: context.appText.bodyStrong,
-          ),
+          Text(display, style: context.appText.bodyStrong),
           SizedBox(width: context.scaled(6)),
           Icon(
             Icons.chevron_right_rounded,
@@ -871,10 +871,7 @@ class _WeekdaySelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Ngày trong tuần',
-          style: context.appText.bodyStrong,
-        ),
+        Text('Ngày trong tuần', style: context.appText.bodyStrong),
         SizedBox(height: context.scaled(10)),
         Wrap(
           spacing: context.scaled(8),
@@ -929,7 +926,9 @@ class _WeekdayChip extends StatelessWidget {
         child: Text(
           label,
           style: context.appText.bodyStrong.copyWith(
-            color: isSelected ? AppColors.primary : context.appPalette.textPrimary,
+            color: isSelected
+                ? AppColors.primary
+                : context.appPalette.textPrimary,
             fontSize: context.scaledFont(13, min: 12),
           ),
         ),
@@ -945,6 +944,7 @@ class _SettingsTipCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlatCard(
       radius: context.scaled(24),
+      showShadow: false,
       color: context.appPalette.primarySoft,
       child: Row(
         children: [
@@ -963,13 +963,13 @@ class _SettingsTipCard extends StatelessWidget {
           ),
           SizedBox(width: context.scaled(14)),
           Expanded(
-              child: Text(
-                'Ghi lại các khoản chi nhỏ mỗi ngày để có bức tranh tài chính rõ hơn.',
-                style: context.appText.bodyStrong.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            child: Text(
+              'Ghi lại các khoản chi nhỏ mỗi ngày để có bức tranh tài chính rõ hơn.',
+              style: context.appText.bodyStrong.copyWith(
+                fontWeight: FontWeight.w800,
               ),
             ),
+          ),
         ],
       ),
     );
@@ -990,7 +990,9 @@ String _syncSummary(AutoSyncSettings settings, AutoSyncStatus status) {
     enabled: settings.enabled,
   );
   if (syncSubtitle !=
-      (settings.enabled ? 'Đang bật đồng bộ theo lịch' : 'Tự động đồng bộ đang tắt')) {
+      (settings.enabled
+          ? 'Đang bật đồng bộ theo lịch'
+          : 'Tự động đồng bộ đang tắt')) {
     return syncSubtitle;
   }
 
@@ -1013,7 +1015,8 @@ String _syncScheduleLabel(AutoSyncSettings settings) {
 }
 
 String _autoSyncSwitchSubtitle(AutoSyncStatus status, {required bool enabled}) {
-  if (status.type == AutoSyncStatusType.success && status.lastSuccessAt != null) {
+  if (status.type == AutoSyncStatusType.success &&
+      status.lastSuccessAt != null) {
     final formatted = DateFormat(
       'HH:mm dd/MM/yyyy',
     ).format(status.lastSuccessAt!.toLocal());
@@ -1093,19 +1096,19 @@ class _SettingsRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                Text(
-                  title,
-                  style: context.appText.bodyStrong.copyWith(
-                    fontSize: context.scaledFont(15, min: 14),
+                  Text(
+                    title,
+                    style: context.appText.bodyStrong.copyWith(
+                      fontSize: context.scaledFont(15, min: 14),
+                    ),
                   ),
-                ),
                   SizedBox(height: context.scaled(5)),
-                Text(
-                  subtitle,
-                  style: context.appText.caption.copyWith(
-                    color: context.appPalette.textSecondary,
+                  Text(
+                    subtitle,
+                    style: context.appText.caption.copyWith(
+                      color: context.appPalette.textSecondary,
+                    ),
                   ),
-                ),
                 ],
               ),
             ),
@@ -1204,7 +1207,9 @@ class _ThemeModeOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? AppColors.primary : context.appPalette.textSecondary;
+    final color = isActive
+        ? AppColors.primary
+        : context.appPalette.textSecondary;
 
     return AppBounceBuilder(
       onTap: onTap,

@@ -24,7 +24,6 @@ class _MonthSelectorBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(context.scaled(20)),
-        boxShadow: appSurfaceShadow(context),
       ),
       child: Row(
         children: [
@@ -134,9 +133,7 @@ class _SummaryMetricCard extends StatelessWidget {
             backgroundColor.withValues(alpha: isSelected ? 0.1 : 0.06),
             palette.surface,
           )
-        : (isSelected
-              ? backgroundColor
-              : colors.surface);
+        : (isSelected ? backgroundColor : colors.surface);
 
     return AppBounceBuilder(
       onTap: onTap,
@@ -158,7 +155,6 @@ class _SummaryMetricCard extends StatelessWidget {
                 : context.appPalette.surfaceElevated,
             width: isSelected ? 2.2 : 2,
           ),
-          boxShadow: appSurfaceShadow(context),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,9 +186,7 @@ class _SummaryMetricCard extends StatelessWidget {
               formatCurrency(amount),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: context.appText.amountSM.copyWith(
-                color: color,
-              ),
+              style: context.appText.amountSM.copyWith(color: color),
             ),
           ],
         ),

@@ -28,8 +28,8 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(26),
-        boxShadow: appSurfaceShadow(context),
       ),
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -58,8 +58,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final chartSize = constraints.biggest.shortestSide;
-                final isPieChart =
-                    _selectedChartView == _CategoryChartView.pie;
+                final isPieChart = _selectedChartView == _CategoryChartView.pie;
 
                 return Align(
                   alignment: isPieChart
@@ -147,8 +146,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
         pieTouchData: PieTouchData(
           touchCallback: (event, response) {
             if (event is! FlTapUpEvent) return;
-            final index =
-                response?.touchedSection?.touchedSectionIndex ?? -1;
+            final index = response?.touchedSection?.touchedSectionIndex ?? -1;
             if (index < 0 || index >= chartItems.length) return;
 
             setState(() {
@@ -229,8 +227,9 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
               if (groupIndex == null) return;
 
               setState(() {
-                _touchedBarIndex =
-                    _touchedBarIndex == groupIndex ? null : groupIndex;
+                _touchedBarIndex = _touchedBarIndex == groupIndex
+                    ? null
+                    : groupIndex;
               });
             },
           ),
@@ -353,13 +352,6 @@ class _CategoryBadge extends StatelessWidget {
               border: Border.fromBorderSide(
                 BorderSide(color: palette.surfaceElevated, width: 2.2),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: item.color.withValues(alpha: selected ? 0.35 : 0.15),
-                  blurRadius: selected ? 8.0 : 5.0,
-                  offset: Offset(0, selected ? 4.0 : 2.0),
-                ),
-              ],
             ),
             child: Container(
               decoration: BoxDecoration(
@@ -422,13 +414,6 @@ class _BarCategoryIcon extends StatelessWidget {
             border: Border.fromBorderSide(
               BorderSide(color: palette.surfaceElevated, width: 2.2),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: item.color.withValues(alpha: selected ? 0.35 : 0.15),
-                blurRadius: selected ? 8.0 : 5.0,
-                offset: const Offset(0, 2),
-              ),
-            ],
           ),
           child: Container(
             decoration: BoxDecoration(
@@ -436,11 +421,7 @@ class _BarCategoryIcon extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Center(
-              child: Icon(
-                item.category.iconData,
-                color: item.color,
-                size: 15,
-              ),
+              child: Icon(item.category.iconData, color: item.color, size: 15),
             ),
           ),
         ),
@@ -609,7 +590,9 @@ class _ChartViewButton extends StatelessWidget {
         child: Icon(
           icon,
           size: 20,
-          color: isSelected ? AppColors.primary : context.appPalette.textSecondary,
+          color: isSelected
+              ? AppColors.primary
+              : context.appPalette.textSecondary,
         ),
       ),
     );

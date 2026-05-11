@@ -15,12 +15,14 @@ class TransactionMarkerCalendar extends ConsumerStatefulWidget {
     required this.onDaySelected,
     this.initialFocusedDay,
     this.onFocusedDayChanged,
+    this.showShadow = true,
   });
 
   final DateTime selectedDay;
   final ValueChanged<DateTime> onDaySelected;
   final DateTime? initialFocusedDay;
   final ValueChanged<DateTime>? onFocusedDayChanged;
+  final bool showShadow;
 
   @override
   ConsumerState<TransactionMarkerCalendar> createState() =>
@@ -65,8 +67,7 @@ class _TransactionMarkerCalendarState
     return AppTableCalendar(
       focusedDay: _focusedDay,
       selectedDay: normalizeCalendarDay(widget.selectedDay),
-      eventLoader: (day) =>
-          eventsByDay[normalizeCalendarDay(day)] ?? const [],
+      eventLoader: (day) => eventsByDay[normalizeCalendarDay(day)] ?? const [],
       onDaySelected: (selectedDay) {
         widget.onDaySelected(normalizeCalendarDay(selectedDay));
       },
@@ -78,6 +79,7 @@ class _TransactionMarkerCalendarState
         });
         widget.onFocusedDayChanged?.call(normalized);
       },
+      showShadow: widget.showShadow,
     );
   }
 
