@@ -35,6 +35,7 @@ class RecurringScreen extends ConsumerStatefulWidget {
 
 class _RecurringScreenState extends ConsumerState<RecurringScreen> {
   RecurringItemKind _selectedTab = RecurringItemKind.transaction;
+  RecurringItemKind _previousTab = RecurringItemKind.transaction;
 
   @override
   Widget build(BuildContext context) {
@@ -63,26 +64,86 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
               SizedBox(height: context.scaled(22)),
               _RecurringTabBar(
                 selectedTab: _selectedTab,
-                onSelected: (tab) => setState(() => _selectedTab = tab),
+                onSelected: (tab) {
+                  if (tab == _selectedTab) {
+                    return;
+                  }
+                  setState(() {
+                    _previousTab = _selectedTab;
+                    _selectedTab = tab;
+                  });
+                },
               ),
               SizedBox(height: context.scaled(18)),
-              _RecurringListHeader(
-                kind: _selectedTab,
-                onAdd: () => showRecurringAddSheet(context, kind: _selectedTab),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 260),
+                reverseDuration: const Duration(milliseconds: 220),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (child, animation) {
+                  final isIncoming =
+                      child.key == ValueKey<RecurringItemKind>(_selectedTab);
+                  final slideDirection =
+                      _selectedTab.index >= _previousTab.index ? 1.0 : -1.0;
+                  final beginOffset = Offset(
+                    isIncoming ? 0.08 * slideDirection : -0.04 * slideDirection,
+                    0,
+                  );
+
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: beginOffset,
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                  );
+                },
+                child: _RecurringTabContent(
+                  key: ValueKey(_selectedTab),
+                  items: items,
+                  kind: _selectedTab,
+                  onAdd: () =>
+                      showRecurringAddSheet(context, kind: _selectedTab),
+                ),
               ),
-              SizedBox(height: context.scaled(12)),
-              if (items.isEmpty)
-                _EmptyRecurringCard(kind: _selectedTab)
-              else
-                for (final item in items)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: context.scaled(12)),
-                    child: _RecurringItemCard(item: item),
-                  ),
             ],
           ).animate().fadeIn(duration: 260.ms),
         ],
       ),
+    );
+  }
+}
+
+class _RecurringTabContent extends StatelessWidget {
+  const _RecurringTabContent({
+    super.key,
+    required this.items,
+    required this.kind,
+    required this.onAdd,
+  });
+
+  final List<RecurringItem> items;
+  final RecurringItemKind kind;
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _RecurringListHeader(kind: kind, onAdd: onAdd),
+        SizedBox(height: context.scaled(12)),
+        if (items.isEmpty)
+          _EmptyRecurringCard(kind: kind)
+        else
+          for (final item in items)
+            Padding(
+              padding: EdgeInsets.only(bottom: context.scaled(12)),
+              child: _RecurringItemCard(item: item),
+            ),
+      ],
     );
   }
 }
