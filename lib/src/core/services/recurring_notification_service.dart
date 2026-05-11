@@ -2,6 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../core/utils/formatters.dart';
 import '../../models/recurring_item.dart';
+import '../../models/transaction.dart';
 
 class RecurringNotificationService {
   RecurringNotificationService._();
@@ -51,9 +52,12 @@ class RecurringNotificationService {
   }
 
   static Future<void> showTransactionCreated(RecurringItem item) async {
+    final transactionLabel = item.type == TransactionType.expense
+        ? 'chi tiêu'
+        : 'thu nhập';
     await _show(
       id: _notificationId(item, 1),
-      title: 'Đã thêm giao dịch định kỳ',
+      title: 'Đã thêm $transactionLabel định kỳ',
       body: '${item.title} • ${formatCurrency(item.amount)}',
     );
   }
