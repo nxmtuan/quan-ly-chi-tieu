@@ -11,7 +11,9 @@ class ObjectBoxDatabase {
   static Future<ObjectBoxDatabase> create() async {
     final docsDir = await getApplicationDocumentsDirectory();
     final storeDir = p.join(docsDir.path, "obx-db");
-    final store = await openStore(directory: storeDir);
+    final store = Store.isOpen(storeDir)
+        ? Store.attach(getObjectBoxModel(), storeDir)
+        : await openStore(directory: storeDir);
     return ObjectBoxDatabase._create(store);
   }
 
