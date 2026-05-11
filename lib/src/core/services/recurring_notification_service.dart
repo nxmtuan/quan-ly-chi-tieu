@@ -62,6 +62,25 @@ class RecurringNotificationService {
     );
   }
 
+  static Future<void> showTransactionsCreated({
+    required RecurringItem item,
+    required int count,
+  }) async {
+    if (count <= 1) {
+      await showTransactionCreated(item);
+      return;
+    }
+
+    final transactionLabel = item.type == TransactionType.expense
+        ? 'chi tiêu'
+        : 'thu nhập';
+    await _show(
+      id: _notificationId(item, 1),
+      title: 'Đã thêm $count $transactionLabel định kỳ',
+      body: '${item.title} • ${formatCurrency(item.amount)} mỗi kỳ',
+    );
+  }
+
   static Future<void> showReminderUpcoming(RecurringItem item) async {
     await _show(
       id: _notificationId(item, 2),

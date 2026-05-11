@@ -130,8 +130,8 @@ class RecurringItem {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson({bool includeNotificationState = true}) {
+    final json = {
       'id': id,
       'kind': kind.name,
       'type': type.name,
@@ -147,10 +147,13 @@ class RecurringItem {
       'reminderText': reminderText,
       'isActive': isActive,
       'isDeleted': isDeleted,
-      'completedOccurrenceKeys': completedOccurrenceKeys,
-      'preNotifiedOccurrenceKeys': preNotifiedOccurrenceKeys,
-      'dueNotifiedOccurrenceKeys': dueNotifiedOccurrenceKeys,
     };
+    if (includeNotificationState) {
+      json['completedOccurrenceKeys'] = completedOccurrenceKeys;
+      json['preNotifiedOccurrenceKeys'] = preNotifiedOccurrenceKeys;
+      json['dueNotifiedOccurrenceKeys'] = dueNotifiedOccurrenceKeys;
+    }
+    return json;
   }
 
   factory RecurringItem.fromJson(Map<String, dynamic> json) {

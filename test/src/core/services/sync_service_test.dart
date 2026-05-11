@@ -136,6 +136,22 @@ void main() {
             completedOccurrenceKeys: const ['local-state'],
           ),
           RecurringItem(
+            id: 'merge-recurring',
+            kind: RecurringItemKind.reminder,
+            type: TransactionType.expense,
+            amount: 10000,
+            categoryId: 'keep-category',
+            sourceId: defaultMoneySourceId,
+            startDate: now,
+            frequency: RecurrenceFrequency.daily,
+            nextRunAt: now,
+            createdAt: now.subtract(const Duration(days: 5)),
+            updatedAt: now.subtract(const Duration(days: 4)),
+            reminderText: 'Old local reminder',
+            preNotifiedOccurrenceKeys: const ['2026-01-01'],
+            dueNotifiedOccurrenceKeys: const ['2026-01-01'],
+          ),
+          RecurringItem(
             id: 'purge-recurring-local',
             kind: RecurringItemKind.reminder,
             type: TransactionType.expense,
@@ -165,6 +181,20 @@ void main() {
             createdAt: now.subtract(const Duration(days: 2)),
             updatedAt: now.subtract(const Duration(hours: 6)),
             reminderText: 'Daily reminder',
+          ),
+          RecurringItem(
+            id: 'merge-recurring',
+            kind: RecurringItemKind.reminder,
+            type: TransactionType.expense,
+            amount: 20000,
+            categoryId: 'keep-category',
+            sourceId: defaultMoneySourceId,
+            startDate: now,
+            frequency: RecurrenceFrequency.weekly,
+            nextRunAt: now.add(const Duration(days: 1)),
+            createdAt: now.subtract(const Duration(days: 5)),
+            updatedAt: now.subtract(const Duration(hours: 1)),
+            reminderText: 'New remote reminder',
           ),
           RecurringItem(
             id: 'purge-recurring-remote',
@@ -254,10 +284,17 @@ void main() {
       final recurringJson = snapshot.recurringItems
           .firstWhere((item) => item.id == 'keep-recurring-local')
           .compactedForStorage()
-          .toJson();
-      expect(recurringJson['completedOccurrenceKeys'], isEmpty);
-      expect(recurringJson['preNotifiedOccurrenceKeys'], isEmpty);
-      expect(recurringJson['dueNotifiedOccurrenceKeys'], isEmpty);
+          .toJson(includeNotificationState: false);
+      expect(recurringJson.containsKey('completedOccurrenceKeys'), isFalse);
+      expect(recurringJson.containsKey('preNotifiedOccurrenceKeys'), isFalse);
+      expect(recurringJson.containsKey('dueNotifiedOccurrenceKeys'), isFalse);
+
+      final mergedRecurring = snapshot.recurringItems.firstWhere(
+        (item) => item.id == 'merge-recurring',
+      );
+      expect(mergedRecurring.reminderText, 'New remote reminder');
+      expect(mergedRecurring.preNotifiedOccurrenceKeys, ['2026-01-01']);
+      expect(mergedRecurring.dueNotifiedOccurrenceKeys, ['2026-01-01']);
 
       expect(snapshot.purgedSoftDeleted, isTrue);
     });

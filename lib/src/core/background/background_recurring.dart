@@ -10,6 +10,7 @@ import '../../models/transaction.dart';
 
 const recurringTaskName = 'process_recurring_items';
 const recurringTaskTag = 'recurring_schedule';
+const _maxCatchUpOccurrencesPerRun = 60;
 
 Future<void> configureRecurringBackgroundProcessingFromStorage(
   RecurringStorage storage, {
@@ -117,8 +118,10 @@ Future<RecurringItem> _processRecurringTransaction(
   required TransactionStorage transactionStorage,
 }) async {
   var nextRunAt = item.nextRunAt;
+  var createdCount = 0;
 
-  while (!nextRunAt.isAfter(now)) {
+  while (!nextRunAt.isAfter(now) &&
+      createdCount < _maxCatchUpOccurrencesPerRun) {
     final key = recurringOccurrenceKey(nextRunAt);
     final transaction = Transaction(
       id: 'rec-${item.id}-$key',
@@ -130,8 +133,15 @@ Future<RecurringItem> _processRecurringTransaction(
       note: item.note,
     );
     await transactionStorage.putTransaction(transaction);
-    await RecurringNotificationService.showTransactionCreated(item);
     nextRunAt = nextRecurringDate(nextRunAt, item.frequency);
+    createdCount++;
+  }
+
+  if (createdCount > 0) {
+    await RecurringNotificationService.showTransactionsCreated(
+      item: item,
+      count: createdCount,
+    );
   }
 
   return item.copyWith(

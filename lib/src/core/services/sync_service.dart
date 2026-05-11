@@ -86,7 +86,11 @@ class SyncService {
       'moneySources': snapshot.moneySources.map((s) => s.toJson()).toList(),
       'transactions': snapshot.transactions.map((t) => t.toJson()).toList(),
       'recurringItems': snapshot.recurringItems
-          .map((item) => item.compactedForStorage().toJson())
+          .map(
+            (item) => item.compactedForStorage().toJson(
+              includeNotificationState: false,
+            ),
+          )
           .toList(),
     };
 
@@ -168,9 +172,14 @@ SyncSnapshot buildSyncSnapshot({
 
   for (final remoteItem in remoteRecurringItems) {
     final localItem = mergedRecurringItems[remoteItem.id];
-    if (localItem == null ||
-        remoteItem.updatedAt.isAfter(localItem.updatedAt)) {
+    if (localItem == null) {
       mergedRecurringItems[remoteItem.id] = remoteItem;
+    } else if (remoteItem.updatedAt.isAfter(localItem.updatedAt)) {
+      mergedRecurringItems[remoteItem.id] = remoteItem.copyWith(
+        completedOccurrenceKeys: localItem.completedOccurrenceKeys,
+        preNotifiedOccurrenceKeys: localItem.preNotifiedOccurrenceKeys,
+        dueNotifiedOccurrenceKeys: localItem.dueNotifiedOccurrenceKeys,
+      );
     }
   }
 
