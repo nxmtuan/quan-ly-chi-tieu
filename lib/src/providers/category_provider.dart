@@ -201,7 +201,7 @@ final defaultCategories = [
     id: 'study',
     name: 'Học tập',
     iconData: Icons.school_rounded,
-    colorHex: 0xFF7C3AED,
+    colorHex: 0xFF0D9488,
     type: TransactionType.expense,
   ),
 ];

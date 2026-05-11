@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class AppColors {
   const AppColors._();
 
-  static const primary = Color(0xFF7C3AED);
-  static const primaryLight = Color(0xFFEDE9FE);
+  static const primary = Color(0xFF0D9488);
+  static const primaryLight = Color(0xFFCCFBF1);
   static const success = Color(0xFF10B981);
   static const danger = Color(0xFFEF4444);
   static const warning = Color(0xFFF59E0B);
@@ -16,8 +16,8 @@ class AppColors {
   static const border = Color(0xFFE2E8F0);
   static const shadow = Color(0xFF0F172A);
 
-  static const darkPrimary = Color(0xFF8B5CF6);
-  static const darkPrimaryLight = Color(0xFF2E1065);
+  static const darkPrimary = Color(0xFF2DD4BF);
+  static const darkPrimaryLight = Color(0xFF134E4A);
   static const darkBackground = Color(0xFF0F172A);
   static const darkSurface = Color(0xFF1E293B);
   static const darkInputBackground = Color(0xFF334155);
