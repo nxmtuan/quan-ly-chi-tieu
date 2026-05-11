@@ -48,6 +48,7 @@ Future<bool> processRecurringItems({
   final currentTime = now ?? DateTime.now();
   final items = recurringStorage.readItems();
   final updatedItems = <RecurringItem>[];
+  final reminders = <RecurringItem>[];
 
   for (final item in items) {
     if (!item.isActive) {
@@ -55,15 +56,23 @@ Future<bool> processRecurringItems({
       continue;
     }
 
-    final updated = item.kind == RecurringItemKind.transaction
-        ? await _processRecurringTransaction(
-            item,
-            now: currentTime,
-            transactionStorage: transactionStorage,
-          )
-        : await _processRecurringReminder(item, now: currentTime);
-    updatedItems.add(updated);
+    if (item.kind == RecurringItemKind.reminder) {
+      reminders.add(item);
+      continue;
+    }
+
+    updatedItems.add(
+      await _processRecurringTransaction(
+        item,
+        now: currentTime,
+        transactionStorage: transactionStorage,
+      ),
+    );
   }
+
+  updatedItems.addAll(
+    await _processRecurringReminders(reminders, now: currentTime),
+  );
 
   await recurringStorage.saveItems(updatedItems);
   await configureRecurringBackgroundProcessingFromStorage(
@@ -128,65 +137,147 @@ Future<RecurringItem> _processRecurringTransaction(
   return item.copyWith(nextRunAt: nextRunAt);
 }
 
-Future<RecurringItem> _processRecurringReminder(
-  RecurringItem item, {
+Future<List<RecurringItem>> _processRecurringReminders(
+  List<RecurringItem> items, {
   required DateTime now,
 }) async {
-  var current = item;
-  final occurrenceKey = recurringOccurrenceKey(current.nextRunAt);
-  final preNotifyAt = current.nextRunAt.subtract(const Duration(days: 1));
-  final completed = current.completedOccurrenceKeys.contains(occurrenceKey);
+  final updatedItems = <RecurringItem>[];
+  final upcomingGroups = <DateTime, List<RecurringItem>>{};
+  final dueGroups = <DateTime, List<RecurringItem>>{};
+  final today = _dateOnly(now);
 
-  if (!completed &&
-      !current.preNotifiedOccurrenceKeys.contains(occurrenceKey) &&
-      !preNotifyAt.isAfter(now)) {
-    await RecurringNotificationService.showReminderUpcoming(current);
-    current = current.copyWith(
-      preNotifiedOccurrenceKeys: [
-        ...current.preNotifiedOccurrenceKeys,
+  for (final item in items) {
+    var current = item;
+    var guard = 0;
+
+    while (guard < 120) {
+      guard++;
+      final occurrenceDate = _dateOnly(current.nextRunAt);
+      final occurrenceKey = recurringOccurrenceKey(current.nextRunAt);
+      final upcomingNotifyAt = _reminderUpcomingNotifyAt(occurrenceDate);
+      final dueNotifyAt = _reminderDueNotifyAt(occurrenceDate);
+      final preNotified = current.preNotifiedOccurrenceKeys.contains(
         occurrenceKey,
-      ],
-    );
-  }
-
-  if (!completed &&
-      !current.dueNotifiedOccurrenceKeys.contains(occurrenceKey) &&
-      !current.nextRunAt.isAfter(now)) {
-    await RecurringNotificationService.showReminderDue(current);
-    current = current.copyWith(
-      dueNotifiedOccurrenceKeys: [
-        ...current.dueNotifiedOccurrenceKeys,
+      );
+      final dueNotified = current.dueNotifiedOccurrenceKeys.contains(
         occurrenceKey,
-      ],
+      );
+
+      if (occurrenceDate.isBefore(today) || dueNotified) {
+        current = current.copyWith(
+          nextRunAt: nextRecurringDate(current.nextRunAt, current.frequency),
+        );
+        continue;
+      }
+
+      if (_isSameDate(occurrenceDate, today)) {
+        if (!dueNotifyAt.isAfter(now)) {
+          dueGroups.putIfAbsent(occurrenceDate, () => []).add(current);
+          current = current.copyWith(
+            dueNotifiedOccurrenceKeys: [
+              ...current.dueNotifiedOccurrenceKeys,
+              occurrenceKey,
+            ],
+            nextRunAt: nextRecurringDate(current.nextRunAt, current.frequency),
+          );
+          continue;
+        }
+        break;
+      }
+
+      if (!preNotified &&
+          !upcomingNotifyAt.isAfter(now) &&
+          now.isBefore(dueNotifyAt)) {
+        upcomingGroups.putIfAbsent(occurrenceDate, () => []).add(current);
+        current = current.copyWith(
+          preNotifiedOccurrenceKeys: [
+            ...current.preNotifiedOccurrenceKeys,
+            occurrenceKey,
+          ],
+        );
+      }
+      break;
+    }
+
+    updatedItems.add(current);
+  }
+
+  for (final entry in _sortedReminderGroups(upcomingGroups)) {
+    await RecurringNotificationService.showReminderUpcomingGroup(
+      date: entry.key,
+      items: entry.value,
+    );
+  }
+  for (final entry in _sortedReminderGroups(dueGroups)) {
+    await RecurringNotificationService.showReminderDueGroup(
+      date: entry.key,
+      items: entry.value,
     );
   }
 
-  while (current.completedOccurrenceKeys.contains(
-    recurringOccurrenceKey(current.nextRunAt),
-  )) {
-    current = current.copyWith(
-      nextRunAt: nextRecurringDate(current.nextRunAt, current.frequency),
-    );
-  }
-
-  return current;
+  return updatedItems;
 }
 
 DateTime? _nextReminderProcessingTime(RecurringItem item, DateTime now) {
-  final key = recurringOccurrenceKey(item.nextRunAt);
-  final completed = item.completedOccurrenceKeys.contains(key);
-  if (completed) {
-    return item.nextRunAt;
+  var current = item;
+  final today = _dateOnly(now);
+  var guard = 0;
+
+  while (guard < 120) {
+    guard++;
+    final occurrenceDate = _dateOnly(current.nextRunAt);
+    final occurrenceKey = recurringOccurrenceKey(current.nextRunAt);
+    final upcomingNotifyAt = _reminderUpcomingNotifyAt(occurrenceDate);
+    final dueNotifyAt = _reminderDueNotifyAt(occurrenceDate);
+
+    if (occurrenceDate.isBefore(today) ||
+        current.dueNotifiedOccurrenceKeys.contains(occurrenceKey)) {
+      current = current.copyWith(
+        nextRunAt: nextRecurringDate(current.nextRunAt, current.frequency),
+      );
+      continue;
+    }
+
+    if (!current.preNotifiedOccurrenceKeys.contains(occurrenceKey)) {
+      return upcomingNotifyAt;
+    }
+
+    if (!current.dueNotifiedOccurrenceKeys.contains(occurrenceKey)) {
+      return dueNotifyAt;
+    }
   }
 
-  final preNotifyAt = item.nextRunAt.subtract(const Duration(days: 1));
-  if (!item.preNotifiedOccurrenceKeys.contains(key)) {
-    return preNotifyAt;
-  }
+  return null;
+}
 
-  if (!item.dueNotifiedOccurrenceKeys.contains(key)) {
-    return item.nextRunAt;
-  }
+DateTime _dateOnly(DateTime date) {
+  return DateTime(date.year, date.month, date.day);
+}
 
-  return nextRecurringDate(item.nextRunAt, item.frequency);
+bool _isSameDate(DateTime a, DateTime b) {
+  return a.year == b.year && a.month == b.month && a.day == b.day;
+}
+
+DateTime _reminderUpcomingNotifyAt(DateTime occurrenceDate) {
+  return DateTime(
+    occurrenceDate.year,
+    occurrenceDate.month,
+    occurrenceDate.day - 1,
+    21,
+  );
+}
+
+DateTime _reminderDueNotifyAt(DateTime occurrenceDate) {
+  return DateTime(
+    occurrenceDate.year,
+    occurrenceDate.month,
+    occurrenceDate.day,
+    7,
+  );
+}
+
+List<MapEntry<DateTime, List<RecurringItem>>> _sortedReminderGroups(
+  Map<DateTime, List<RecurringItem>> groups,
+) {
+  return groups.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
 }

@@ -74,6 +74,38 @@ class RecurringNotificationService {
     );
   }
 
+  static Future<void> showReminderUpcomingGroup({
+    required DateTime date,
+    required List<RecurringItem> items,
+  }) async {
+    if (items.isEmpty) {
+      return;
+    }
+
+    await _show(
+      id: _dateNotificationId(date, 2),
+      title: 'Lời nhắc cho ngày mai',
+      body:
+          'Bạn có ${items.length} lời nhắc vào ngày mai (${formatShortDate(date)}). ${_previewItems(items)}',
+    );
+  }
+
+  static Future<void> showReminderDueGroup({
+    required DateTime date,
+    required List<RecurringItem> items,
+  }) async {
+    if (items.isEmpty) {
+      return;
+    }
+
+    await _show(
+      id: _dateNotificationId(date, 3),
+      title: 'Lời nhắc cần thực hiện hôm nay',
+      body:
+          'Bạn có ${items.length} lời nhắc cần thực hiện vào hôm nay. Bỏ qua thông báo này nếu bạn đã hoàn thành. ${_previewItems(items)}',
+    );
+  }
+
   static Future<void> _show({
     required int id,
     required String title,
@@ -98,5 +130,17 @@ class RecurringNotificationService {
 
   static int _notificationId(RecurringItem item, int salt) {
     return item.id.hashCode.abs() % 100000 + salt * 100000;
+  }
+
+  static int _dateNotificationId(DateTime date, int salt) {
+    return date.year * 10000 + date.month * 100 + date.day + salt * 100000000;
+  }
+
+  static String _previewItems(List<RecurringItem> items) {
+    final titles = items.take(3).map((item) => item.title).join(', ');
+    if (items.length <= 3) {
+      return titles;
+    }
+    return '$titles và ${items.length - 3} lời nhắc khác';
   }
 }

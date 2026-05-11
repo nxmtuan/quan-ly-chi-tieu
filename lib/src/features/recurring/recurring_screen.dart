@@ -303,59 +303,12 @@ class _RecurringItemCard extends ConsumerWidget {
                     ),
                   ),
                 ),
-                if (item.kind == RecurringItemKind.reminder) ...[
-                  SizedBox(width: context.scaled(10)),
-                  AppBounceBuilder(
-                    onTap: () => _completeReminder(context, ref),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.scaled(9),
-                        vertical: context.scaled(5),
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        'Hoàn thành',
-                        style: context.appText.captionStrong.copyWith(
-                          color: AppColors.primary,
-                          fontSize: context.scaledFont(11, min: 10),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _completeReminder(BuildContext context, WidgetRef ref) async {
-    final key = recurringOccurrenceKey(item.nextRunAt);
-    var nextRunAt = item.nextRunAt;
-    while (!nextRunAt.isAfter(DateTime.now())) {
-      nextRunAt = nextRecurringDate(nextRunAt, item.frequency);
-    }
-
-    await ref
-        .read(recurringItemsProvider.notifier)
-        .updateItem(
-          item.copyWith(
-            nextRunAt: nextRunAt,
-            completedOccurrenceKeys: [...item.completedOccurrenceKeys, key],
-          ),
-        );
-    if (context.mounted) {
-      AppToast.show(
-        context,
-        message: 'Đã hoàn thành lời nhắc',
-        type: AppToastType.success,
-      );
-    }
   }
 }
 
