@@ -81,8 +81,6 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
                       _CategoryAmountRow(
                             item: entry.$2,
                             total: total,
-                            scope: widget.scope,
-                            transactions: widget.transactions,
                             showDivider: false,
                           )
                           .animate(delay: Duration(milliseconds: 38 * entry.$1))

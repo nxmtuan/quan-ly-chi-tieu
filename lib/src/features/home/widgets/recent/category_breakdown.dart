@@ -5,15 +5,11 @@ class _CategoryAmountRow extends StatelessWidget {
     required this.item,
     required this.total,
     required this.showDivider,
-    required this.scope,
-    required this.transactions,
   });
 
   final _CategoryAmountItem item;
   final double total;
   final bool showDivider;
-  final HomeSummaryScope scope;
-  final List<Transaction> transactions;
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +20,7 @@ class _CategoryAmountRow extends StatelessWidget {
 
     return AppBounceBuilder(
       onTap: () {
-        showCategoryTransactionsSheet(
-          context,
-          category: item.category,
-          scope: scope,
-        );
+        showCategoryTransactionsSheet(context, category: item.category);
       },
       child: Padding(
         padding: EdgeInsets.symmetric(
@@ -77,9 +69,7 @@ class _CategoryAmountRow extends StatelessWidget {
               children: [
                 Text(
                   '$sign${formatCurrency(item.amount)}',
-                  style: context.appText.bodyStrong.copyWith(
-                    color: color,
-                  ),
+                  style: context.appText.bodyStrong.copyWith(color: color),
                 ),
                 SizedBox(height: context.scaled(4)),
                 Icon(
