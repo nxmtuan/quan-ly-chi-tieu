@@ -52,6 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           .fold<double>(0, (total, transaction) => total + transaction.amount),
     );
     final now = DateTime.now();
+    final expenseComparison = _expensePeriodComparison(now);
 
     return ColoredBox(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -95,6 +96,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child:
                         SummaryCard(
                               summary: summary,
+                              expenseComparison: expenseComparison,
                               scope: _selectedScope,
                               selectedType: _selectedType,
                               onSelectedType: (type) {
@@ -171,6 +173,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  ExpensePeriodComparison _expensePeriodComparison(DateTime now) {
+    final currentExpense = _expenseTotal(
+      fromDate: DateTime(now.year, now.month),
+      toDate: DateTime(now.year, now.month, now.day, 23, 59, 59, 999),
+    );
+    final previousMonthStart = DateTime(now.year, now.month - 1);
+    final previousMonthEnd = _sameDayPreviousMonthEnd(now);
+    final previousExpense = _expenseTotal(
+      fromDate: previousMonthStart,
+      toDate: previousMonthEnd,
+    );
+
+    return ExpensePeriodComparison(
+      currentExpense: currentExpense,
+      previousExpense: previousExpense,
+    );
+  }
+
+  double _expenseTotal({required DateTime fromDate, required DateTime toDate}) {
+    final transactions = ref.watch(
+      transactionsQueryProvider((
+        categoryId: null,
+        fromDate: fromDate,
+        limit: null,
+        toDate: toDate,
+        type: TransactionType.expense,
+      )),
+    );
+
+    return transactions.fold<double>(
+      0,
+      (total, transaction) => total + transaction.amount,
+    );
+  }
+
   void _goToPreviousScope() {
     setState(() => _selectedScope = _selectedScope.previous());
   }
@@ -217,6 +254,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 DateTime _monthStart(DateTime date) {
   return DateTime(date.year, date.month);
+}
+
+DateTime _sameDayPreviousMonthEnd(DateTime date) {
+  final previousMonthStart = DateTime(date.year, date.month - 1);
+  final previousMonthLastDay = DateTime(
+    previousMonthStart.year,
+    previousMonthStart.month + 1,
+    0,
+  ).day;
+  final day = date.day > previousMonthLastDay ? previousMonthLastDay : date.day;
+
+  return DateTime(
+    previousMonthStart.year,
+    previousMonthStart.month,
+    day,
+    23,
+    59,
+    59,
+    999,
+  );
 }
 
 class _QuickAddButton extends StatelessWidget {

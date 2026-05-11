@@ -68,14 +68,36 @@ class _MonthSelectorBar extends StatelessWidget {
 }
 
 class _BalanceBanner extends StatelessWidget {
-  const _BalanceBanner({required this.balance});
+  const _BalanceBanner({
+    required this.balance,
+    required this.expenseComparison,
+  });
 
   final double balance;
+  final ExpensePeriodComparison expenseComparison;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.appPalette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final difference = expenseComparison.difference;
+    final isIncrease = difference > 0;
+    final isDecrease = difference < 0;
+    final comparisonColor = isDecrease
+        ? AppColors.success
+        : isIncrease
+        ? AppColors.danger
+        : palette.textSecondary;
+    final comparisonLabel = isDecrease
+        ? 'Giảm'
+        : isIncrease
+        ? 'Tăng'
+        : 'Không đổi';
+    final comparisonIcon = isDecrease
+        ? Icons.trending_down_rounded
+        : isIncrease
+        ? Icons.trending_up_rounded
+        : Icons.drag_handle_rounded;
 
     return Container(
       width: double.infinity,
@@ -95,10 +117,60 @@ class _BalanceBanner extends StatelessWidget {
           color: palette.surfaceElevated.withValues(alpha: 0.8),
         ),
       ),
-      child: Text(
-        'Dư: ${formatCurrency(balance)}',
-        textAlign: TextAlign.center,
-        style: context.appText.amountMD.copyWith(color: AppColors.primary),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Dư: ${formatCurrency(balance)}',
+            textAlign: TextAlign.center,
+            style: context.appText.amountMD.copyWith(color: AppColors.primary),
+          ),
+          SizedBox(height: context.scaled(10)),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.scaled(12),
+              vertical: context.scaled(8),
+            ),
+            decoration: BoxDecoration(
+              color: palette.surface.withValues(alpha: isDark ? 0.08 : 0.72),
+              borderRadius: BorderRadius.circular(context.scaled(12)),
+              border: Border.all(
+                color: comparisonColor.withValues(alpha: 0.16),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  comparisonIcon,
+                  color: comparisonColor,
+                  size: context.scaled(18),
+                ),
+                SizedBox(width: context.scaled(6)),
+                Flexible(
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: context.appText.captionStrong.copyWith(
+                        color: palette.textPrimary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      children: [
+                        TextSpan(
+                          text:
+                              '$comparisonLabel ${formatCurrency(difference.abs())}',
+                          style: TextStyle(color: comparisonColor),
+                        ),
+                        const TextSpan(text: ' so với cùng kỳ tháng trước'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

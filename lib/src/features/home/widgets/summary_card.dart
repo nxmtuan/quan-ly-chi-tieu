@@ -13,10 +13,23 @@ import '../../../providers/transaction_provider.dart';
 part 'summary/summary_components.dart';
 part '../sheets/month_picker_sheet.dart';
 
+class ExpensePeriodComparison {
+  const ExpensePeriodComparison({
+    required this.currentExpense,
+    required this.previousExpense,
+  });
+
+  final double currentExpense;
+  final double previousExpense;
+
+  double get difference => currentExpense - previousExpense;
+}
+
 class SummaryCard extends StatelessWidget {
   const SummaryCard({
     super.key,
     required this.summary,
+    required this.expenseComparison,
     required this.scope,
     required this.selectedType,
     required this.onSelectedType,
@@ -26,6 +39,7 @@ class SummaryCard extends StatelessWidget {
   });
 
   final TransactionSummary summary;
+  final ExpensePeriodComparison expenseComparison;
   final HomeSummaryScope scope;
   final TransactionType selectedType;
   final ValueChanged<TransactionType> onSelectedType;
@@ -75,7 +89,10 @@ class SummaryCard extends StatelessWidget {
           ],
         ),
         SizedBox(height: context.scaled(14)),
-        _BalanceBanner(balance: summary.balance),
+        _BalanceBanner(
+          balance: summary.balance,
+          expenseComparison: expenseComparison,
+        ),
       ],
     );
   }
