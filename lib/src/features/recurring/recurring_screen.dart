@@ -9,6 +9,7 @@ import '../../core/utils/adaptive.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/local_id.dart';
 import '../../core/widgets/app_bounce_builder.dart';
+import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_page_header.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_toast.dart';
@@ -217,89 +218,118 @@ class _RecurringItemCard extends ConsumerWidget {
         ? AppColors.danger
         : AppColors.success;
 
-    return FlatCard(
-      showShadow: false,
-      radius: context.scaled(22),
-      padding: EdgeInsets.all(context.scaled(14)),
-      child: Row(
-        children: [
-          Container(
-            width: context.scaled(50),
-            height: context.scaled(50),
-            decoration: BoxDecoration(
-              color: (category?.color ?? color).withValues(alpha: 0.13),
-              borderRadius: BorderRadius.circular(context.scaled(18)),
-            ),
-            child: Icon(
-              category?.iconData ?? Icons.repeat_rounded,
-              color: category?.color ?? color,
-              size: context.scaled(23),
-            ),
-          ),
-          SizedBox(width: context.scaled(12)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return AppBounceBuilder(
+      onTap: () => showRecurringDetailSheet(context, item: item),
+      child: FlatCard(
+        showShadow: false,
+        radius: context.scaled(22),
+        padding: EdgeInsets.all(context.scaled(14)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(
-                  item.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.appText.fieldValue,
-                ),
-                SizedBox(height: context.scaled(5)),
-                Text(
-                  '${category?.name ?? 'Khác'} • ${source?.name ?? 'Tiền mặt'} • ${item.frequency.label}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.appText.caption.copyWith(
-                    color: context.appPalette.textSecondary,
+                Container(
+                  width: context.scaled(48),
+                  height: context.scaled(48),
+                  decoration: BoxDecoration(
+                    color: (category?.color ?? color).withValues(alpha: 0.13),
+                    borderRadius: BorderRadius.circular(context.scaled(17)),
+                  ),
+                  child: Icon(
+                    category?.iconData ?? Icons.repeat_rounded,
+                    color: category?.color ?? color,
+                    size: context.scaled(22),
                   ),
                 ),
-                SizedBox(height: context.scaled(4)),
-                Text(
-                  'Kỳ tiếp theo: ${formatShortDate(item.nextRunAt)}',
-                  style: context.appText.caption.copyWith(
-                    color: context.appPalette.textSecondary,
+                SizedBox(width: context.scaled(12)),
+                Expanded(
+                  child: Text(
+                    item.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.appText.fieldValue,
                   ),
+                ),
+                SizedBox(width: context.scaled(10)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      formatCurrency(item.amount),
+                      style: context.appText.bodyStrong.copyWith(color: color),
+                    ),
+                    SizedBox(height: context.scaled(2)),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: context.appPalette.textSecondary,
+                      size: context.scaled(20),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ),
-          SizedBox(width: context.scaled(10)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                formatCurrency(item.amount),
-                style: context.appText.bodyStrong.copyWith(color: color),
-              ),
-              if (item.kind == RecurringItemKind.reminder) ...[
-                SizedBox(height: context.scaled(8)),
-                AppBounceBuilder(
-                  onTap: () => _completeReminder(context, ref),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.scaled(9),
-                      vertical: context.scaled(5),
+            SizedBox(height: context.scaled(10)),
+            Wrap(
+              spacing: context.scaled(6),
+              runSpacing: context.scaled(6),
+              children: [
+                _RecurringInfoChip(
+                  icon: category?.iconData ?? Icons.category_rounded,
+                  label: category?.name ?? 'Khác',
+                  color: category?.color ?? color,
+                ),
+                _RecurringInfoChip(
+                  icon:
+                      source?.iconData ?? Icons.account_balance_wallet_rounded,
+                  label: source?.name ?? 'Tiền mặt',
+                  color: AppColors.primary,
+                ),
+                _RecurringInfoChip(
+                  icon: Icons.repeat_rounded,
+                  label: item.frequency.label,
+                  color: color,
+                ),
+              ],
+            ),
+            SizedBox(height: context.scaled(10)),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Kỳ tiếp theo: ${formatShortDate(item.nextRunAt)}',
+                    style: context.appText.caption.copyWith(
+                      color: context.appPalette.textSecondary,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      'Hoàn thành',
-                      style: context.appText.captionStrong.copyWith(
-                        color: AppColors.primary,
-                        fontSize: context.scaledFont(11, min: 10),
+                  ),
+                ),
+                if (item.kind == RecurringItemKind.reminder) ...[
+                  SizedBox(width: context.scaled(10)),
+                  AppBounceBuilder(
+                    onTap: () => _completeReminder(context, ref),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.scaled(9),
+                        vertical: context.scaled(5),
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        'Hoàn thành',
+                        style: context.appText.captionStrong.copyWith(
+                          color: AppColors.primary,
+                          fontSize: context.scaledFont(11, min: 10),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ],
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -326,6 +356,53 @@ class _RecurringItemCard extends ConsumerWidget {
         type: AppToastType.success,
       );
     }
+  }
+}
+
+class _RecurringInfoChip extends StatelessWidget {
+  const _RecurringInfoChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.scaled(8),
+        vertical: context.scaled(5),
+      ),
+      decoration: BoxDecoration(
+        color: palette.surfaceMuted,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: palette.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: context.scaled(13)),
+          SizedBox(width: context.scaled(4)),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.appText.captionStrong.copyWith(
+                color: palette.textSecondary,
+                fontSize: context.scaledFont(11, min: 10),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
