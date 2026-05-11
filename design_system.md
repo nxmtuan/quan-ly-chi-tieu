@@ -16,8 +16,8 @@
 *Quy tắc: Chỉ dùng màu Solid (màu trơn), không dùng Gradient.*
 
 **Brand / Primary:**
-- Primary: `#7C3AED` (Tím hiện đại - Dùng cho nút FAB, Nút lưu)
-- Primary Light: `#EDE9FE` (Tím nhạt - Dùng cho background của nút phụ, trạng thái active)
+- Primary: `#0D9488` (Xanh teal - Dùng cho nút FAB, Nút lưu)
+- Primary Light: `#CCFBF1` (Xanh teal nhạt - Dùng cho background của nút phụ, trạng thái active)
 
 **Semantic (Thu / Chi):**
 - Success (Thu): `#10B981` (Xanh ngọc/Mint - Trơn, nổi bật)
@@ -46,8 +46,8 @@
 
 **Brand & Semantic (Màu chủ đạo & Thu/Chi):**
 *Lưu ý: Các màu này vẫn giữ Solid, màu Thu/Chi giữ nguyên vì màu sáng tự nổi bật trên nền tối.*
-- Primary: `#8B5CF6` (Tím - được đẩy sáng lên một chút so với Light mode để rõ hơn trên nền đen)
-- Primary Light (Cho nút phụ/trạng thái Active): `#2E1065` (Tím cực đậm) hoặc dùng `#334155`
+- Primary: `#2DD4BF` (Xanh teal - được đẩy sáng lên một chút so với Light mode để rõ hơn trên nền đen)
+- Primary Light (Cho nút phụ/trạng thái Active): `#134E4A` (Xanh teal cực đậm) hoặc dùng `#334155`
 - Success (Thu): `#10B981` (Giữ nguyên)
 - Danger (Chi): `#EF4444` (Giữ nguyên)
 
