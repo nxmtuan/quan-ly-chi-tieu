@@ -150,6 +150,7 @@ class _CategoryMonthlyChart extends StatelessWidget {
       0,
       (value, point) => point.amount > value ? point.amount : value,
     );
+    final chartHeight = context.scaled(198).clamp(180.0, 220.0).toDouble();
 
     return Container(
       width: double.infinity,
@@ -202,7 +203,7 @@ class _CategoryMonthlyChart extends StatelessWidget {
           ),
           SizedBox(height: context.scaled(14)),
           SizedBox(
-            height: context.scaled(180),
+            height: chartHeight,
             child: BarChart(
               BarChartData(
                 minY: 0,
