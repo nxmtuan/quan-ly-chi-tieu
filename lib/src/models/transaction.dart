@@ -96,6 +96,7 @@ class Transaction {
     String? categoryId,
     String? sourceId,
     String? savingsGoalId,
+    bool clearSavingsGoalId = false,
     DateTime? date,
     String? note,
     DateTime? updatedAt,
@@ -108,7 +109,9 @@ class Transaction {
       type: type ?? this.type,
       categoryId: categoryId ?? this.categoryId,
       sourceId: sourceId ?? this.sourceId,
-      savingsGoalId: savingsGoalId ?? this.savingsGoalId,
+      savingsGoalId: clearSavingsGoalId
+          ? null
+          : savingsGoalId ?? this.savingsGoalId,
       date: date ?? this.date,
       note: note ?? this.note,
       updatedAt: updatedAt ?? this.updatedAt,

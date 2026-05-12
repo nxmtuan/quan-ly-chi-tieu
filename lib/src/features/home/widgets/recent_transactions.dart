@@ -129,13 +129,15 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
         _CategoryAmountItem(
           category: categories.firstWhere(
             (category) => category.id == entry.key,
-            orElse: () => Category(
-              id: entry.key,
-              name: 'Khác',
-              iconData: Icons.category_rounded,
-              colorHex: AppColors.textSecondary.toARGB32(),
-              type: widget.selectedType,
-            ),
+            orElse: () =>
+                uncategorizedCategoryFromId(entry.key) ??
+                Category(
+                  id: entry.key,
+                  name: 'Khác',
+                  iconData: Icons.category_rounded,
+                  colorHex: AppColors.textSecondary.toARGB32(),
+                  type: widget.selectedType,
+                ),
           ),
           amount: entry.value,
           color: AppColors.textSecondary,

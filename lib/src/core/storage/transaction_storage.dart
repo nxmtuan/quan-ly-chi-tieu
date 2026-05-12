@@ -129,6 +129,58 @@ class TransactionStorage {
     ]);
   }
 
+  Future<void> reassignTransactionsByCategory(
+    String categoryId,
+    String replacementCategoryId, {
+    DateTime? updatedAt,
+  }) async {
+    final timestamp = updatedAt ?? DateTime.now();
+    final query = _box
+        .query(
+          Transaction_.categoryId.equals(categoryId) &
+              Transaction_.isDeleted.equals(false),
+        )
+        .build();
+    final transactions = query.find();
+    query.close();
+
+    if (transactions.isEmpty) {
+      return;
+    }
+
+    _box.putMany([
+      for (final transaction in transactions)
+        transaction.copyWith(
+          categoryId: replacementCategoryId,
+          updatedAt: timestamp,
+        ),
+    ]);
+  }
+
+  Future<void> clearSavingsGoalFromTransactions(
+    String savingsGoalId, {
+    DateTime? updatedAt,
+  }) async {
+    final timestamp = updatedAt ?? DateTime.now();
+    final query = _box
+        .query(
+          Transaction_.savingsGoalId.equals(savingsGoalId) &
+              Transaction_.isDeleted.equals(false),
+        )
+        .build();
+    final transactions = query.find();
+    query.close();
+
+    if (transactions.isEmpty) {
+      return;
+    }
+
+    _box.putMany([
+      for (final transaction in transactions)
+        transaction.copyWith(clearSavingsGoalId: true, updatedAt: timestamp),
+    ]);
+  }
+
   Transaction? _findById(String id) {
     final query = _box.query(Transaction_.id.equals(id)).build();
     try {
@@ -138,10 +190,7 @@ class TransactionStorage {
     }
   }
 
-  List<DateTime> readTransactionDates({
-    DateTime? fromDate,
-    DateTime? toDate,
-  }) {
+  List<DateTime> readTransactionDates({DateTime? fromDate, DateTime? toDate}) {
     Condition<Transaction>? condition = Transaction_.isDeleted.equals(false);
 
     if (fromDate != null && toDate != null) {

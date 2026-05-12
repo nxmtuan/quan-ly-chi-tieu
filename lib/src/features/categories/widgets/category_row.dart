@@ -31,13 +31,12 @@ class _CategoryRow extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  category.name,
-                  style: context.appText.bodyStrong,
-                ),
+                Text(category.name, style: context.appText.bodyStrong),
                 SizedBox(height: context.scaled(3)),
                 Text(
-                  category.type == TransactionType.income ? 'Thu nhập' : 'Chi tiêu',
+                  category.type == TransactionType.income
+                      ? 'Thu nhập'
+                      : 'Chi tiêu',
                   style: context.appText.caption.copyWith(
                     color: context.appPalette.textSecondary,
                   ),
@@ -67,7 +66,8 @@ class _CategoryRow extends ConsumerWidget {
     final confirmed = await showAppConfirmDialog(
       context,
       title: 'Xóa danh mục',
-      message: 'Các giao dịch trong danh mục này cũng sẽ bị xóa.',
+      message:
+          'Các giao dịch trong danh mục này sẽ được chuyển về Chưa phân loại.',
       confirmText: 'Xóa',
       confirmTextColor: const Color(0xFFDC2626),
       confirmBackgroundColor: context.appPalette.dangerSoft,
@@ -79,7 +79,10 @@ class _CategoryRow extends ConsumerWidget {
 
     await ref
         .read(transactionsProvider.notifier)
-        .deleteTransactionsByCategory(category.id);
+        .reassignTransactionsByCategory(
+          category.id,
+          uncategorizedCategoryIdFor(category.type),
+        );
     await ref.read(categoriesProvider.notifier).deleteCategory(category.id);
     if (context.mounted) {
       AppToast.show(

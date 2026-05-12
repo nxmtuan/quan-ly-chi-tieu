@@ -50,7 +50,9 @@ class CategoriesNotifier extends Notifier<List<Category>> {
 
   Future<void> updateCategory(Category category) async {
     if (isDefaultCategoryId(category.id)) {
-      final existingCategory = state.where((item) => item.id == category.id).firstOrNull;
+      final existingCategory = state
+          .where((item) => item.id == category.id)
+          .firstOrNull;
       if (existingCategory == null) {
         return;
       }
@@ -63,7 +65,9 @@ class CategoriesNotifier extends Notifier<List<Category>> {
         for (final item in state)
           if (item.id == category.id) updatedDefaultCategory else item,
       ];
-      await ref.read(categoryStorageProvider).putCategory(updatedDefaultCategory);
+      await ref
+          .read(categoryStorageProvider)
+          .putCategory(updatedDefaultCategory);
       return;
     }
 
@@ -85,11 +89,14 @@ class CategoriesNotifier extends Notifier<List<Category>> {
   static List<Category> _visibleCategories(List<Category> categories) {
     return [
       for (final category in categories)
-        if (!category.isDeleted) category,
+        if (!category.isDeleted && !isHiddenSystemCategoryId(category.id))
+          category,
     ];
   }
 
-  static List<Category> _mergeWithDefaultCategories(List<Category> storedCategories) {
+  static List<Category> _mergeWithDefaultCategories(
+    List<Category> storedCategories,
+  ) {
     final storedById = {
       for (final category in storedCategories) category.id: category,
     };
@@ -215,6 +222,11 @@ final categoriesByTypeProvider =
     });
 
 final categoryByIdProvider = Provider.family<Category?, String>((ref, id) {
+  final hiddenCategory = uncategorizedCategoryFromId(id);
+  if (hiddenCategory != null) {
+    return hiddenCategory;
+  }
+
   for (final category in ref.watch(categoriesProvider)) {
     if (category.id == id) {
       return category;

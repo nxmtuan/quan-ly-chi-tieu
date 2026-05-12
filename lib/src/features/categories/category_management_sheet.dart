@@ -14,10 +14,7 @@ import '../../models/transaction.dart';
 import '../../providers/category_provider.dart';
 import '../../providers/transaction_provider.dart';
 
-Future<void> showCategoryManagementSheet(
-  BuildContext context,
-  WidgetRef ref,
-) {
+Future<void> showCategoryManagementSheet(BuildContext context, WidgetRef ref) {
   return showAppBottomSheet<void>(
     context: context,
     builder: (_) => const _CategoryManagementSheet(),
@@ -31,10 +28,8 @@ Future<Category?> showCategoryEditorSheet(
 }) {
   return showAppBottomSheet<Category>(
     context: context,
-    builder: (_) => _CategoryEditorSheet(
-      initialType: initialType,
-      category: category,
-    ),
+    builder: (_) =>
+        _CategoryEditorSheet(initialType: initialType, category: category),
   );
 }
 
@@ -91,10 +86,23 @@ class _CategoryManagementSheetState
           ),
         ],
       ),
-      action: AppPrimaryButton(
-        label: 'Thêm danh mục',
-        color: AppColors.primary,
-        onTap: () => _openEditor(),
+      action: Row(
+        children: [
+          Expanded(
+            child: _SheetSecondaryActionButton(
+              label: 'Đóng',
+              onTap: () => Navigator.of(context).pop(),
+            ),
+          ),
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: AppPrimaryButton(
+              label: 'Thêm danh mục',
+              color: AppColors.primary,
+              onTap: () => _openEditor(),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -111,7 +119,8 @@ class _CategoryManagementSheetState
     final confirmed = await showAppConfirmDialog(
       context,
       title: 'Xóa danh mục',
-      message: 'Các giao dịch trong danh mục này cũng sẽ bị xóa.',
+      message:
+          'Các giao dịch trong danh mục này sẽ được chuyển về Chưa phân loại.',
       confirmText: 'Xóa',
       confirmTextColor: const Color(0xFFDC2626),
       confirmBackgroundColor: context.appPalette.dangerSoft,
@@ -123,7 +132,10 @@ class _CategoryManagementSheetState
 
     await ref
         .read(transactionsProvider.notifier)
-        .deleteTransactionsByCategory(category.id);
+        .reassignTransactionsByCategory(
+          category.id,
+          uncategorizedCategoryIdFor(category.type),
+        );
     await ref.read(categoriesProvider.notifier).deleteCategory(category.id);
     if (!mounted) {
       return;
@@ -263,15 +275,9 @@ class _ManagedCategoryRow extends StatelessWidget {
           ),
           SizedBox(width: context.scaled(14)),
           Expanded(
-            child: Text(
-              category.name,
-              style: context.appText.bodyStrong,
-            ),
+            child: Text(category.name, style: context.appText.bodyStrong),
           ),
-          _CategoryActionButton(
-            icon: Icons.edit_rounded,
-            onTap: onEdit,
-          ),
+          _CategoryActionButton(icon: Icons.edit_rounded, onTap: onEdit),
           if (canDelete) ...[
             SizedBox(width: context.scaled(8)),
             _CategoryActionButton(
@@ -325,10 +331,7 @@ class _CategoryActionButton extends StatelessWidget {
 }
 
 class _CategoryEditorSheet extends ConsumerStatefulWidget {
-  const _CategoryEditorSheet({
-    required this.initialType,
-    this.category,
-  });
+  const _CategoryEditorSheet({required this.initialType, this.category});
 
   final TransactionType initialType;
   final Category? category;
@@ -433,10 +436,23 @@ class _CategoryEditorSheetState extends ConsumerState<_CategoryEditorSheet> {
           ],
         ),
       ),
-      action: AppPrimaryButton(
-        label: _isEditing ? 'Lưu thay đổi' : 'Tạo danh mục',
-        color: AppColors.primary,
-        onTap: _save,
+      action: Row(
+        children: [
+          Expanded(
+            child: _SheetSecondaryActionButton(
+              label: 'Đóng',
+              onTap: () => Navigator.of(context).pop(),
+            ),
+          ),
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: AppPrimaryButton(
+              label: _isEditing ? 'Lưu thay đổi' : 'Tạo danh mục',
+              color: AppColors.primary,
+              onTap: _save,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -479,6 +495,35 @@ class _CategoryEditorSheetState extends ConsumerState<_CategoryEditorSheet> {
   }
 }
 
+class _SheetSecondaryActionButton extends StatelessWidget {
+  const _SheetSecondaryActionButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+        decoration: BoxDecoration(
+          color: context.appPalette.surfaceMuted,
+          borderRadius: BorderRadius.circular(context.scaled(16)),
+          border: Border.all(color: context.appPalette.border),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: context.appText.buttonLabel.copyWith(
+            color: context.appPalette.textPrimary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _EditorSectionLabel extends StatelessWidget {
   const _EditorSectionLabel({required this.label});
 
@@ -486,10 +531,7 @@ class _EditorSectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: context.appText.fieldLabel,
-    );
+    return Text(label, style: context.appText.fieldLabel);
   }
 }
 
@@ -534,9 +576,7 @@ class _EditorNameField extends StatelessWidget {
           errorBorder: InputBorder.none,
           focusedErrorBorder: InputBorder.none,
           isDense: true,
-          contentPadding: EdgeInsets.symmetric(
-            vertical: context.scaled(14),
-          ),
+          contentPadding: EdgeInsets.symmetric(vertical: context.scaled(14)),
           hintText: 'Nhập tên danh mục',
           hintStyle: context.appText.body.copyWith(
             color: context.appPalette.textSecondary.withValues(alpha: 0.65),

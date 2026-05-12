@@ -133,6 +133,40 @@ const defaultCategoryIds = {
 
 bool isDefaultCategoryId(String id) => defaultCategoryIds.contains(id);
 
+const uncategorizedExpenseCategoryId = '__uncategorized_expense__';
+const uncategorizedIncomeCategoryId = '__uncategorized_income__';
+
+bool isHiddenSystemCategoryId(String id) =>
+    id == uncategorizedExpenseCategoryId || id == uncategorizedIncomeCategoryId;
+
+String uncategorizedCategoryIdFor(TransactionType type) {
+  return type == TransactionType.expense
+      ? uncategorizedExpenseCategoryId
+      : uncategorizedIncomeCategoryId;
+}
+
+Category? uncategorizedCategoryFromId(String id) {
+  return switch (id) {
+    uncategorizedExpenseCategoryId => uncategorizedCategoryFor(
+      TransactionType.expense,
+    ),
+    uncategorizedIncomeCategoryId => uncategorizedCategoryFor(
+      TransactionType.income,
+    ),
+    _ => null,
+  };
+}
+
+Category uncategorizedCategoryFor(TransactionType type) {
+  return Category(
+    id: uncategorizedCategoryIdFor(type),
+    name: 'Chưa phân loại',
+    iconData: Icons.category_rounded,
+    colorHex: 0xFF6B7280,
+    type: type,
+  );
+}
+
 @Entity()
 class Category {
   Category({

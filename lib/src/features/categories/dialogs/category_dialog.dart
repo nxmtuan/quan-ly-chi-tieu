@@ -79,10 +79,23 @@ class _CategoryFormSheetState extends ConsumerState<_CategoryFormSheet> {
           ],
         ),
       ),
-      action: AppPrimaryButton(
-        label: _isEditing ? 'Lưu thay đổi' : 'Tạo danh mục',
-        color: AppColors.primary,
-        onTap: _save,
+      action: Row(
+        children: [
+          Expanded(
+            child: _CategoryDialogSecondaryActionButton(
+              label: 'Đóng',
+              onTap: () => Navigator.of(context).pop(),
+            ),
+          ),
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: AppPrimaryButton(
+              label: _isEditing ? 'Lưu thay đổi' : 'Tạo danh mục',
+              color: AppColors.primary,
+              onTap: _save,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -125,6 +138,38 @@ class _CategoryFormSheetState extends ConsumerState<_CategoryFormSheet> {
   }
 }
 
+class _CategoryDialogSecondaryActionButton extends StatelessWidget {
+  const _CategoryDialogSecondaryActionButton({
+    required this.label,
+    required this.onTap,
+  });
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+        decoration: BoxDecoration(
+          color: context.appPalette.surfaceMuted,
+          borderRadius: BorderRadius.circular(context.scaled(16)),
+          border: Border.all(color: context.appPalette.border),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: context.appText.buttonLabel.copyWith(
+            color: context.appPalette.textPrimary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _SheetSectionLabel extends StatelessWidget {
   const _SheetSectionLabel({required this.label});
 
@@ -132,10 +177,7 @@ class _SheetSectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: context.appText.fieldLabel,
-    );
+    return Text(label, style: context.appText.fieldLabel);
   }
 }
 
@@ -171,10 +213,7 @@ class _CategoryNameField extends StatelessWidget {
 }
 
 class _TypeToggleGroup extends StatelessWidget {
-  const _TypeToggleGroup({
-    required this.value,
-    required this.onChanged,
-  });
+  const _TypeToggleGroup({required this.value, required this.onChanged});
 
   final TransactionType value;
   final ValueChanged<TransactionType> onChanged;
@@ -233,10 +272,14 @@ class _TypeToggleButton extends StatelessWidget {
           vertical: context.scaled(14),
         ),
         decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.08) : context.appPalette.surface,
+          color: selected
+              ? color.withValues(alpha: 0.08)
+              : context.appPalette.surface,
           borderRadius: BorderRadius.circular(context.scaled(18)),
           border: Border.all(
-            color: selected ? color.withValues(alpha: 0.28) : context.appPalette.border,
+            color: selected
+                ? color.withValues(alpha: 0.28)
+                : context.appPalette.border,
           ),
         ),
         child: Row(
@@ -256,10 +299,7 @@ class _TypeToggleButton extends StatelessWidget {
 }
 
 class _IconPickerGrid extends StatelessWidget {
-  const _IconPickerGrid({
-    required this.selectedIcon,
-    required this.onSelected,
-  });
+  const _IconPickerGrid({required this.selectedIcon, required this.onSelected});
 
   final IconData selectedIcon;
   final ValueChanged<IconData> onSelected;
@@ -368,7 +408,9 @@ class _ColorOption extends StatelessWidget {
           color: color,
           shape: BoxShape.circle,
           border: Border.all(
-            color: selected ? context.appPalette.textPrimary : Colors.transparent,
+            color: selected
+                ? context.appPalette.textPrimary
+                : Colors.transparent,
             width: context.scaled(selected ? 2 : 1),
           ),
           boxShadow: selected

@@ -55,6 +55,9 @@ class SavingsGoalsNotifier extends Notifier<List<SavingsGoal>> {
   }
 
   Future<void> deleteGoal(String id) async {
+    await ref
+        .read(transactionsProvider.notifier)
+        .clearSavingsGoalFromTransactions(id);
     state = state.where((goal) => goal.id != id).toList();
     await ref.read(savingsGoalStorageProvider).markSavingsGoalDeleted(id);
   }

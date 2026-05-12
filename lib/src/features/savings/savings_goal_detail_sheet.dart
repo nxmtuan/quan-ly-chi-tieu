@@ -210,7 +210,8 @@ class _SavingsGoalDetailSheet extends ConsumerWidget {
     final confirmed = await showAppConfirmDialog(
       context,
       title: 'Xóa mục tiêu',
-      message: 'Mục tiêu tiết kiệm này sẽ bị xóa khỏi danh sách.',
+      message:
+          'Mục tiêu này sẽ bị xóa. Các giao dịch đã gắn mục tiêu sẽ trở về mặc định.',
       confirmText: 'Xóa',
       confirmTextColor: const Color(0xFFDC2626),
       confirmBackgroundColor: context.appPalette.dangerSoft,

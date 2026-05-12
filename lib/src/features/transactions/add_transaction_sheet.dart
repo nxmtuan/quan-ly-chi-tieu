@@ -356,13 +356,15 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     final categories = ref.read(categoriesByTypeProvider(_type));
     final category = categories.firstWhere(
       (c) => c.id == _categoryId,
-      orElse: () => Category(
-        id: _categoryId!,
-        name: 'Khác',
-        iconData: Icons.category_rounded,
-        colorHex: AppColors.textSecondary.toARGB32(),
-        type: _type,
-      ),
+      orElse: () =>
+          uncategorizedCategoryFromId(_categoryId!) ??
+          Category(
+            id: _categoryId!,
+            name: 'Khác',
+            iconData: Icons.category_rounded,
+            colorHex: AppColors.textSecondary.toARGB32(),
+            type: _type,
+          ),
     );
     final source =
         ref.read(moneySourceByIdProvider(_sourceId!)) ??
