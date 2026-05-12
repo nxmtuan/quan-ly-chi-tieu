@@ -34,7 +34,6 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
   String? _categoryId;
   String? _sourceId;
   String? _promotedCategoryId;
-  String? _promotedSourceId;
 
   @override
   void initState() {
@@ -54,7 +53,6 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
       _categoryId = item.categoryId;
       _sourceId = item.sourceId;
       _promotedCategoryId = item.categoryId;
-      _promotedSourceId = item.sourceId;
     }
   }
 
@@ -91,6 +89,9 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
     if (_sourceId == null && moneySources.isNotEmpty) {
       _sourceId = moneySources.first.id;
     }
+    final selectedMoneySource = _sourceId == null
+        ? null
+        : moneySources.where((source) => source.id == _sourceId).firstOrNull;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -175,14 +176,9 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
                     ),
                     SizedBox(height: context.scaled(10)),
                     _RecurringMoneySourcePicker(
-                      moneySources: moneySources,
-                      selectedSourceId: _sourceId,
+                      selectedSource: selectedMoneySource,
                       actionColor: actionColor,
-                      onSelected: (source) {
-                        setState(() => _sourceId = source.id);
-                      },
                       onShowAll: () => _showAllMoneySources(moneySources),
-                      promotedSourceId: _promotedSourceId,
                     ),
                   ],
                 ),
@@ -277,10 +273,7 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
     );
 
     if (selectedSource != null && mounted) {
-      setState(() {
-        _sourceId = selectedSource.id;
-        _promotedSourceId = selectedSource.id;
-      });
+      setState(() => _sourceId = selectedSource.id);
     }
   }
 
@@ -1307,172 +1300,62 @@ class _RecurringCategoryTile extends StatelessWidget {
 
 class _RecurringMoneySourcePicker extends StatelessWidget {
   const _RecurringMoneySourcePicker({
-    required this.moneySources,
-    required this.selectedSourceId,
+    required this.selectedSource,
     required this.actionColor,
-    required this.onSelected,
     required this.onShowAll,
-    required this.promotedSourceId,
   });
 
-  final List<MoneySource> moneySources;
-  final String? selectedSourceId;
+  final MoneySource? selectedSource;
   final Color actionColor;
-  final ValueChanged<MoneySource> onSelected;
   final VoidCallback onShowAll;
-  final String? promotedSourceId;
-
-  @override
-  Widget build(BuildContext context) {
-    final orderedSources = _orderedSources();
-    final visibleSources = orderedSources.take(2).toList();
-
-    return _RecurringFormCard(
-      padding: EdgeInsets.fromLTRB(
-        context.scaled(14),
-        context.scaled(12),
-        context.scaled(14),
-        context.scaled(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _RecurringRequiredLabel(label: 'Nguồn tiền', color: actionColor),
-          SizedBox(height: context.scaled(10)),
-          if (moneySources.isEmpty)
-            Text(
-              'Chưa có nguồn tiền',
-              style: context.appText.bodyStrong.copyWith(
-                color: context.appPalette.textSecondary,
-              ),
-            )
-          else
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final itemWidth =
-                    (constraints.maxWidth - context.scaled(16)) / 3;
-
-                return Wrap(
-                  spacing: context.scaled(8),
-                  runSpacing: context.scaled(8),
-                  children: [
-                    for (final source in visibleSources)
-                      SizedBox(
-                        width: itemWidth,
-                        child: _RecurringMoneySourceTile(
-                          source: source,
-                          selected: source.id == selectedSourceId,
-                          actionColor: actionColor,
-                          onTap: () => onSelected(source),
-                        ),
-                      ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _MoreRecurringTile(
-                        height: context.scaled(120),
-                        onTap: onShowAll,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  List<MoneySource> _orderedSources() {
-    if (promotedSourceId == null) {
-      return moneySources;
-    }
-
-    final promotedSource = moneySources
-        .where((source) => source.id == promotedSourceId)
-        .firstOrNull;
-    if (promotedSource == null) {
-      return moneySources;
-    }
-
-    return [
-      promotedSource,
-      for (final source in moneySources)
-        if (source.id != promotedSource.id) source,
-    ];
-  }
-}
-
-class _RecurringMoneySourceTile extends StatelessWidget {
-  const _RecurringMoneySourceTile({
-    required this.source,
-    required this.selected,
-    required this.actionColor,
-    required this.onTap,
-  });
-
-  final MoneySource source;
-  final bool selected;
-  final Color actionColor;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return AppBounceBuilder(
-      onTap: onTap,
-      child: SizedBox(
-        height: context.scaled(120),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: EdgeInsets.symmetric(
-            horizontal: context.scaled(8),
-            vertical: context.scaled(10),
-          ),
-          decoration: BoxDecoration(
-            color: selected
-                ? actionColor.withValues(alpha: 0.045)
-                : context.appPalette.surface,
-            borderRadius: BorderRadius.circular(context.scaled(14)),
-            border: Border.all(
-              color: selected ? actionColor : context.appPalette.border,
-              width: selected ? 1.2 : 1,
+      onTap: onShowAll,
+      child: _RecurringFormCard(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.scaled(14),
+          vertical: context.scaled(10),
+        ),
+        child: Row(
+          children: [
+            _RecurringLeadingIcon(
+              icon:
+                  selectedSource?.iconData ??
+                  Icons.account_balance_wallet_rounded,
+              color: AppColors.primary,
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: context.scaled(36),
-                height: context.scaled(36),
-                decoration: BoxDecoration(
-                  color: actionColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Icon(
-                  source.iconData,
-                  color: actionColor,
-                  size: context.scaled(19),
-                ),
-              ),
-              SizedBox(height: context.scaled(8)),
-              SizedBox(
-                height: context.scaled(34),
-                child: Center(
-                  child: Text(
-                    source.name,
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                    style: context.appText.captionStrong.copyWith(
-                      color: selected
-                          ? actionColor
+            SizedBox(width: context.scaled(10)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _RecurringRequiredLabel(
+                    label: 'Nguồn tiền',
+                    color: actionColor,
+                  ),
+                  SizedBox(height: context.scaled(6)),
+                  Text(
+                    selectedSource?.name ?? 'Chọn nguồn tiền',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.appText.fieldValue.copyWith(
+                      color: selectedSource == null
+                          ? context.appPalette.textSecondary
                           : context.appPalette.textPrimary,
-                      fontSize: context.scaledFont(11.5, min: 11),
-                      height: 1.15,
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: context.appPalette.iconMuted,
+              size: context.scaled(18),
+            ),
+          ],
         ),
       ),
     );
