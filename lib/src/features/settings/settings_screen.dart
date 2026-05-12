@@ -59,6 +59,8 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   _ThemeSettingsRow(themeMode: themeMode),
                   const _DividerIndent(),
+                  const _BiometricUnlockRow(),
+                  const _DividerIndent(),
                   const _ManageCategoriesRow(),
                   const _DividerIndent(),
                   const _ManageMoneySourcesRow(),

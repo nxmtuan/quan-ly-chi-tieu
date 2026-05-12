@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/background/background_sync.dart';
+import '../core/services/biometric_auth_result.dart';
 import '../models/auto_sync_settings.dart';
 import '../models/auto_sync_status.dart';
 import 'storage_provider.dart';
@@ -109,4 +110,186 @@ class AutoSyncStatusNotifier extends Notifier<AutoSyncStatus> {
 final autoSyncStatusProvider =
     NotifierProvider<AutoSyncStatusNotifier, AutoSyncStatus>(
       AutoSyncStatusNotifier.new,
+    );
+
+enum BiometricLockTrigger { onScreenOff, onAppExit, afterTwoMinutes }
+
+extension BiometricLockTriggerLabel on BiometricLockTrigger {
+  String get label {
+    return switch (this) {
+      BiometricLockTrigger.onScreenOff => 'Khóa ứng dụng khi tắt máy',
+      BiometricLockTrigger.onAppExit => 'Khóa mỗi khi thoát app',
+      BiometricLockTrigger.afterTwoMinutes =>
+        'Khóa ứng dụng sau 2 phút rời app',
+    };
+  }
+}
+
+class BiometricLockState {
+  const BiometricLockState({
+    required this.enabled,
+    required this.unlocked,
+    required this.lockTrigger,
+    this.isAuthenticating = false,
+    this.lastResult,
+  });
+
+  final bool enabled;
+  final bool unlocked;
+  final BiometricLockTrigger lockTrigger;
+  final bool isAuthenticating;
+  final BiometricAuthResult? lastResult;
+
+  bool get isLocked => enabled && !unlocked;
+
+  String? get errorMessage {
+    final result = lastResult;
+    if (result == null || result.success) {
+      return null;
+    }
+
+    return result.message;
+  }
+
+  bool get canRetry => lastResult?.canRetry ?? true;
+
+  bool get canDisableLock => lastResult?.canDisableLock ?? false;
+
+  BiometricLockState copyWith({
+    bool? enabled,
+    bool? unlocked,
+    BiometricLockTrigger? lockTrigger,
+    bool? isAuthenticating,
+    BiometricAuthResult? lastResult,
+    bool clearLastResult = false,
+  }) {
+    return BiometricLockState(
+      enabled: enabled ?? this.enabled,
+      unlocked: unlocked ?? this.unlocked,
+      lockTrigger: lockTrigger ?? this.lockTrigger,
+      isAuthenticating: isAuthenticating ?? this.isAuthenticating,
+      lastResult: clearLastResult ? null : lastResult ?? this.lastResult,
+    );
+  }
+}
+
+class BiometricLockNotifier extends Notifier<BiometricLockState> {
+  @override
+  BiometricLockState build() {
+    final storage = ref.read(settingsStorageProvider);
+    final enabled = storage.readBiometricUnlockEnabled();
+    final lockTrigger = _lockTriggerFromStorage(
+      storage.readBiometricLockTrigger(),
+    );
+
+    return BiometricLockState(
+      enabled: enabled,
+      unlocked: !enabled,
+      lockTrigger: lockTrigger,
+    );
+  }
+
+  Future<BiometricAuthResult> enable() async {
+    state = state.copyWith(
+      isAuthenticating: true,
+      unlocked: true,
+      clearLastResult: true,
+    );
+
+    final result = await ref
+        .read(biometricAuthServiceProvider)
+        .authenticate(
+          reason: 'Xác thực bằng bảo mật thiết bị để bật mở khóa ứng dụng.',
+        );
+
+    if (result.success) {
+      await ref.read(settingsStorageProvider).saveBiometricUnlockEnabled(true);
+      state = state.copyWith(
+        enabled: true,
+        unlocked: true,
+        isAuthenticating: false,
+        clearLastResult: true,
+      );
+      return result;
+    }
+
+    state = state.copyWith(
+      enabled: false,
+      unlocked: true,
+      isAuthenticating: false,
+      lastResult: result,
+    );
+    return result;
+  }
+
+  Future<void> disable() async {
+    await ref.read(settingsStorageProvider).saveBiometricUnlockEnabled(false);
+    state = state.copyWith(
+      enabled: false,
+      unlocked: true,
+      isAuthenticating: false,
+      clearLastResult: true,
+    );
+  }
+
+  Future<void> setLockTrigger(BiometricLockTrigger lockTrigger) async {
+    state = state.copyWith(lockTrigger: lockTrigger);
+    await ref
+        .read(settingsStorageProvider)
+        .saveBiometricLockTrigger(lockTrigger.name);
+  }
+
+  void lock() {
+    if (!state.enabled || state.isAuthenticating) {
+      return;
+    }
+
+    state = state.copyWith(unlocked: false, clearLastResult: true);
+  }
+
+  Future<BiometricAuthResult> unlock() async {
+    if (!state.enabled) {
+      const result = BiometricAuthResult.success();
+      state = state.copyWith(enabled: false, unlocked: true);
+      return result;
+    }
+
+    if (state.unlocked) {
+      return const BiometricAuthResult.success();
+    }
+
+    state = state.copyWith(isAuthenticating: true, clearLastResult: true);
+
+    final result = await ref
+        .read(biometricAuthServiceProvider)
+        .authenticate(reason: 'Xác thực bằng bảo mật thiết bị để mở ứng dụng.');
+
+    state = result.success
+        ? state.copyWith(
+            enabled: true,
+            unlocked: true,
+            isAuthenticating: false,
+            clearLastResult: true,
+          )
+        : state.copyWith(
+            unlocked: false,
+            isAuthenticating: false,
+            lastResult: result,
+          );
+
+    return result;
+  }
+
+  BiometricLockTrigger _lockTriggerFromStorage(String value) {
+    return switch (value) {
+      'onAppExit' => BiometricLockTrigger.onAppExit,
+      'afterTwoMinutes' => BiometricLockTrigger.afterTwoMinutes,
+      _ => BiometricLockTrigger.onScreenOff,
+    };
+  }
+}
+
+final biometricLockProvider =
+    NotifierProvider<BiometricLockNotifier, BiometricLockState>(
+      BiometricLockNotifier.new,
     );

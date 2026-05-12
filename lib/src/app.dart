@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_scroll_behavior.dart';
 import 'core/theme/app_theme.dart';
+import 'features/auth/biometric_lock_gate.dart';
 import 'providers/auth_provider.dart';
 import 'providers/settings_provider.dart';
 
@@ -29,9 +30,7 @@ class ExpenseManagerApp extends ConsumerWidget {
       routerConfig: appRouter,
       builder: (context, child) {
         final mediaQuery = MediaQuery.of(context);
-        final compactTextScaler = _compactTextScalerForWidth(
-          mediaQuery,
-        );
+        final compactTextScaler = _compactTextScalerForWidth(mediaQuery);
         final compactTheme = Theme.of(context).copyWith(
           visualDensity: const VisualDensity(horizontal: -0.6, vertical: -0.6),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -41,7 +40,7 @@ class ExpenseManagerApp extends ConsumerWidget {
           data: mediaQuery.copyWith(textScaler: compactTextScaler),
           child: Theme(
             data: compactTheme,
-            child: child ?? const SizedBox.shrink(),
+            child: BiometricLockGate(child: child ?? const SizedBox.shrink()),
           ),
         );
       },

@@ -3,6 +3,7 @@ import 'package:googleapis/drive/v3.dart' as drive;
 
 import '../core/services/sync_service.dart';
 import '../core/network/google_drive_service.dart';
+import '../core/services/biometric_auth_service.dart';
 
 import '../core/storage/auth_storage.dart';
 import '../core/storage/category_storage.dart';
@@ -52,6 +53,10 @@ final settingsStorageProvider = Provider<SettingsStorage>((ref) {
 final authStorageProvider = Provider<AuthStorage>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
   return AuthStorage(prefs);
+});
+
+final biometricAuthServiceProvider = Provider<BiometricAuthService>((ref) {
+  return BiometricAuthService();
 });
 
 final syncServiceProvider = Provider.family<SyncService, drive.DriveApi>((
