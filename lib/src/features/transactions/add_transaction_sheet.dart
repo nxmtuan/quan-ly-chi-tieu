@@ -65,7 +65,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   String? _categoryId;
   String? _savingsGoalId;
   String? _promotedCategoryId;
-  String? _promotedSourceId;
 
   @override
   void initState() {
@@ -123,6 +122,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     if (_sourceId == null && moneySources.isNotEmpty) {
       _sourceId = moneySources.first.id;
     }
+    final selectedMoneySource = _sourceId == null
+        ? null
+        : moneySources.where((source) => source.id == _sourceId).firstOrNull;
     final actionColor = _type == TransactionType.expense
         ? const Color(0xFFFF1493)
         : AppColors.success;
@@ -181,14 +183,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                               _DateTrigger(date: _date, onTap: _pickDate),
                               const SizedBox(height: 10),
                               _MoneySourcePicker(
-                                moneySources: moneySources,
-                                selectedSourceId: _sourceId,
+                                selectedSource: selectedMoneySource,
                                 actionColor: actionColor,
-                                onSelected: (source) {
-                                  setState(() => _sourceId = source.id);
-                                },
                                 onShowAll: () => _showAllMoneySources(moneySources),
-                                promotedSourceId: _promotedSourceId,
                               ),
                               if (_type == TransactionType.expense) ...[
                                 const SizedBox(height: 10),
@@ -279,10 +276,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     );
 
     if (selectedSource != null && mounted) {
-      setState(() {
-        _sourceId = selectedSource.id;
-        _promotedSourceId = selectedSource.id;
-      });
+      setState(() => _sourceId = selectedSource.id);
     }
   }
 

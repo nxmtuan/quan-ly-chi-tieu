@@ -48,7 +48,6 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
   Widget build(BuildContext context) {
     return AppSheetScaffold(
       title: 'Chọn danh mục',
-      subtitle: 'Hiển thị toàn bộ danh mục của nhóm hiện tại.',
       body: SingleChildScrollView(
         primary: true,
         padding: EdgeInsets.only(bottom: context.scaled(12)),

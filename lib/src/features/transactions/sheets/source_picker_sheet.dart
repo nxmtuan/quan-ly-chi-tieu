@@ -44,7 +44,6 @@ class _AllMoneySourcesSheetState extends State<_AllMoneySourcesSheet> {
   Widget build(BuildContext context) {
     return AppSheetScaffold(
       title: 'Chọn nguồn tiền',
-      subtitle: 'Hiển thị toàn bộ nguồn tiền hiện có.',
       body: SingleChildScrollView(
         primary: true,
         padding: EdgeInsets.only(bottom: context.scaled(12)),

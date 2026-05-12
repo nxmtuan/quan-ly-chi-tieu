@@ -406,95 +406,62 @@ class _NoteCard extends StatelessWidget {
 
 class _MoneySourcePicker extends StatelessWidget {
   const _MoneySourcePicker({
-    required this.moneySources,
-    required this.selectedSourceId,
+    required this.selectedSource,
     required this.actionColor,
-    required this.onSelected,
     required this.onShowAll,
-    required this.promotedSourceId,
   });
 
-  final List<MoneySource> moneySources;
-  final String? selectedSourceId;
+  final MoneySource? selectedSource;
   final Color actionColor;
-  final ValueChanged<MoneySource> onSelected;
   final VoidCallback onShowAll;
-  final String? promotedSourceId;
 
   @override
   Widget build(BuildContext context) {
-    final orderedSources = _orderedSources();
-    final visibleSources = orderedSources.take(2).toList();
-
-    return _FormCard(
-      padding: EdgeInsets.fromLTRB(
-        context.scaled(14),
-        context.scaled(12),
-        context.scaled(14),
-        context.scaled(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _RequiredLabel(label: 'Nguồn tiền', color: actionColor),
-          SizedBox(height: context.scaled(10)),
-          if (moneySources.isEmpty)
-            Text(
-              'Chưa có nguồn tiền',
-              style: context.appText.bodyStrong.copyWith(
-                color: context.appPalette.textSecondary,
-              ),
-            )
-          else
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final itemWidth =
-                    (constraints.maxWidth - context.scaled(16)) / 3;
-
-                return Wrap(
-                  spacing: context.scaled(8),
-                  runSpacing: context.scaled(8),
-                  children: [
-                    for (final source in visibleSources)
-                      SizedBox(
-                        width: itemWidth,
-                        child: _MoneySourceTile(
-                          source: source,
-                          selected: source.id == selectedSourceId,
-                          actionColor: actionColor,
-                          onTap: () => onSelected(source),
-                        ),
-                      ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _MoreMoneySourcesTile(onTap: onShowAll),
-                    ),
-                  ],
-                );
-              },
+    return AppBounceBuilder(
+      onTap: onShowAll,
+      child: _FormCard(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.scaled(14),
+          vertical: context.scaled(10),
+        ),
+        child: Row(
+          children: [
+            _LeadingIcon(
+              icon:
+                  selectedSource?.iconData ??
+                  Icons.account_balance_wallet_rounded,
+              color: AppColors.primary,
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             ),
-        ],
+            SizedBox(width: context.scaled(10)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _RequiredLabel(label: 'Nguồn tiền', color: actionColor),
+                  SizedBox(height: context.scaled(6)),
+                  Text(
+                    selectedSource?.name ?? 'Chọn nguồn tiền',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.appText.fieldValue.copyWith(
+                      color: selectedSource == null
+                          ? context.appPalette.textSecondary
+                          : context.appPalette.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: context.appPalette.iconMuted,
+              size: context.scaled(18),
+            ),
+          ],
+        ),
       ),
     );
-  }
-
-  List<MoneySource> _orderedSources() {
-    if (promotedSourceId == null) {
-      return moneySources;
-    }
-
-    final promotedSource = moneySources
-        .where((source) => source.id == promotedSourceId)
-        .firstOrNull;
-    if (promotedSource == null) {
-      return moneySources;
-    }
-
-    return [
-      promotedSource,
-      for (final source in moneySources)
-        if (source.id != promotedSource.id) source,
-    ];
   }
 }
 
@@ -567,50 +534,6 @@ class _MoneySourceTile extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MoreMoneySourcesTile extends StatelessWidget {
-  const _MoreMoneySourcesTile({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBounceBuilder(
-      onTap: onTap,
-      child: Container(
-        height: context.scaled(120),
-        padding: EdgeInsets.fromLTRB(
-          context.scaled(6),
-          context.scaled(10),
-          context.scaled(6),
-          context.scaled(8),
-        ),
-        decoration: BoxDecoration(
-          color: context.appPalette.surfaceMuted,
-          borderRadius: BorderRadius.circular(context.scaled(14)),
-          border: Border.all(color: context.appPalette.border),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _MoreCategoriesIcon(),
-            SizedBox(height: context.scaled(10)),
-            Text(
-              'Khác',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: context.appText.captionStrong.copyWith(
-                color: context.appPalette.textPrimary,
-                fontSize: context.scaledFont(12, min: 12),
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -740,7 +663,6 @@ class _SavingsGoalPickerSheetState extends State<_SavingsGoalPickerSheet> {
 
     return AppSheetScaffold(
       title: 'Chọn mục tiêu tiết kiệm',
-      subtitle: 'Chỉ hiển thị mục tiêu đang tiến hành',
       body: ListView.separated(
               padding: EdgeInsets.only(bottom: context.scaled(16)),
               itemCount: itemCount,
