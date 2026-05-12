@@ -80,6 +80,12 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
                     reverseDuration: const Duration(milliseconds: 220),
                     switchInCurve: Curves.easeOutCubic,
                     switchOutCurve: Curves.easeInCubic,
+                    layoutBuilder: (currentChild, previousChildren) {
+                      return Stack(
+                        alignment: Alignment.topCenter,
+                        children: [...previousChildren, ?currentChild],
+                      );
+                    },
                     transitionBuilder: (child, animation) {
                       final isIncoming =
                           child.key ==

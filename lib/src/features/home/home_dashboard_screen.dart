@@ -23,6 +23,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   late HomeSummaryScope _selectedScope;
   TransactionType _selectedType = TransactionType.expense;
+  TransactionType _previousSelectedType = TransactionType.expense;
   bool _showQuickAddButton = true;
 
   @override
@@ -91,7 +92,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               scope: _selectedScope,
                               selectedType: _selectedType,
                               onSelectedType: (type) {
-                                setState(() => _selectedType = type);
+                                if (type == _selectedType) {
+                                  return;
+                                }
+
+                                setState(() {
+                                  _previousSelectedType = _selectedType;
+                                  _selectedType = type;
+                                });
                               },
                               onPreviousScope: _selectedScope.canGoPrevious
                                   ? _goToPreviousScope
@@ -112,10 +120,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 MediaQuery.paddingOf(context).bottom,
                           ),
                           sliver: SliverToBoxAdapter(
-                            child: RecentTransactions(
-                              scope: _selectedScope,
-                              transactions: filteredTransactions,
-                              selectedType: _selectedType,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 260),
+                              reverseDuration: const Duration(
+                                milliseconds: 220,
+                              ),
+                              switchInCurve: Curves.easeOutCubic,
+                              switchOutCurve: Curves.easeInCubic,
+                              layoutBuilder: (currentChild, previousChildren) {
+                                return Stack(
+                                  alignment: Alignment.topCenter,
+                                  children: [
+                                    ...previousChildren,
+                                    ?currentChild,
+                                  ],
+                                );
+                              },
+                              transitionBuilder: (child, animation) {
+                                final isIncoming =
+                                    child.key ==
+                                    ValueKey<TransactionType>(_selectedType);
+                                final slideDirection =
+                                    _selectedType.index >=
+                                        _previousSelectedType.index
+                                    ? 1.0
+                                    : -1.0;
+                                final beginOffset = Offset(
+                                  isIncoming
+                                      ? 0.08 * slideDirection
+                                      : -0.04 * slideDirection,
+                                  0,
+                                );
+
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: SlideTransition(
+                                    position: Tween<Offset>(
+                                      begin: beginOffset,
+                                      end: Offset.zero,
+                                    ).animate(animation),
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              child: RecentTransactions(
+                                key: ValueKey(_selectedType),
+                                scope: _selectedScope,
+                                transactions: filteredTransactions,
+                                selectedType: _selectedType,
+                              ),
                             ),
                           ),
                         ),
