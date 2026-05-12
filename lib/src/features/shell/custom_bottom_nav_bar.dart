@@ -24,10 +24,10 @@ class CustomBottomNavBar extends StatelessWidget {
     final barColor = isDark ? colors.surface : Colors.white;
     final items = [
       const _NavItem(Icons.grid_view_rounded, 'Tổng quan'),
-      const _NavItem(Icons.calendar_month_rounded, 'Lịch'),
+      const _NavItem(Icons.pie_chart_rounded, 'Ngân sách'),
       const _NavItem(Icons.savings_rounded, 'Tiết kiệm'),
       const _NavItem(Icons.repeat_rounded, 'Định kỳ'),
-      const _NavItem(Icons.pie_chart_rounded, 'Ngân sách'),
+      const _NavItem(Icons.calendar_month_rounded, 'Lịch'),
     ];
 
     return Container(

@@ -34,10 +34,10 @@ class AppShell extends StatelessWidget {
 
   int _indexForPath(String path) {
     return switch (path) {
-      '/calendar' => 1,
+      '/budget' => 1,
       '/wallet' => 2,
       '/recurring' => 3,
-      '/budget' => 4,
+      '/calendar' => 4,
       _ => 0,
     };
   }
@@ -47,13 +47,13 @@ class AppShell extends StatelessWidget {
       case 0:
         context.go('/');
       case 1:
-        context.go('/calendar');
+        context.go('/budget');
       case 2:
         context.go('/wallet');
       case 3:
         context.go('/recurring');
       case 4:
-        context.go('/budget');
+        context.go('/calendar');
     }
   }
 }
