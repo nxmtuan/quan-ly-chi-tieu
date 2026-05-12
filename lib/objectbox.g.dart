@@ -225,7 +225,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(6, 4449110663233528591),
     name: 'SavingsGoal',
-    lastPropertyId: const obx_int.IdUid(11, 5368346050396594622),
+    lastPropertyId: const obx_int.IdUid(13, 7252998695314141752),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -296,6 +296,18 @@ final _entities = <obx_int.ModelEntity>[
         type: 10,
         flags: 8,
         indexId: const obx_int.IdUid(12, 3254630399225974344),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 8506350822989154819),
+        name: 'dbIconCodePoint',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(13, 7252998695314141752),
+        name: 'colorHex',
+        type: 6,
+        flags: 0,
       ),
     ],
     relations: <obx_int.ModelRelation>[],
@@ -640,7 +652,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final noteOffset = object.note == null
             ? null
             : fbb.writeString(object.note!);
-        fbb.startTable(12);
+        fbb.startTable(14);
         fbb.addInt64(0, object.obxId);
         fbb.addOffset(1, idOffset);
         fbb.addOffset(2, titleOffset);
@@ -652,6 +664,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(8, object.updatedAt.millisecondsSinceEpoch);
         fbb.addBool(9, object.isDeleted);
         fbb.addInt64(10, object.startDate.millisecondsSinceEpoch);
+        fbb.addInt64(11, object.dbIconCodePoint);
+        fbb.addInt64(12, object.colorHex);
         fbb.finish(fbb.endTable());
         return object.obxId;
       },
@@ -687,6 +701,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
           12,
           0,
         );
+        final dbIconCodePointParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          26,
+          0,
+        );
+        final colorHexParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          28,
+          0,
+        );
         final startDateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 24, 0),
         );
@@ -714,6 +740,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           title: titleParam,
           targetAmount: targetAmountParam,
           savedAmount: savedAmountParam,
+          dbIconCodePoint: dbIconCodePointParam,
+          colorHex: colorHexParam,
           startDate: startDateParam,
           deadline: deadlineParam,
           note: noteParam,
@@ -929,5 +957,15 @@ class SavingsGoal_ {
   /// See [SavingsGoal.startDate].
   static final startDate = obx.QueryDateProperty<SavingsGoal>(
     _entities[3].properties[10],
+  );
+
+  /// See [SavingsGoal.dbIconCodePoint].
+  static final dbIconCodePoint = obx.QueryIntegerProperty<SavingsGoal>(
+    _entities[3].properties[11],
+  );
+
+  /// See [SavingsGoal.colorHex].
+  static final colorHex = obx.QueryIntegerProperty<SavingsGoal>(
+    _entities[3].properties[12],
   );
 }

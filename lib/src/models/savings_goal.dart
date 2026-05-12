@@ -1,6 +1,11 @@
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
 import 'package:objectbox/objectbox.dart';
+
+import 'category.dart';
+
+const defaultSavingsGoalColorHex = 0xFF0D9488;
 
 @Entity()
 class SavingsGoal {
@@ -10,17 +15,29 @@ class SavingsGoal {
     required this.title,
     required this.targetAmount,
     this.savedAmount = 0,
+    IconData? iconData,
+    int? dbIconCodePoint,
+    int? colorHex,
     DateTime? startDate,
     DateTime? deadline,
     String? note,
     DateTime? createdAt,
     DateTime? updatedAt,
     this.isDeleted = false,
-  }) : startDate = _dateOnly(startDate) ?? _dateOnly(DateTime.now())!,
+  }) : colorHex = colorHex ?? defaultSavingsGoalColorHex,
+       startDate = _dateOnly(startDate) ?? _dateOnly(DateTime.now())!,
        deadline = _dateOnly(deadline),
        note = _normalizeNote(note),
        createdAt = createdAt ?? DateTime.now(),
-       updatedAt = updatedAt ?? DateTime.now();
+       updatedAt = updatedAt ?? DateTime.now() {
+    if (iconData != null) {
+      this.dbIconCodePoint = iconData.codePoint;
+    } else if (dbIconCodePoint != null) {
+      this.dbIconCodePoint = dbIconCodePoint;
+    } else {
+      this.dbIconCodePoint = Icons.flag_rounded.codePoint;
+    }
+  }
 
   @Id()
   int obxId;
@@ -33,6 +50,16 @@ class SavingsGoal {
   double targetAmount;
 
   double savedAmount;
+
+  int dbIconCodePoint = 0;
+
+  int colorHex;
+
+  @Transient()
+  IconData get iconData => _iconFromCodePoint(dbIconCodePoint);
+
+  @Transient()
+  Color get color => Color(colorHex);
 
   @Index()
   @Property(type: PropertyType.date)
@@ -108,6 +135,8 @@ class SavingsGoal {
       title: title,
       targetAmount: targetAmount,
       savedAmount: savedAmount,
+      dbIconCodePoint: dbIconCodePoint,
+      colorHex: colorHex,
       startDate: startDate,
       deadline: deadline,
       note: note,
@@ -123,6 +152,8 @@ class SavingsGoal {
     String? title,
     double? targetAmount,
     double? savedAmount,
+    IconData? iconData,
+    int? colorHex,
     DateTime? startDate,
     DateTime? deadline,
     String? note,
@@ -136,6 +167,8 @@ class SavingsGoal {
       title: title ?? this.title,
       targetAmount: targetAmount ?? this.targetAmount,
       savedAmount: savedAmount ?? this.savedAmount,
+      iconData: iconData ?? this.iconData,
+      colorHex: colorHex ?? this.colorHex,
       startDate: startDate ?? this.startDate,
       deadline: deadline ?? this.deadline,
       note: note ?? this.note,
@@ -151,6 +184,8 @@ class SavingsGoal {
       'title': title,
       'targetAmount': targetAmount,
       'savedAmount': savedAmount,
+      'iconCodePoint': dbIconCodePoint,
+      'colorHex': colorHex,
       'startDate': startDate.toIso8601String(),
       'deadline': deadline?.toIso8601String(),
       'note': note,
@@ -166,6 +201,9 @@ class SavingsGoal {
       title: json['title'] as String,
       targetAmount: (json['targetAmount'] as num).toDouble(),
       savedAmount: (json['savedAmount'] as num?)?.toDouble() ?? 0,
+      dbIconCodePoint:
+          json['iconCodePoint'] as int? ?? Icons.flag_rounded.codePoint,
+      colorHex: json['colorHex'] as int? ?? defaultSavingsGoalColorHex,
       startDate: json['startDate'] != null
           ? DateTime.parse(json['startDate'] as String)
           : null,
@@ -182,6 +220,16 @@ class SavingsGoal {
       isDeleted: json['isDeleted'] as bool? ?? false,
     );
   }
+}
+
+IconData _iconFromCodePoint(int codePoint) {
+  for (final iconData in categoryIconOptions) {
+    if (iconData.codePoint == codePoint) {
+      return iconData;
+    }
+  }
+
+  return Icons.flag_rounded;
 }
 
 DateTime? _dateOnly(DateTime? date) {

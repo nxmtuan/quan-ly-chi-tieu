@@ -11,6 +11,7 @@ import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_table_calendar.dart';
 import '../../core/widgets/app_toast.dart';
+import '../../models/category.dart';
 import '../../models/savings_goal.dart';
 import '../../providers/savings_goal_provider.dart';
 
@@ -43,6 +44,8 @@ class _SavingsGoalSheetState extends ConsumerState<_SavingsGoalSheet> {
   late final FocusNode _targetFocusNode;
   late final FocusNode _noteFocusNode;
   late DateTime _startDate;
+  late IconData _iconData;
+  late int _colorHex;
   DateTime? _deadline;
 
   bool get _isEditing => widget.goal != null;
@@ -57,6 +60,8 @@ class _SavingsGoalSheetState extends ConsumerState<_SavingsGoalSheet> {
     );
     _noteController = TextEditingController(text: goal?.note ?? '');
     _startDate = goal?.startDate ?? _today();
+    _iconData = goal?.iconData ?? Icons.flag_rounded;
+    _colorHex = goal?.colorHex ?? defaultSavingsGoalColorHex;
     _deadline = goal?.deadline;
     _titleFocusNode = FocusNode()..addListener(_handleFocusChanged);
     _targetFocusNode = FocusNode()..addListener(_handleFocusChanged);
@@ -148,13 +153,71 @@ class _SavingsGoalSheetState extends ConsumerState<_SavingsGoalSheet> {
                 minLines: 3,
                 maxLines: null,
               ),
+              SizedBox(height: context.scaled(18)),
+              _SectionLabel(label: 'Biểu tượng'),
+              SizedBox(height: context.scaled(10)),
+              Wrap(
+                spacing: context.scaled(10),
+                runSpacing: context.scaled(10),
+                children: [
+                  for (final icon in categoryIconOptions)
+                    _IconOption(
+                      icon: icon,
+                      selected: icon == _iconData,
+                      color: Color(_colorHex),
+                      onTap: () => setState(() => _iconData = icon),
+                    ),
+                ],
+              ),
+              SizedBox(height: context.scaled(18)),
+              _SectionLabel(label: 'Màu sắc'),
+              SizedBox(height: context.scaled(10)),
+              Wrap(
+                spacing: context.scaled(10),
+                runSpacing: context.scaled(10),
+                children: [
+                  for (final color in categoryColorOptions)
+                    _ColorOption(
+                      color: color,
+                      selected: _colorHex == color.toARGB32(),
+                      onTap: () => setState(() => _colorHex = color.toARGB32()),
+                    ),
+                ],
+              ),
             ],
           ),
         ),
-        action: AppPrimaryButton(
-          label: _isEditing ? 'Lưu thay đổi' : 'Tạo mục tiêu',
-          color: AppColors.primary,
-          onTap: _save,
+        action: Row(
+          children: [
+            Expanded(
+              child: AppBounceBuilder(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+                  decoration: BoxDecoration(
+                    color: context.appPalette.surfaceMuted,
+                    borderRadius: BorderRadius.circular(context.scaled(16)),
+                    border: Border.all(color: context.appPalette.border),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Đóng',
+                    style: context.appText.buttonLabel.copyWith(
+                      color: context.appPalette.textPrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: context.scaled(12)),
+            Expanded(
+              child: AppPrimaryButton(
+                label: _isEditing ? 'Lưu thay đổi' : 'Tạo mục tiêu',
+                color: AppColors.primary,
+                onTap: _save,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -244,6 +307,8 @@ class _SavingsGoalSheetState extends ConsumerState<_SavingsGoalSheet> {
       title: title,
       targetAmount: targetAmount,
       savedAmount: existingGoal?.savedAmount ?? 0,
+      iconData: _iconData,
+      colorHex: _colorHex,
       startDate: _startDate,
       deadline: _deadline,
       note: _noteController.text,
@@ -266,6 +331,101 @@ class _SavingsGoalSheetState extends ConsumerState<_SavingsGoalSheet> {
       context,
       message: _isEditing ? 'Đã cập nhật mục tiêu' : 'Đã tạo mục tiêu',
       type: AppToastType.success,
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(label, style: context.appText.fieldLabel);
+  }
+}
+
+class _IconOption extends StatelessWidget {
+  const _IconOption({
+    required this.icon,
+    required this.selected,
+    required this.color,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool selected;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: context.scaled(52),
+        height: context.scaled(52),
+        decoration: BoxDecoration(
+          color: selected
+              ? color.withValues(alpha: 0.1)
+              : context.appPalette.surface,
+          borderRadius: BorderRadius.circular(context.scaled(18)),
+          border: Border.all(
+            color: selected ? color : context.appPalette.border,
+          ),
+        ),
+        child: Icon(
+          icon,
+          color: selected ? color : context.appPalette.textPrimary,
+          size: context.scaled(22),
+        ),
+      ),
+    );
+  }
+}
+
+class _ColorOption extends StatelessWidget {
+  const _ColorOption({
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: context.scaled(52),
+        height: context.scaled(52),
+        decoration: BoxDecoration(
+          color: context.appPalette.surface,
+          borderRadius: BorderRadius.circular(context.scaled(18)),
+          border: Border.all(
+            color: selected
+                ? context.appPalette.textPrimary
+                : context.appPalette.border,
+            width: context.scaled(selected ? 3 : 1),
+          ),
+        ),
+        child: Center(
+          child: Container(
+            width: context.scaled(30),
+            height: context.scaled(30),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(context.scaled(10)),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

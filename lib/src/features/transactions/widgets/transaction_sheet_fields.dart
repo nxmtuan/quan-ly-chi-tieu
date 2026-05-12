@@ -69,7 +69,9 @@ class _TypeToggle extends StatelessWidget {
         border: Border.all(color: palette.border),
         boxShadow: [
           BoxShadow(
-            color: palette.shadow.withValues(alpha: context.isDarkMode ? 0.22 : 0.06),
+            color: palette.shadow.withValues(
+              alpha: context.isDarkMode ? 0.22 : 0.06,
+            ),
             blurRadius: context.scaled(9),
             offset: Offset(0, context.scaled(3)),
           ),
@@ -188,8 +190,7 @@ class _FormCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: padding ??
-          EdgeInsets.all(context.scaled(14)),
+      padding: padding ?? EdgeInsets.all(context.scaled(14)),
       decoration: BoxDecoration(
         color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(14)),
@@ -199,7 +200,9 @@ class _FormCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: palette.shadow.withValues(alpha: context.isDarkMode ? 0.18 : 0.025),
+            color: palette.shadow.withValues(
+              alpha: context.isDarkMode ? 0.18 : 0.025,
+            ),
             blurRadius: context.scaled(6),
             offset: Offset(0, context.scaled(2)),
           ),
@@ -280,7 +283,9 @@ class _AmountCard extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: '0',
                     hintStyle: context.appText.amountXL.copyWith(
-                      color: context.appPalette.textSecondary.withValues(alpha: 0.55),
+                      color: context.appPalette.textSecondary.withValues(
+                        alpha: 0.55,
+                      ),
                       fontSize: context.scaledFont(28, min: 24),
                     ),
                     filled: false,
@@ -384,7 +389,9 @@ class _NoteCard extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: 'Nhập mô tả giao dịch',
                     hintStyle: context.appText.fieldValue.copyWith(
-                      color: context.appPalette.textSecondary.withValues(alpha: 0.65),
+                      color: context.appPalette.textSecondary.withValues(
+                        alpha: 0.65,
+                      ),
                     ),
                     filled: false,
                     fillColor: Colors.transparent,
@@ -525,7 +532,9 @@ class _MoneySourceTile extends StatelessWidget {
                     maxLines: 2,
                     textAlign: TextAlign.center,
                     style: context.appText.captionStrong.copyWith(
-                      color: selected ? actionColor : context.appPalette.textPrimary,
+                      color: selected
+                          ? actionColor
+                          : context.appPalette.textPrimary,
                       fontSize: context.scaledFont(11.5, min: 11),
                       height: 1.15,
                     ),
@@ -555,7 +564,8 @@ class _SavingsGoalPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final value = selectedGoal?.title ??
+    final value =
+        selectedGoal?.title ??
         (activeGoals.isEmpty
             ? 'Chưa có mục tiêu đang tiến hành'
             : 'Chọn mục tiêu');
@@ -570,9 +580,10 @@ class _SavingsGoalPicker extends StatelessWidget {
         child: Row(
           children: [
             _LeadingIcon(
-              icon: Icons.savings_rounded,
-              color: AppColors.primary,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+              icon: selectedGoal?.iconData ?? Icons.savings_rounded,
+              color: selectedGoal?.color ?? AppColors.primary,
+              backgroundColor: (selectedGoal?.color ?? AppColors.primary)
+                  .withValues(alpha: 0.1),
             ),
             SizedBox(width: context.scaled(10)),
             Expanded(
@@ -664,30 +675,30 @@ class _SavingsGoalPickerSheetState extends State<_SavingsGoalPickerSheet> {
     return AppSheetScaffold(
       title: 'Chọn mục tiêu tiết kiệm',
       body: ListView.separated(
-              padding: EdgeInsets.only(bottom: context.scaled(16)),
-              itemCount: itemCount,
-              separatorBuilder: (_, _) => SizedBox(height: context.scaled(12)),
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return _NoSavingsGoalPickerItem(
-                    selected: _selectedGoalId == null,
-                    actionColor: widget.actionColor,
-                    onTap: () => setState(() => _selectedGoalId = null),
-                  );
-                }
+        padding: EdgeInsets.only(bottom: context.scaled(16)),
+        itemCount: itemCount,
+        separatorBuilder: (_, _) => SizedBox(height: context.scaled(12)),
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return _NoSavingsGoalPickerItem(
+              selected: _selectedGoalId == null,
+              actionColor: widget.actionColor,
+              onTap: () => setState(() => _selectedGoalId = null),
+            );
+          }
 
-                final goal = widget.goals[index - 1];
-                final savedAmount =
-                    goal.savedAmount + (widget.savedAmounts[goal.id] ?? 0);
-                return _SavingsGoalPickerItem(
-                  goal: goal,
-                  savedAmount: savedAmount,
-                  selected: goal.id == _selectedGoalId,
-                  actionColor: widget.actionColor,
-                  onTap: () => setState(() => _selectedGoalId = goal.id),
-                );
-              },
-            ),
+          final goal = widget.goals[index - 1];
+          final savedAmount =
+              goal.savedAmount + (widget.savedAmounts[goal.id] ?? 0);
+          return _SavingsGoalPickerItem(
+            goal: goal,
+            savedAmount: savedAmount,
+            selected: goal.id == _selectedGoalId,
+            actionColor: widget.actionColor,
+            onTap: () => setState(() => _selectedGoalId = goal.id),
+          );
+        },
+      ),
       action: Row(
         children: [
           Expanded(
@@ -715,9 +726,9 @@ class _SavingsGoalPickerSheetState extends State<_SavingsGoalPickerSheet> {
             child: AppPrimaryButton(
               label: 'Chọn mục tiêu',
               color: widget.actionColor,
-              onTap: () => Navigator.of(context).pop(
-                _SavingsGoalPickerResult(_selectedGoalId),
-              ),
+              onTap: () => Navigator.of(
+                context,
+              ).pop(_SavingsGoalPickerResult(_selectedGoalId)),
             ),
           ),
         ],
@@ -825,12 +836,12 @@ class _SavingsGoalPickerItem extends StatelessWidget {
                   width: context.scaled(48),
                   height: context.scaled(48),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.12),
+                    color: goal.color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(context.scaled(17)),
                   ),
                   child: Icon(
-                    Icons.flag_rounded,
-                    color: AppColors.primary,
+                    goal.iconData,
+                    color: goal.color,
                     size: context.scaled(22),
                   ),
                 ),
@@ -1011,10 +1022,7 @@ class _DateTrigger extends StatelessWidget {
                 children: [
                   const _RequiredStaticLabel('Ngày giao dịch'),
                   SizedBox(height: context.scaled(6)),
-                  Text(
-                    _dateLabel(date),
-                    style: context.appText.fieldValue,
-                  ),
+                  Text(_dateLabel(date), style: context.appText.fieldValue),
                 ],
               ),
             ),

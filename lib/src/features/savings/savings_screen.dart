@@ -83,8 +83,9 @@ class _SavingsScreenState extends ConsumerState<SavingsScreen> {
                     transitionBuilder: (child, animation) {
                       final isIncoming =
                           child.key == ValueKey<_SavingsTab>(_selectedTab);
-                      final direction =
-                          _selectedTab.index >= _previousTab.index ? 1.0 : -1.0;
+                      final direction = _selectedTab.index >= _previousTab.index
+                          ? 1.0
+                          : -1.0;
                       final beginOffset = Offset(
                         isIncoming ? 0.08 * direction : -0.04 * direction,
                         0,
@@ -331,12 +332,12 @@ class _SavingsGoalCard extends StatelessWidget {
                   width: context.scaled(48),
                   height: context.scaled(48),
                   decoration: BoxDecoration(
-                    color: status.color.withValues(alpha: 0.12),
+                    color: goal.color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(context.scaled(17)),
                   ),
                   child: Icon(
-                    status.icon,
-                    color: status.color,
+                    goal.iconData,
+                    color: goal.color,
                     size: context.scaled(22),
                   ),
                 ),
@@ -578,11 +579,7 @@ class _EmptySavingsCard extends StatelessWidget {
         radius: context.scaled(24),
         child: Column(
           children: [
-            Icon(
-              tab.icon,
-              color: AppColors.primary,
-              size: context.scaled(36),
-            ),
+            Icon(tab.icon, color: AppColors.primary, size: context.scaled(36)),
             SizedBox(height: context.scaled(10)),
             Text(tab.emptyTitle, style: context.appText.bodyStrong),
             SizedBox(height: context.scaled(6)),
@@ -660,11 +657,5 @@ extension _SavingsTabX on _SavingsTab {
     };
   }
 
-  IconData get icon {
-    return switch (this) {
-      _SavingsTab.waiting => Icons.schedule_rounded,
-      _SavingsTab.active => Icons.flag_rounded,
-      _SavingsTab.completed => Icons.check_circle_rounded,
-    };
-  }
+  IconData get icon => Icons.flag_rounded;
 }

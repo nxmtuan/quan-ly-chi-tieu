@@ -54,12 +54,12 @@ class _SavingsGoalDetailSheet extends ConsumerWidget {
               width: context.scaled(72),
               height: context.scaled(72),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
+                color: goal.color.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                completed ? Icons.check_circle_rounded : Icons.flag_rounded,
-                color: color,
+                completed ? Icons.check_circle_rounded : goal.iconData,
+                color: goal.color,
                 size: context.scaled(32),
               ),
             ),

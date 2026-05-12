@@ -183,7 +183,7 @@
     },
     {
       "id": "6:4449110663233528591",
-      "lastPropertyId": "11:5368346050396594622",
+      "lastPropertyId": "13:7252998695314141752",
       "name": "SavingsGoal",
       "properties": [
         {
@@ -247,6 +247,16 @@
           "indexId": "12:3254630399225974344",
           "type": 10,
           "flags": 8
+        },
+        {
+          "id": "12:8506350822989154819",
+          "name": "dbIconCodePoint",
+          "type": 6
+        },
+        {
+          "id": "13:7252998695314141752",
+          "name": "colorHex",
+          "type": 6
         }
       ],
       "relations": []
