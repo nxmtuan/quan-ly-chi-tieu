@@ -116,9 +116,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     final selectedSavingsGoal = savingsGoals
         .where((goal) => goal.id == _savingsGoalId)
         .firstOrNull;
-    if (_categoryId == null && categories.isNotEmpty) {
-      _categoryId = categories.first.id;
-    }
     if (_sourceId == null && moneySources.isNotEmpty) {
       _sourceId = moneySources.first.id;
     }
@@ -335,18 +332,17 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
 
   Future<void> _saveTransaction() async {
     final amount = parseAmountInput(_amountController.text);
-    if (amount == null ||
-        amount <= 0 ||
-        _categoryId == null ||
-        _sourceId == null) {
+    if (amount == null || amount <= 0 || _sourceId == null) {
       return;
     }
 
+    final effectiveCategoryId =
+        _categoryId ?? uncategorizedCategoryIdFor(_type);
     final transaction = Transaction(
       id: widget.transaction?.id ?? generateLocalEntityId(),
       amount: amount,
       type: _type,
-      categoryId: _categoryId!,
+      categoryId: effectiveCategoryId,
       sourceId: _sourceId!,
       savingsGoalId: _type == TransactionType.expense ? _savingsGoalId : null,
       date: _date,
@@ -355,11 +351,11 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
 
     final categories = ref.read(categoriesByTypeProvider(_type));
     final category = categories.firstWhere(
-      (c) => c.id == _categoryId,
+      (c) => c.id == effectiveCategoryId,
       orElse: () =>
-          uncategorizedCategoryFromId(_categoryId!) ??
+          uncategorizedCategoryFromId(effectiveCategoryId) ??
           Category(
-            id: _categoryId!,
+            id: effectiveCategoryId,
             name: 'Khác',
             iconData: Icons.category_rounded,
             colorHex: AppColors.textSecondary.toARGB32(),

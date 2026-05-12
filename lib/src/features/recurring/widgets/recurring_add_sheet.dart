@@ -83,9 +83,6 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
         ? const Color(0xFFFF1493)
         : AppColors.success;
     final isEditing = widget.item != null;
-    if (_categoryId == null && categories.isNotEmpty) {
-      _categoryId = categories.first.id;
-    }
     if (_sourceId == null && moneySources.isNotEmpty) {
       _sourceId = moneySources.first.id;
     }
@@ -279,10 +276,7 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
 
   Future<void> _save() async {
     final amount = parseAmountInput(_amountController.text);
-    if (amount == null ||
-        amount <= 0 ||
-        _categoryId == null ||
-        _sourceId == null) {
+    if (amount == null || amount <= 0 || _sourceId == null) {
       AppToast.show(
         context,
         message: 'Vui lòng nhập đầy đủ thông tin',
@@ -301,12 +295,14 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
             existing.startDate == normalizedStart
         ? existing.nextRunAt
         : normalizedStart;
+    final effectiveCategoryId =
+        _categoryId ?? uncategorizedCategoryIdFor(_type);
     final item = RecurringItem(
       id: existing?.id ?? generateLocalEntityId(),
       kind: widget.kind,
       type: _type,
       amount: amount,
-      categoryId: _categoryId!,
+      categoryId: effectiveCategoryId,
       sourceId: _sourceId!,
       startDate: normalizedStart,
       frequency: _frequency,
