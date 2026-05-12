@@ -362,19 +362,46 @@ class _AutoSyncScheduleSheetState
             ),
         ],
       ),
-      action: AppPrimaryButton(
-        label: 'Lưu lịch',
-        color: AppColors.primary,
-        onTap: () {
-          Navigator.of(context).pop(
-            widget.initialSettings.copyWith(
-              scheduleType: _scheduleType,
-              hour: _hour,
-              minute: _minute,
-              weekday: _weekday,
+      action: Row(
+        children: [
+          Expanded(
+            child: AppBounceBuilder(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+                decoration: BoxDecoration(
+                  color: context.appPalette.surfaceMuted,
+                  borderRadius: BorderRadius.circular(context.scaled(16)),
+                  border: Border.all(color: context.appPalette.border),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Đóng',
+                  style: context.appText.buttonLabel.copyWith(
+                    color: context.appPalette.textPrimary,
+                  ),
+                ),
+              ),
             ),
-          );
-        },
+          ),
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: AppPrimaryButton(
+              label: 'Lưu lịch',
+              color: AppColors.primary,
+              onTap: () {
+                Navigator.of(context).pop(
+                  widget.initialSettings.copyWith(
+                    scheduleType: _scheduleType,
+                    hour: _hour,
+                    minute: _minute,
+                    weekday: _weekday,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -134,95 +134,129 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child:
-                AppSheetContainer(
-                  child: Column(
-                    children: [
-                      _SheetHeader(
-                        title: widget.transaction == null
-                            ? 'Ghi chép GD'
-                            : 'Cập nhật GD',
-                      ),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _TypeToggle(
-                                type: _type,
-                                onChanged: (type) {
-                                  setState(() {
-                                    _type = type;
-                                    _categoryId = null;
-                                    if (type == TransactionType.income) {
-                                      _savingsGoalId = null;
-                                    }
-                                    _promotedCategoryId = null;
-                                  });
-                                },
-                              ),
+          AppSheetContainer(
+                child: Column(
+                  children: [
+                    _SheetHeader(
+                      title: widget.transaction == null
+                          ? 'Ghi chép GD'
+                          : 'Cập nhật GD',
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _TypeToggle(
+                              type: _type,
+                              onChanged: (type) {
+                                setState(() {
+                                  _type = type;
+                                  _categoryId = null;
+                                  if (type == TransactionType.income) {
+                                    _savingsGoalId = null;
+                                  }
+                                  _promotedCategoryId = null;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                            _AmountCard(
+                              controller: _amountController,
+                              actionColor: actionColor,
+                              focusNode: _amountFocusNode,
+                              isFocused: _amountFocusNode.hasFocus,
+                            ),
+                            const SizedBox(height: 10),
+                            _CategoryPicker(
+                              categories: categories,
+                              selectedCategoryId: _categoryId,
+                              actionColor: actionColor,
+                              onSelected: (category) {
+                                setState(() => _categoryId = category.id);
+                              },
+                              onShowAll: () => _showAllCategories(categories),
+                              promotedCategoryId: _promotedCategoryId,
+                            ),
+                            const SizedBox(height: 10),
+                            _DateTrigger(date: _date, onTap: _pickDate),
+                            const SizedBox(height: 10),
+                            _MoneySourcePicker(
+                              selectedSource: selectedMoneySource,
+                              actionColor: actionColor,
+                              onShowAll: () =>
+                                  _showAllMoneySources(moneySources),
+                            ),
+                            if (_type == TransactionType.expense) ...[
                               const SizedBox(height: 10),
-                              _AmountCard(
-                                controller: _amountController,
+                              _SavingsGoalPicker(
+                                activeGoals: activeSavingsGoals,
+                                selectedGoal: selectedSavingsGoal,
                                 actionColor: actionColor,
-                                focusNode: _amountFocusNode,
-                                isFocused: _amountFocusNode.hasFocus,
-                              ),
-                              const SizedBox(height: 10),
-                              _CategoryPicker(
-                                categories: categories,
-                                selectedCategoryId: _categoryId,
-                                actionColor: actionColor,
-                                onSelected: (category) {
-                                  setState(() => _categoryId = category.id);
-                                },
-                                onShowAll: () => _showAllCategories(categories),
-                                promotedCategoryId: _promotedCategoryId,
-                              ),
-                              const SizedBox(height: 10),
-                              _DateTrigger(date: _date, onTap: _pickDate),
-                              const SizedBox(height: 10),
-                              _MoneySourcePicker(
-                                selectedSource: selectedMoneySource,
-                                actionColor: actionColor,
-                                onShowAll: () => _showAllMoneySources(moneySources),
-                              ),
-                              if (_type == TransactionType.expense) ...[
-                                const SizedBox(height: 10),
-                                _SavingsGoalPicker(
-                                  activeGoals: activeSavingsGoals,
-                                  selectedGoal: selectedSavingsGoal,
-                                  actionColor: actionColor,
-                                  onTap: () => _showSavingsGoalPicker(
-                                    activeSavingsGoals,
-                                    savingsGoalSavedAmounts,
-                                  ),
+                                onTap: () => _showSavingsGoalPicker(
+                                  activeSavingsGoals,
+                                  savingsGoalSavedAmounts,
                                 ),
-                              ],
-                              const SizedBox(height: 10),
-                              _NoteCard(
-                                controller: _noteController,
-                                focusNode: _noteFocusNode,
-                                isFocused: _noteFocusNode.hasFocus,
                               ),
                             ],
+                            const SizedBox(height: 10),
+                            _NoteCard(
+                              controller: _noteController,
+                              focusNode: _noteFocusNode,
+                              isFocused: _noteFocusNode.hasFocus,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    AppSheetFooter(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: AppBounceBuilder(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: context.scaled(16),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: context.appPalette.surfaceMuted,
+                                  borderRadius: BorderRadius.circular(
+                                    context.scaled(16),
+                                  ),
+                                  border: Border.all(
+                                    color: context.appPalette.border,
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Đóng',
+                                  style: context.appText.buttonLabel.copyWith(
+                                    color: context.appPalette.textPrimary,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          SizedBox(width: context.scaled(12)),
+                          Expanded(
+                            child: AppPrimaryButton(
+                              label: widget.transaction == null
+                                  ? (_type == TransactionType.expense
+                                        ? 'Thêm giao dịch chi'
+                                        : 'Thêm giao dịch thu')
+                                  : 'Cập nhật giao dịch',
+                              color: actionColor,
+                              onTap: _saveTransaction,
+                            ),
+                          ),
+                        ],
                       ),
-                      AppSheetFooter(
-                        child: AppPrimaryButton(
-                          label: widget.transaction == null
-                              ? (_type == TransactionType.expense
-                                    ? 'Thêm giao dịch chi'
-                                    : 'Thêm giao dịch thu')
-                              : 'Cập nhật giao dịch',
-                          color: actionColor,
-                          onTap: _saveTransaction,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
+                    ),
+                  ],
+                ),
+              )
               .animate()
               .fadeIn(duration: 220.ms)
               .slideY(
@@ -309,9 +343,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     }
 
     final transaction = Transaction(
-      id:
-          widget.transaction?.id ??
-          generateLocalEntityId(),
+      id: widget.transaction?.id ?? generateLocalEntityId(),
       amount: amount,
       type: _type,
       categoryId: _categoryId!,
@@ -332,7 +364,8 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         type: _type,
       ),
     );
-    final source = ref.read(moneySourceByIdProvider(_sourceId!)) ??
+    final source =
+        ref.read(moneySourceByIdProvider(_sourceId!)) ??
         defaultMoneySources.first;
 
     final confirmed = await showTransactionConfirmationSheet(

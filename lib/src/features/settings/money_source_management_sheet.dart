@@ -68,18 +68,42 @@ class _MoneySourceManagementSheet extends ConsumerWidget {
                 );
               },
             ),
-      action: AppPrimaryButton(
-        label: 'Thêm nguồn tiền',
-        color: AppColors.primary,
-        onTap: () => _openEditor(context),
+      action: Row(
+        children: [
+          Expanded(
+            child: AppBounceBuilder(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+                decoration: BoxDecoration(
+                  color: context.appPalette.surfaceMuted,
+                  borderRadius: BorderRadius.circular(context.scaled(16)),
+                  border: Border.all(color: context.appPalette.border),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Đóng',
+                  style: context.appText.buttonLabel.copyWith(
+                    color: context.appPalette.textPrimary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: AppPrimaryButton(
+              label: 'Thêm nguồn tiền',
+              color: AppColors.primary,
+              onTap: () => _openEditor(context),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Future<void> _openEditor(
-    BuildContext context, {
-    MoneySource? source,
-  }) async {
+  Future<void> _openEditor(BuildContext context, {MoneySource? source}) async {
     await showMoneySourceEditorSheet(context, source: source);
   }
 
@@ -169,10 +193,7 @@ class _ManagedMoneySourceRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  source.name,
-                  style: context.appText.bodyStrong,
-                ),
+                Text(source.name, style: context.appText.bodyStrong),
                 if (isDefaultMoneySourceId(source.id)) ...[
                   SizedBox(height: context.scaled(3)),
                   Text(
@@ -186,10 +207,7 @@ class _ManagedMoneySourceRow extends StatelessWidget {
             ),
           ),
           if (onEdit != null) ...[
-            _ActionButton(
-              icon: Icons.edit_rounded,
-              onTap: onEdit!,
-            ),
+            _ActionButton(icon: Icons.edit_rounded, onTap: onEdit!),
             SizedBox(width: context.scaled(8)),
           ],
           if (onDelete != null)
@@ -232,7 +250,11 @@ class _ActionButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(context.scaled(14)),
           border: Border.all(color: palette.border),
         ),
-        child: Icon(icon, color: color ?? palette.textPrimary, size: context.scaled(18)),
+        child: Icon(
+          icon,
+          color: color ?? palette.textPrimary,
+          size: context.scaled(18),
+        ),
       ),
     );
   }
@@ -261,8 +283,7 @@ class _MoneySourceEditorSheetState
     super.initState();
     _nameController = TextEditingController(text: widget.source?.name ?? '');
     _nameFocusNode = FocusNode()..addListener(_handleFocusChanged);
-    _iconData =
-        widget.source?.iconData ?? Icons.account_balance_wallet_rounded;
+    _iconData = widget.source?.iconData ?? Icons.account_balance_wallet_rounded;
   }
 
   void _handleFocusChanged() {
@@ -314,10 +335,37 @@ class _MoneySourceEditorSheetState
           ],
         ),
       ),
-      action: AppPrimaryButton(
-        label: _isEditing ? 'Lưu thay đổi' : 'Tạo nguồn tiền',
-        color: AppColors.primary,
-        onTap: _save,
+      action: Row(
+        children: [
+          Expanded(
+            child: AppBounceBuilder(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+                decoration: BoxDecoration(
+                  color: context.appPalette.surfaceMuted,
+                  borderRadius: BorderRadius.circular(context.scaled(16)),
+                  border: Border.all(color: context.appPalette.border),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Đóng',
+                  style: context.appText.buttonLabel.copyWith(
+                    color: context.appPalette.textPrimary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: AppPrimaryButton(
+              label: _isEditing ? 'Lưu thay đổi' : 'Tạo nguồn tiền',
+              color: AppColors.primary,
+              onTap: _save,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -365,10 +413,7 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: context.appText.fieldLabel,
-    );
+    return Text(label, style: context.appText.fieldLabel);
   }
 }
 
@@ -410,9 +455,7 @@ class _NameField extends StatelessWidget {
           errorBorder: InputBorder.none,
           focusedErrorBorder: InputBorder.none,
           isDense: true,
-          contentPadding: EdgeInsets.symmetric(
-            vertical: context.scaled(14),
-          ),
+          contentPadding: EdgeInsets.symmetric(vertical: context.scaled(14)),
           hintText: 'Nhập tên nguồn tiền',
           hintStyle: context.appText.body.copyWith(
             color: context.appPalette.textSecondary.withValues(alpha: 0.65),

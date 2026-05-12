@@ -189,14 +189,45 @@ class _RecurringAddSheetState extends ConsumerState<_RecurringAddSheet> {
               ),
             ),
             AppSheetFooter(
-              child: AppPrimaryButton(
-                label: isEditing
-                    ? 'Cập nhật định kỳ'
-                    : (widget.kind == RecurringItemKind.transaction
-                          ? 'Thêm giao dịch định kỳ'
-                          : 'Thêm nhắc nhở định kỳ'),
-                color: actionColor,
-                onTap: _save,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: AppBounceBuilder(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: context.scaled(16),
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.appPalette.surfaceMuted,
+                          borderRadius: BorderRadius.circular(
+                            context.scaled(16),
+                          ),
+                          border: Border.all(color: context.appPalette.border),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Đóng',
+                          style: context.appText.buttonLabel.copyWith(
+                            color: context.appPalette.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: context.scaled(12)),
+                  Expanded(
+                    child: AppPrimaryButton(
+                      label: isEditing
+                          ? 'Cập nhật định kỳ'
+                          : (widget.kind == RecurringItemKind.transaction
+                                ? 'Thêm giao dịch'
+                                : 'Thêm nhắc nhở'),
+                      color: actionColor,
+                      onTap: _save,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
