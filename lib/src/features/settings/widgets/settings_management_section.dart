@@ -28,7 +28,7 @@ class _ManageMoneySourcesRow extends ConsumerWidget {
       icon: Icons.account_balance_wallet_rounded,
       iconColor: AppColors.primary,
       title: 'Quản lý nguồn tiền',
-      subtitle: 'Thêm và chỉnh sửa danh sách nguồn tiền',
+      subtitle: 'Chỉnh sửa danh sách nguồn tiền',
       trailing: Icon(
         Icons.chevron_right_rounded,
         color: context.appPalette.textSecondary,

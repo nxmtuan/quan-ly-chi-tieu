@@ -79,11 +79,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
             SizedBox(height: context.scaled(18)),
-            const AppPageHeader(
-              subtitle: 'Cài đặt',
-              title: 'Tuỳ chỉnh ứng dụng',
-              showAvatar: false,
-            ),
+            const AppPageHeader(title: 'Cài đặt', showAvatar: false),
             SizedBox(height: context.scaled(24)),
             FlatCard(
               radius: context.scaled(24),

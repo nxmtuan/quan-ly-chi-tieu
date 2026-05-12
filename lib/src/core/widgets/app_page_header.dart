@@ -13,13 +13,13 @@ import 'app_bounce_builder.dart';
 class AppPageHeader extends ConsumerWidget {
   const AppPageHeader({
     super.key,
-    required this.subtitle,
+    this.subtitle,
     required this.title,
     this.titleColor,
     this.showAvatar = true,
   });
 
-  final String subtitle;
+  final String? subtitle;
   final String title;
   final Color? titleColor;
   final bool showAvatar;
@@ -37,8 +37,10 @@ class AppPageHeader extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(subtitle, style: context.appText.pageEyebrow),
-              const SizedBox(height: 5),
+              if (subtitle != null && subtitle!.isNotEmpty) ...[
+                Text(subtitle!, style: context.appText.pageEyebrow),
+                const SizedBox(height: 5),
+              ],
               Text(
                 title,
                 style: context.appText.pageTitle.copyWith(
