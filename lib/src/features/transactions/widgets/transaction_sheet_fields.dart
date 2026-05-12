@@ -619,112 +619,443 @@ class _MoreMoneySourcesTile extends StatelessWidget {
 
 class _SavingsGoalPicker extends StatelessWidget {
   const _SavingsGoalPicker({
-    required this.savingsGoals,
-    required this.selectedGoalId,
+    required this.activeGoals,
+    required this.selectedGoal,
     required this.actionColor,
-    required this.onSelected,
+    required this.onTap,
   });
 
-  final List<SavingsGoal> savingsGoals;
-  final String? selectedGoalId;
+  final List<SavingsGoal> activeGoals;
+  final SavingsGoal? selectedGoal;
   final Color actionColor;
-  final ValueChanged<String?> onSelected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return _FormCard(
-      padding: EdgeInsets.fromLTRB(
-        context.scaled(14),
-        context.scaled(12),
-        context.scaled(14),
-        context.scaled(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Mục tiêu tiết kiệm',
-            style: context.appText.fieldLabel.copyWith(
+    final value = selectedGoal?.title ??
+        (activeGoals.isEmpty
+            ? 'Chưa có mục tiêu đang tiến hành'
+            : 'Chọn mục tiêu');
+
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: _FormCard(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.scaled(14),
+          vertical: context.scaled(10),
+        ),
+        child: Row(
+          children: [
+            _LeadingIcon(
+              icon: Icons.savings_rounded,
+              color: AppColors.primary,
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            ),
+            SizedBox(width: context.scaled(10)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Mục tiêu tiết kiệm',
+                    style: context.appText.fieldLabel.copyWith(
+                      color: context.appPalette.iconMuted,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: context.scaled(6)),
+                  Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.appText.fieldValue.copyWith(
+                      color: selectedGoal == null
+                          ? context.appPalette.textSecondary
+                          : context.appPalette.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
               color: context.appPalette.iconMuted,
-              fontWeight: FontWeight.w800,
+              size: context.scaled(18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Future<_SavingsGoalPickerResult?> _showSavingsGoalPickerSheet(
+  BuildContext context, {
+  required List<SavingsGoal> goals,
+  required Map<String, double> savedAmounts,
+  required String? initialSelectedGoalId,
+  required Color actionColor,
+}) {
+  return showAppBottomSheet<_SavingsGoalPickerResult>(
+    context: context,
+    builder: (context) => _SavingsGoalPickerSheet(
+      goals: goals,
+      savedAmounts: savedAmounts,
+      initialSelectedGoalId: initialSelectedGoalId,
+      actionColor: actionColor,
+    ),
+  );
+}
+
+class _SavingsGoalPickerSheet extends StatefulWidget {
+  const _SavingsGoalPickerSheet({
+    required this.goals,
+    required this.savedAmounts,
+    required this.initialSelectedGoalId,
+    required this.actionColor,
+  });
+
+  final List<SavingsGoal> goals;
+  final Map<String, double> savedAmounts;
+  final String? initialSelectedGoalId;
+  final Color actionColor;
+
+  @override
+  State<_SavingsGoalPickerSheet> createState() =>
+      _SavingsGoalPickerSheetState();
+}
+
+class _SavingsGoalPickerSheetState extends State<_SavingsGoalPickerSheet> {
+  late String? _selectedGoalId;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedGoalId = widget.initialSelectedGoalId;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final itemCount = widget.goals.length + 1;
+
+    return AppSheetScaffold(
+      title: 'Chọn mục tiêu tiết kiệm',
+      subtitle: 'Chỉ hiển thị mục tiêu đang tiến hành',
+      body: ListView.separated(
+              padding: EdgeInsets.only(bottom: context.scaled(16)),
+              itemCount: itemCount,
+              separatorBuilder: (_, _) => SizedBox(height: context.scaled(12)),
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return _NoSavingsGoalPickerItem(
+                    selected: _selectedGoalId == null,
+                    actionColor: widget.actionColor,
+                    onTap: () => setState(() => _selectedGoalId = null),
+                  );
+                }
+
+                final goal = widget.goals[index - 1];
+                final savedAmount =
+                    goal.savedAmount + (widget.savedAmounts[goal.id] ?? 0);
+                return _SavingsGoalPickerItem(
+                  goal: goal,
+                  savedAmount: savedAmount,
+                  selected: goal.id == _selectedGoalId,
+                  actionColor: widget.actionColor,
+                  onTap: () => setState(() => _selectedGoalId = goal.id),
+                );
+              },
+            ),
+      action: Row(
+        children: [
+          Expanded(
+            child: AppBounceBuilder(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+                decoration: BoxDecoration(
+                  color: context.appPalette.surfaceMuted,
+                  borderRadius: BorderRadius.circular(context.scaled(16)),
+                  border: Border.all(color: context.appPalette.border),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Đóng',
+                  style: context.appText.buttonLabel.copyWith(
+                    color: context.appPalette.textPrimary,
+                  ),
+                ),
+              ),
             ),
           ),
-          SizedBox(height: context.scaled(10)),
-          if (savingsGoals.isEmpty)
-            Text(
-              'Chưa có mục tiêu tiết kiệm',
-              style: context.appText.bodyStrong.copyWith(
-                color: context.appPalette.textSecondary,
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: AppPrimaryButton(
+              label: 'Chọn mục tiêu',
+              color: widget.actionColor,
+              onTap: () => Navigator.of(context).pop(
+                _SavingsGoalPickerResult(_selectedGoalId),
               ),
-            )
-          else
-            Wrap(
-              spacing: context.scaled(8),
-              runSpacing: context.scaled(8),
-              children: [
-                _SavingsGoalChoiceChip(
-                  label: 'Không gắn',
-                  selected: selectedGoalId == null,
-                  color: actionColor,
-                  onTap: () => onSelected(null),
-                ),
-                for (final goal in savingsGoals)
-                  _SavingsGoalChoiceChip(
-                    label: goal.title,
-                    selected: selectedGoalId == goal.id,
-                    color: actionColor,
-                    onTap: () => onSelected(goal.id),
-                  ),
-              ],
             ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _SavingsGoalChoiceChip extends StatelessWidget {
-  const _SavingsGoalChoiceChip({
-    required this.label,
+class _NoSavingsGoalPickerItem extends StatelessWidget {
+  const _NoSavingsGoalPickerItem({
     required this.selected,
-    required this.color,
+    required this.actionColor,
     required this.onTap,
   });
 
-  final String label;
   final bool selected;
-  final Color color;
+  final Color actionColor;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
     return AppBounceBuilder(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        constraints: BoxConstraints(maxWidth: context.scaled(150)),
-        padding: EdgeInsets.symmetric(
-          horizontal: context.scaled(11),
-          vertical: context.scaled(9),
-        ),
+        padding: EdgeInsets.all(context.scaled(15)),
         decoration: BoxDecoration(
-          color: selected
-              ? color.withValues(alpha: 0.08)
-              : context.appPalette.surfaceMuted,
-          borderRadius: BorderRadius.circular(context.scaled(14)),
+          color: palette.surface,
+          borderRadius: BorderRadius.circular(context.scaled(24)),
           border: Border.all(
-            color: selected ? color : context.appPalette.border,
+            color: selected ? actionColor : palette.border,
+            width: selected ? 1.4 : 1,
           ),
         ),
-        child: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: context.appText.captionStrong.copyWith(
-            color: selected ? color : context.appPalette.textPrimary,
-          ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Không phải GD tiết kiệm',
+                style: context.appText.fieldValue,
+              ),
+            ),
+            if (selected)
+              Icon(
+                Icons.check_rounded,
+                color: actionColor,
+                size: context.scaled(22),
+              ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class _SavingsGoalPickerResult {
+  const _SavingsGoalPickerResult(this.goalId);
+
+  final String? goalId;
+}
+
+class _SavingsGoalPickerItem extends StatelessWidget {
+  const _SavingsGoalPickerItem({
+    required this.goal,
+    required this.savedAmount,
+    required this.selected,
+    required this.actionColor,
+    required this.onTap,
+  });
+
+  final SavingsGoal goal;
+  final double savedAmount;
+  final bool selected;
+  final Color actionColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = goal.progressWith(savedAmount);
+    final remainingAmount = goal.remainingAmountWith(savedAmount);
+    final palette = context.appPalette;
+
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: EdgeInsets.all(context.scaled(15)),
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: BorderRadius.circular(context.scaled(24)),
+          border: Border.all(
+            color: selected ? actionColor : palette.border,
+            width: selected ? 1.4 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: context.scaled(48),
+                  height: context.scaled(48),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(context.scaled(17)),
+                  ),
+                  child: Icon(
+                    Icons.flag_rounded,
+                    color: AppColors.primary,
+                    size: context.scaled(22),
+                  ),
+                ),
+                SizedBox(width: context.scaled(12)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        goal.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.appText.fieldValue,
+                      ),
+                      SizedBox(height: context.scaled(6)),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.scaled(9),
+                          vertical: context.scaled(5),
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          'Đang tiến hành',
+                          style: context.appText.captionStrong.copyWith(
+                            color: AppColors.primary,
+                            fontSize: context.scaledFont(11, min: 10),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (selected)
+                  Icon(
+                    Icons.check_rounded,
+                    color: actionColor,
+                    size: context.scaled(22),
+                  ),
+              ],
+            ),
+            SizedBox(height: context.scaled(14)),
+            Row(
+              children: [
+                Text(
+                  '${(progress * 100).round()}%',
+                  style: context.appText.bodyStrong.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
+                SizedBox(width: context.scaled(10)),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: context.scaled(8),
+                      backgroundColor: palette.surfaceMuted,
+                      valueColor: const AlwaysStoppedAnimation(
+                        AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: context.scaled(12)),
+            Row(
+              children: [
+                Expanded(
+                  child: _SavingsGoalAmountLabel(
+                    label: 'Đã tiết kiệm',
+                    value: formatCurrency(savedAmount),
+                  ),
+                ),
+                SizedBox(width: context.scaled(8)),
+                Expanded(
+                  child: _SavingsGoalAmountLabel(
+                    label: 'Còn lại',
+                    value: formatCurrency(remainingAmount),
+                    alignCenter: true,
+                  ),
+                ),
+                SizedBox(width: context.scaled(8)),
+                Expanded(
+                  child: _SavingsGoalAmountLabel(
+                    label: 'Mục tiêu',
+                    value: formatCurrency(goal.targetAmount),
+                    alignEnd: true,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SavingsGoalAmountLabel extends StatelessWidget {
+  const _SavingsGoalAmountLabel({
+    required this.label,
+    required this.value,
+    this.alignCenter = false,
+    this.alignEnd = false,
+  });
+
+  final String label;
+  final String value;
+  final bool alignCenter;
+  final bool alignEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    final alignment = alignEnd
+        ? CrossAxisAlignment.end
+        : alignCenter
+        ? CrossAxisAlignment.center
+        : CrossAxisAlignment.start;
+
+    return Column(
+      crossAxisAlignment: alignment,
+      children: [
+        Text(
+          label,
+          style: context.appText.caption.copyWith(
+            color: context.appPalette.textSecondary,
+          ),
+        ),
+        SizedBox(height: context.scaled(3)),
+        Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: alignEnd
+              ? TextAlign.end
+              : alignCenter
+              ? TextAlign.center
+              : TextAlign.start,
+          style: context.appText.captionStrong.copyWith(
+            color: context.appPalette.textPrimary,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -109,6 +109,14 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     final categories = ref.watch(categoriesByTypeProvider(_type));
     final moneySources = ref.watch(moneySourcesProvider);
     final savingsGoals = ref.watch(savingsGoalsProvider);
+    final savingsGoalSavedAmounts = ref.watch(savingsGoalSavedAmountsProvider);
+    final activeSavingsGoals = _activeSavingsGoals(
+      savingsGoals,
+      savingsGoalSavedAmounts,
+    );
+    final selectedSavingsGoal = savingsGoals
+        .where((goal) => goal.id == _savingsGoalId)
+        .firstOrNull;
     if (_categoryId == null && categories.isNotEmpty) {
       _categoryId = categories.first.id;
     }
@@ -185,12 +193,13 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                               if (_type == TransactionType.expense) ...[
                                 const SizedBox(height: 10),
                                 _SavingsGoalPicker(
-                                  savingsGoals: savingsGoals,
-                                  selectedGoalId: _savingsGoalId,
+                                  activeGoals: activeSavingsGoals,
+                                  selectedGoal: selectedSavingsGoal,
                                   actionColor: actionColor,
-                                  onSelected: (goalId) {
-                                    setState(() => _savingsGoalId = goalId);
-                                  },
+                                  onTap: () => _showSavingsGoalPicker(
+                                    activeSavingsGoals,
+                                    savingsGoalSavedAmounts,
+                                  ),
                                 ),
                               ],
                               const SizedBox(height: 10),
@@ -277,6 +286,25 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     }
   }
 
+  Future<void> _showSavingsGoalPicker(
+    List<SavingsGoal> activeGoals,
+    Map<String, double> savedAmounts,
+  ) async {
+    final result = await _showSavingsGoalPickerSheet(
+      context,
+      goals: activeGoals,
+      savedAmounts: savedAmounts,
+      initialSelectedGoalId: _savingsGoalId,
+      actionColor: _type == TransactionType.expense
+          ? const Color(0xFFFF1493)
+          : AppColors.success,
+    );
+
+    if (mounted && result != null) {
+      setState(() => _savingsGoalId = result.goalId);
+    }
+  }
+
   Future<void> _saveTransaction() async {
     final amount = parseAmountInput(_amountController.text);
     if (amount == null ||
@@ -347,5 +375,20 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     if (mounted) {
       Navigator.of(context).pop();
     }
+  }
+
+  List<SavingsGoal> _activeSavingsGoals(
+    List<SavingsGoal> goals,
+    Map<String, double> savedAmounts,
+  ) {
+    final now = DateTime.now();
+    return [
+      for (final goal in goals)
+        if (!goal.isWaitingAt(now) &&
+            !goal.isCompletedWith(
+              goal.savedAmount + (savedAmounts[goal.id] ?? 0),
+            ))
+          goal,
+    ];
   }
 }
