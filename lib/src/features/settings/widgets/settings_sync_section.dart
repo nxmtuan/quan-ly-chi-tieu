@@ -206,6 +206,7 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
       ref.read(transactionsProvider.notifier).reload();
       ref.read(categoriesProvider.notifier).reload();
       ref.read(moneySourcesProvider.notifier).reload();
+      ref.read(savingsGoalsProvider.notifier).reload();
       ref.read(recurringItemsProvider.notifier).reload();
 
       if (mounted) {

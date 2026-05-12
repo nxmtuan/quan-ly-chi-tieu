@@ -109,6 +109,7 @@ class _AuthSettingsRow extends ConsumerWidget {
             ref.read(transactionsProvider.notifier).reload();
             ref.read(categoriesProvider.notifier).reload();
             ref.read(moneySourcesProvider.notifier).reload();
+            ref.read(savingsGoalsProvider.notifier).reload();
 
             if (!context.mounted) {
               return;

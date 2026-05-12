@@ -18,6 +18,8 @@ class AppTableCalendar extends StatelessWidget {
     required this.focusedDay,
     required this.selectedDay,
     required this.onDaySelected,
+    this.firstDay,
+    this.lastDay,
     this.onPageChanged,
     this.eventLoader,
     this.showShadow = true,
@@ -26,6 +28,8 @@ class AppTableCalendar extends StatelessWidget {
   final DateTime focusedDay;
   final DateTime selectedDay;
   final ValueChanged<DateTime> onDaySelected;
+  final DateTime? firstDay;
+  final DateTime? lastDay;
   final ValueChanged<DateTime>? onPageChanged;
   final CalendarEventLoader? eventLoader;
   final bool showShadow;
@@ -55,8 +59,8 @@ class AppTableCalendar extends StatelessWidget {
       ),
       child: TableCalendar<Object>(
         locale: 'vi_VN',
-        firstDay: DateTime(2020),
-        lastDay: DateTime(2035),
+        firstDay: firstDay ?? DateTime(2020),
+        lastDay: lastDay ?? DateTime(2035),
         focusedDay: focusedDay,
         currentDay: DateTime.now(),
         availableCalendarFormats: const {CalendarFormat.month: 'Month'},

@@ -16,6 +16,7 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'src/models/category.dart';
 import 'src/models/money_source.dart';
+import 'src/models/savings_goal.dart';
 import 'src/models/transaction.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -89,7 +90,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 7804320392523648537),
     name: 'Transaction',
-    lastPropertyId: const obx_int.IdUid(11, 3743505230492404707),
+    lastPropertyId: const obx_int.IdUid(12, 5819948035215699391),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -163,6 +164,13 @@ final _entities = <obx_int.ModelEntity>[
         flags: 2048,
         indexId: const obx_int.IdUid(9, 5507329943214301050),
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 5819948035215699391),
+        name: 'savingsGoalId',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(13, 1091651197108033581),
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -214,6 +222,85 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(6, 4449110663233528591),
+    name: 'SavingsGoal',
+    lastPropertyId: const obx_int.IdUid(11, 5368346050396594622),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 4640397952089517882),
+        name: 'obxId',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 3396422360137261182),
+        name: 'id',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(10, 7357680742283767692),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 1128947346705756346),
+        name: 'title',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 5225968569058340931),
+        name: 'targetAmount',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 3273161100223818518),
+        name: 'savedAmount',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 6678201446676429553),
+        name: 'deadline',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 7034784935062051904),
+        name: 'note',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 7898982240400800410),
+        name: 'createdAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 2282060080335797069),
+        name: 'updatedAt',
+        type: 10,
+        flags: 8,
+        indexId: const obx_int.IdUid(11, 8219870922745221666),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 8519554436366512149),
+        name: 'isDeleted',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 5368346050396594622),
+        name: 'startDate',
+        type: 10,
+        flags: 8,
+        indexId: const obx_int.IdUid(12, 3254630399225974344),
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -259,8 +346,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(5, 6814073455354518124),
-    lastIndexId: const obx_int.IdUid(9, 5507329943214301050),
+    lastEntityId: const obx_int.IdUid(6, 4449110663233528591),
+    lastIndexId: const obx_int.IdUid(13, 1091651197108033581),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [2958872209723789033, 7083601830508858313],
@@ -388,7 +475,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.note!);
         final sourceIdOffset = fbb.writeString(object.sourceId);
-        fbb.startTable(12);
+        final savingsGoalIdOffset = object.savingsGoalId == null
+            ? null
+            : fbb.writeString(object.savingsGoalId!);
+        fbb.startTable(13);
         fbb.addInt64(0, object.obxId);
         fbb.addOffset(1, idOffset);
         fbb.addFloat64(2, object.amount);
@@ -400,6 +490,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addBool(8, object.isDeleted);
         fbb.addInt8(9, object.typeCode);
         fbb.addOffset(10, sourceIdOffset);
+        fbb.addOffset(11, savingsGoalIdOffset);
         fbb.finish(fbb.endTable());
         return object.obxId;
       },
@@ -436,6 +527,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final sourceIdParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 24, '');
+        final savingsGoalIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 26);
         final dateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0),
         );
@@ -459,6 +553,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           dbType: dbTypeParam,
           categoryId: categoryIdParam,
           sourceId: sourceIdParam,
+          savingsGoalId: savingsGoalIdParam,
           date: dateParam,
           note: noteParam,
           updatedAt: updatedAtParam,
@@ -524,6 +619,105 @@ obx_int.ModelDefinition getObjectBoxModel() {
           id: idParam,
           name: nameParam,
           dbIconCodePoint: dbIconCodePointParam,
+          updatedAt: updatedAtParam,
+          isDeleted: isDeletedParam,
+        );
+
+        return object;
+      },
+    ),
+    SavingsGoal: obx_int.EntityDefinition<SavingsGoal>(
+      model: _entities[3],
+      toOneRelations: (SavingsGoal object) => [],
+      toManyRelations: (SavingsGoal object) => {},
+      getId: (SavingsGoal object) => object.obxId,
+      setId: (SavingsGoal object, int id) {
+        object.obxId = id;
+      },
+      objectToFB: (SavingsGoal object, fb.Builder fbb) {
+        final idOffset = fbb.writeString(object.id);
+        final titleOffset = fbb.writeString(object.title);
+        final noteOffset = object.note == null
+            ? null
+            : fbb.writeString(object.note!);
+        fbb.startTable(12);
+        fbb.addInt64(0, object.obxId);
+        fbb.addOffset(1, idOffset);
+        fbb.addOffset(2, titleOffset);
+        fbb.addFloat64(3, object.targetAmount);
+        fbb.addFloat64(4, object.savedAmount);
+        fbb.addInt64(5, object.deadline?.millisecondsSinceEpoch);
+        fbb.addOffset(6, noteOffset);
+        fbb.addInt64(7, object.createdAt.millisecondsSinceEpoch);
+        fbb.addInt64(8, object.updatedAt.millisecondsSinceEpoch);
+        fbb.addBool(9, object.isDeleted);
+        fbb.addInt64(10, object.startDate.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.obxId;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final deadlineValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          14,
+        );
+        final obxIdParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final idParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final titleParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final targetAmountParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final savedAmountParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
+        final startDateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 24, 0),
+        );
+        final deadlineParam = deadlineValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(deadlineValue);
+        final noteParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 16);
+        final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0),
+        );
+        final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0),
+        );
+        final isDeletedParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          22,
+          false,
+        );
+        final object = SavingsGoal(
+          obxId: obxIdParam,
+          id: idParam,
+          title: titleParam,
+          targetAmount: targetAmountParam,
+          savedAmount: savedAmountParam,
+          startDate: startDateParam,
+          deadline: deadlineParam,
+          note: noteParam,
+          createdAt: createdAtParam,
           updatedAt: updatedAtParam,
           isDeleted: isDeletedParam,
         );
@@ -640,6 +834,11 @@ class Transaction_ {
   static final sourceId = obx.QueryStringProperty<Transaction>(
     _entities[1].properties[10],
   );
+
+  /// See [Transaction.savingsGoalId].
+  static final savingsGoalId = obx.QueryStringProperty<Transaction>(
+    _entities[1].properties[11],
+  );
 }
 
 /// [MoneySource] entity fields to define ObjectBox queries.
@@ -672,5 +871,63 @@ class MoneySource_ {
   /// See [MoneySource.isDeleted].
   static final isDeleted = obx.QueryBooleanProperty<MoneySource>(
     _entities[2].properties[5],
+  );
+}
+
+/// [SavingsGoal] entity fields to define ObjectBox queries.
+class SavingsGoal_ {
+  /// See [SavingsGoal.obxId].
+  static final obxId = obx.QueryIntegerProperty<SavingsGoal>(
+    _entities[3].properties[0],
+  );
+
+  /// See [SavingsGoal.id].
+  static final id = obx.QueryStringProperty<SavingsGoal>(
+    _entities[3].properties[1],
+  );
+
+  /// See [SavingsGoal.title].
+  static final title = obx.QueryStringProperty<SavingsGoal>(
+    _entities[3].properties[2],
+  );
+
+  /// See [SavingsGoal.targetAmount].
+  static final targetAmount = obx.QueryDoubleProperty<SavingsGoal>(
+    _entities[3].properties[3],
+  );
+
+  /// See [SavingsGoal.savedAmount].
+  static final savedAmount = obx.QueryDoubleProperty<SavingsGoal>(
+    _entities[3].properties[4],
+  );
+
+  /// See [SavingsGoal.deadline].
+  static final deadline = obx.QueryDateProperty<SavingsGoal>(
+    _entities[3].properties[5],
+  );
+
+  /// See [SavingsGoal.note].
+  static final note = obx.QueryStringProperty<SavingsGoal>(
+    _entities[3].properties[6],
+  );
+
+  /// See [SavingsGoal.createdAt].
+  static final createdAt = obx.QueryDateProperty<SavingsGoal>(
+    _entities[3].properties[7],
+  );
+
+  /// See [SavingsGoal.updatedAt].
+  static final updatedAt = obx.QueryDateProperty<SavingsGoal>(
+    _entities[3].properties[8],
+  );
+
+  /// See [SavingsGoal.isDeleted].
+  static final isDeleted = obx.QueryBooleanProperty<SavingsGoal>(
+    _entities[3].properties[9],
+  );
+
+  /// See [SavingsGoal.startDate].
+  static final startDate = obx.QueryDateProperty<SavingsGoal>(
+    _entities[3].properties[10],
   );
 }

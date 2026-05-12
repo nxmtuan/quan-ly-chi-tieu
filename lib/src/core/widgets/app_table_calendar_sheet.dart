@@ -6,6 +6,8 @@ Future<DateTime?> showAppCalendarSheet(
   CalendarEventLoader? eventLoader,
   String title = 'Chọn ngày',
   String? subtitle,
+  DateTime? firstDay,
+  DateTime? lastDay,
 }) {
   return showAppBottomSheet<DateTime>(
     context: context,
@@ -14,6 +16,8 @@ Future<DateTime?> showAppCalendarSheet(
       eventLoader: eventLoader,
       title: title,
       subtitle: subtitle,
+      firstDay: firstDay,
+      lastDay: lastDay,
     ),
   );
 }
@@ -23,12 +27,16 @@ class _CalendarBottomSheet extends StatefulWidget {
     required this.initialDate,
     required this.title,
     this.subtitle,
+    this.firstDay,
+    this.lastDay,
     this.eventLoader,
   });
 
   final DateTime initialDate;
   final String title;
   final String? subtitle;
+  final DateTime? firstDay;
+  final DateTime? lastDay;
   final CalendarEventLoader? eventLoader;
 
   @override
@@ -63,6 +71,8 @@ class _CalendarBottomSheetState extends State<_CalendarBottomSheet> {
         focusedDay: _focusedDay,
         selectedDay: _selectedDay,
         eventLoader: widget.eventLoader,
+        firstDay: widget.firstDay,
+        lastDay: widget.lastDay,
         onDaySelected: (selectedDay) {
           setState(() => _selectedDay = _normalizeDate(selectedDay));
         },

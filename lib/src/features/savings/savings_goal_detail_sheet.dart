@@ -1,48 +1,50 @@
-part of '../add_transaction_sheet.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void showTransactionDetailSheet(
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
+import '../../core/utils/adaptive.dart';
+import '../../core/utils/formatters.dart';
+import '../../core/widgets/app_bounce_builder.dart';
+import '../../core/widgets/app_dialog.dart';
+import '../../core/widgets/app_sheet.dart';
+import '../../core/widgets/app_toast.dart';
+import '../../models/savings_goal.dart';
+import '../../providers/savings_goal_provider.dart';
+import 'savings_goal_sheet.dart';
+
+void showSavingsGoalDetailSheet(
   BuildContext context, {
-  required Transaction transaction,
-  required Category category,
+  required SavingsGoal goal,
+  required double savedAmount,
 }) {
   showAppBottomSheet<void>(
     context: context,
     builder: (context) {
-      return _TransactionDetailSheet(
-        transaction: transaction,
-        category: category,
-      );
+      return _SavingsGoalDetailSheet(goal: goal, savedAmount: savedAmount);
     },
   );
 }
 
-class _TransactionDetailSheet extends ConsumerWidget {
-  const _TransactionDetailSheet({
-    required this.transaction,
-    required this.category,
+class _SavingsGoalDetailSheet extends ConsumerWidget {
+  const _SavingsGoalDetailSheet({
+    required this.goal,
+    required this.savedAmount,
   });
 
-  final Transaction transaction;
-  final Category category;
+  final SavingsGoal goal;
+  final double savedAmount;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.appPalette;
-    final isExpense = transaction.type == TransactionType.expense;
-    final color = isExpense ? const Color(0xFFFF1493) : AppColors.success;
-    final sign = isExpense ? '-' : '+';
-    final title = isExpense ? 'Giao dịch chi' : 'Giao dịch thu';
-    final source = ref.watch(moneySourceByIdProvider(transaction.sourceId)) ??
-        defaultMoneySources.first;
-    final savingsGoal = transaction.savingsGoalId == null
-        ? null
-        : ref
-              .watch(savingsGoalsProvider)
-              .where((goal) => goal.id == transaction.savingsGoalId)
-              .firstOrNull;
+    final progress = goal.progressWith(savedAmount);
+    final remainingAmount = goal.remainingAmountWith(savedAmount);
+    final completed = goal.isCompletedWith(savedAmount);
+    final color = completed ? AppColors.success : AppColors.primary;
 
     return AppSheetScaffold(
-      title: title,
+      title: 'Chi tiết mục tiêu',
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -52,39 +54,54 @@ class _TransactionDetailSheet extends ConsumerWidget {
               width: context.scaled(72),
               height: context.scaled(72),
               decoration: BoxDecoration(
-                color: category.color.withValues(alpha: 0.15),
+                color: color.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                category.iconData,
-                color: category.color,
+                completed ? Icons.check_circle_rounded : Icons.flag_rounded,
+                color: color,
                 size: context.scaled(32),
               ),
             ),
             SizedBox(height: context.scaled(12)),
             Text(
-              '$sign${formatCurrency(transaction.amount)}',
-              style: context.appText.amountXL.copyWith(
-                color: color,
-                fontSize: context.scaledFont(32, min: 28),
+              goal.title,
+              textAlign: TextAlign.center,
+              style: context.appText.amountLG,
+            ),
+            SizedBox(height: context.scaled(12)),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: context.scaled(10),
+                backgroundColor: palette.surfaceMuted,
+                valueColor: AlwaysStoppedAnimation(color),
               ),
             ),
-            if (transaction.hasNote) ...[
-              SizedBox(height: context.scaled(12)),
+            SizedBox(height: context.scaled(8)),
+            Text(
+              '${(progress * 100).round()}%',
+              style: context.appText.bodyStrong.copyWith(color: color),
+            ),
+            if (goal.hasNote) ...[
+              SizedBox(height: context.scaled(14)),
               Container(
+                width: double.infinity,
                 padding: EdgeInsets.symmetric(
                   horizontal: context.scaled(12),
-                  vertical: context.scaled(8),
+                  vertical: context.scaled(10),
                 ),
                 decoration: BoxDecoration(
                   color: palette.inputBackground,
-                  borderRadius: BorderRadius.circular(context.scaled(8)),
+                  borderRadius: BorderRadius.circular(context.scaled(12)),
                 ),
                 child: Text(
-                  transaction.note!,
-                  textAlign: TextAlign.center,
+                  goal.note!,
+                  textAlign: TextAlign.left,
                   style: context.appText.body.copyWith(
                     color: palette.iconMuted,
+                    height: 1.35,
                   ),
                 ),
               ),
@@ -99,28 +116,37 @@ class _TransactionDetailSheet extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  _buildRow(context, label: 'Danh mục', value: category.name),
-                  Divider(color: palette.border, height: context.scaled(24)),
                   _buildRow(
                     context,
-                    label: 'Loại',
-                    value: isExpense ? 'Chi tiêu' : 'Thu nhập',
+                    label: 'Đã tiết kiệm',
+                    value: formatCurrency(savedAmount),
+                    valueColor: color,
                   ),
                   Divider(color: palette.border, height: context.scaled(24)),
-                  _buildRow(context, label: 'Nguồn tiền', value: source.name),
-                  if (savingsGoal != null) ...[
-                    Divider(color: palette.border, height: context.scaled(24)),
-                    _buildRow(
-                      context,
-                      label: 'Mục tiêu',
-                      value: savingsGoal.title,
-                    ),
-                  ],
+                  _buildRow(
+                    context,
+                    label: 'Còn lại',
+                    value: formatCurrency(remainingAmount),
+                  ),
                   Divider(color: palette.border, height: context.scaled(24)),
                   _buildRow(
                     context,
-                    label: 'Ngày giao dịch',
-                    value: formatShortDate(transaction.date),
+                    label: 'Mục tiêu',
+                    value: formatCurrency(goal.targetAmount),
+                  ),
+                  Divider(color: palette.border, height: context.scaled(24)),
+                  _buildRow(
+                    context,
+                    label: 'Ngày bắt đầu',
+                    value: formatShortDate(goal.startDate),
+                  ),
+                  Divider(color: palette.border, height: context.scaled(24)),
+                  _buildRow(
+                    context,
+                    label: 'Deadline',
+                    value: goal.deadline == null
+                        ? 'Không có'
+                        : formatShortDate(goal.deadline!),
                   ),
                 ],
               ),
@@ -155,11 +181,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
             child: AppBounceBuilder(
               onTap: () {
                 Navigator.of(context).pop();
-                showAddTransactionSheet(
-                  context,
-                  transaction: transaction,
-                  replaceSheet: true,
-                );
+                showSavingsGoalSheet(context, goal: goal, replaceSheet: true);
               },
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
@@ -175,10 +197,7 @@ class _TransactionDetailSheet extends ConsumerWidget {
                   ],
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  'Chỉnh sửa',
-                  style: context.appText.buttonLabel,
-                ),
+                child: Text('Chỉnh sửa', style: context.appText.buttonLabel),
               ),
             ),
           ),
@@ -190,18 +209,21 @@ class _TransactionDetailSheet extends ConsumerWidget {
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
     final confirmed = await showAppConfirmDialog(
       context,
-      title: 'Xóa giao dịch',
-      message: 'Bạn có chắc muốn xóa giao dịch này không?',
+      title: 'Xóa mục tiêu',
+      message: 'Mục tiêu tiết kiệm này sẽ bị xóa khỏi danh sách.',
       confirmText: 'Xóa',
       confirmTextColor: const Color(0xFFDC2626),
       confirmBackgroundColor: context.appPalette.dangerSoft,
     );
 
     if (confirmed == true && context.mounted) {
-      ref.read(transactionsProvider.notifier).deleteTransaction(transaction.id);
+      await ref.read(savingsGoalsProvider.notifier).deleteGoal(goal.id);
+      if (!context.mounted) {
+        return;
+      }
       AppToast.show(
         context,
-        message: 'Đã xóa giao dịch',
+        message: 'Đã xóa mục tiêu',
         type: AppToastType.success,
       );
       Navigator.of(context).pop();
@@ -211,16 +233,14 @@ class _TransactionDetailSheet extends ConsumerWidget {
   Widget _buildRow(
     BuildContext context, {
     required String label,
-    String? value,
-    Widget? valueWidget,
+    required String value,
     Color? valueColor,
-    double? valueSize,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: context.scaled(110),
+          width: context.scaled(118),
           child: Text(
             label,
             style: context.appText.body.copyWith(
@@ -229,19 +249,12 @@ class _TransactionDetailSheet extends ConsumerWidget {
           ),
         ),
         Expanded(
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: valueWidget ??
-                Text(
-                  value ?? '',
-                  textAlign: TextAlign.right,
-                  style: context.appText.bodyStrong.copyWith(
-                    color: valueColor ?? context.appPalette.textPrimary,
-                    fontSize: valueSize != null
-                        ? context.scaledFont(valueSize, min: valueSize - 2)
-                        : null,
-                  ),
-                ),
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: context.appText.bodyStrong.copyWith(
+              color: valueColor ?? context.appPalette.textPrimary,
+            ),
           ),
         ),
       ],

@@ -5,6 +5,7 @@ import '../../features/calendar/calendar_screen.dart';
 import '../../features/home/home_dashboard_screen.dart';
 import '../../features/placeholder/coming_soon_screen.dart';
 import '../../features/recurring/recurring_screen.dart';
+import '../../features/savings/savings_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/shell/app_shell.dart';
 import '../../features/statistics/statistics_screen.dart';
@@ -32,13 +33,7 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/wallet',
           pageBuilder: (context, state) {
-            return _buildPage(
-              state: state,
-              child: const ComingSoonScreen(
-                title: 'Tiết kiệm',
-                icon: Icons.savings_rounded,
-              ),
-            );
+            return _buildPage(state: state, child: const SavingsScreen());
           },
         ),
         GoRoute(

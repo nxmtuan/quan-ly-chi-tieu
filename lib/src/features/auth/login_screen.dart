@@ -10,6 +10,7 @@ import '../../core/widgets/gradient_button.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/category_provider.dart';
 import '../../providers/money_source_provider.dart';
+import '../../providers/savings_goal_provider.dart';
 import '../../providers/transaction_provider.dart';
 import 'google_web_sign_in_button.dart';
 
@@ -123,6 +124,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ref.read(transactionsProvider.notifier).reload();
             ref.read(categoriesProvider.notifier).reload();
             ref.read(moneySourcesProvider.notifier).reload();
+            ref.read(savingsGoalsProvider.notifier).reload();
 
             if (!mounted) {
               return;

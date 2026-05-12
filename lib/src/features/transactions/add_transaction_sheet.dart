@@ -17,9 +17,11 @@ import '../categories/category_management_sheet.dart';
 import '../settings/money_source_management_sheet.dart';
 import '../../models/category.dart';
 import '../../models/money_source.dart';
+import '../../models/savings_goal.dart';
 import '../../models/transaction.dart';
 import '../../providers/category_provider.dart';
 import '../../providers/money_source_provider.dart';
+import '../../providers/savings_goal_provider.dart';
 import '../../providers/transaction_provider.dart';
 
 part 'widgets/transaction_sheet_scaffold.dart';
@@ -61,6 +63,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   DateTime _date = DateTime.now();
   String? _sourceId;
   String? _categoryId;
+  String? _savingsGoalId;
   String? _promotedCategoryId;
   String? _promotedSourceId;
 
@@ -78,6 +81,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       _date = transaction.date;
       _categoryId = transaction.categoryId;
       _sourceId = transaction.sourceId;
+      _savingsGoalId = transaction.savingsGoalId;
     }
   }
 
@@ -104,6 +108,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   Widget build(BuildContext context) {
     final categories = ref.watch(categoriesByTypeProvider(_type));
     final moneySources = ref.watch(moneySourcesProvider);
+    final savingsGoals = ref.watch(savingsGoalsProvider);
     if (_categoryId == null && categories.isNotEmpty) {
       _categoryId = categories.first.id;
     }
@@ -139,6 +144,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                                   setState(() {
                                     _type = type;
                                     _categoryId = null;
+                                    if (type == TransactionType.income) {
+                                      _savingsGoalId = null;
+                                    }
                                     _promotedCategoryId = null;
                                   });
                                 },
@@ -174,6 +182,17 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                                 onShowAll: () => _showAllMoneySources(moneySources),
                                 promotedSourceId: _promotedSourceId,
                               ),
+                              if (_type == TransactionType.expense) ...[
+                                const SizedBox(height: 10),
+                                _SavingsGoalPicker(
+                                  savingsGoals: savingsGoals,
+                                  selectedGoalId: _savingsGoalId,
+                                  actionColor: actionColor,
+                                  onSelected: (goalId) {
+                                    setState(() => _savingsGoalId = goalId);
+                                  },
+                                ),
+                              ],
                               const SizedBox(height: 10),
                               _NoteCard(
                                 controller: _noteController,
@@ -275,6 +294,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       type: _type,
       categoryId: _categoryId!,
       sourceId: _sourceId!,
+      savingsGoalId: _type == TransactionType.expense ? _savingsGoalId : null,
       date: _date,
       note: _noteController.text.trim(),
     );

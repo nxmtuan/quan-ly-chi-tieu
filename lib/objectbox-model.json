@@ -61,7 +61,7 @@
     },
     {
       "id": "2:7804320392523648537",
-      "lastPropertyId": "11:3743505230492404707",
+      "lastPropertyId": "12:5819948035215699391",
       "name": "Transaction",
       "properties": [
         {
@@ -129,6 +129,13 @@
           "indexId": "9:5507329943214301050",
           "type": 9,
           "flags": 2048
+        },
+        {
+          "id": "12:5819948035215699391",
+          "name": "savingsGoalId",
+          "indexId": "13:1091651197108033581",
+          "type": 9,
+          "flags": 2048
         }
       ],
       "relations": []
@@ -173,10 +180,80 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "6:4449110663233528591",
+      "lastPropertyId": "11:5368346050396594622",
+      "name": "SavingsGoal",
+      "properties": [
+        {
+          "id": "1:4640397952089517882",
+          "name": "obxId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3396422360137261182",
+          "name": "id",
+          "indexId": "10:7357680742283767692",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:1128947346705756346",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "4:5225968569058340931",
+          "name": "targetAmount",
+          "type": 8
+        },
+        {
+          "id": "5:3273161100223818518",
+          "name": "savedAmount",
+          "type": 8
+        },
+        {
+          "id": "6:6678201446676429553",
+          "name": "deadline",
+          "type": 10
+        },
+        {
+          "id": "7:7034784935062051904",
+          "name": "note",
+          "type": 9
+        },
+        {
+          "id": "8:7898982240400800410",
+          "name": "createdAt",
+          "type": 10
+        },
+        {
+          "id": "9:2282060080335797069",
+          "name": "updatedAt",
+          "indexId": "11:8219870922745221666",
+          "type": 10,
+          "flags": 8
+        },
+        {
+          "id": "10:8519554436366512149",
+          "name": "isDeleted",
+          "type": 1
+        },
+        {
+          "id": "11:5368346050396594622",
+          "name": "startDate",
+          "indexId": "12:3254630399225974344",
+          "type": 10,
+          "flags": 8
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "5:6814073455354518124",
-  "lastIndexId": "9:5507329943214301050",
+  "lastEntityId": "6:4449110663233528591",
+  "lastIndexId": "13:1091651197108033581",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

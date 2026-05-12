@@ -15,6 +15,7 @@ class Transaction {
     String? dbType,
     required this.categoryId,
     String? sourceId,
+    String? savingsGoalId,
     required this.date,
     String? note,
     DateTime? updatedAt,
@@ -22,6 +23,7 @@ class Transaction {
   }) : typeCode = type?.index ?? typeCode ?? _legacyTypeCode(dbType),
        dbType = type == null && typeCode == null ? dbType : null,
        sourceId = sourceId ?? defaultMoneySourceId,
+       savingsGoalId = _normalizeSavingsGoalId(savingsGoalId),
        note = _normalizeNote(note),
        updatedAt = updatedAt ?? DateTime.now();
 
@@ -45,6 +47,9 @@ class Transaction {
   String sourceId;
 
   @Index()
+  String? savingsGoalId;
+
+  @Index()
   @Property(type: PropertyType.date)
   DateTime date;
 
@@ -63,6 +68,7 @@ class Transaction {
 
   bool get isExpense => type == TransactionType.expense;
   bool get hasNote => note != null && note!.isNotEmpty;
+  bool get hasSavingsGoal => savingsGoalId != null && savingsGoalId!.isNotEmpty;
   bool get needsStorageCompaction =>
       dbType != null || (note != null && note!.isEmpty);
 
@@ -74,6 +80,7 @@ class Transaction {
       typeCode: type.index,
       categoryId: categoryId,
       sourceId: sourceId,
+      savingsGoalId: savingsGoalId,
       date: date,
       note: note,
       updatedAt: updatedAt,
@@ -88,6 +95,7 @@ class Transaction {
     TransactionType? type,
     String? categoryId,
     String? sourceId,
+    String? savingsGoalId,
     DateTime? date,
     String? note,
     DateTime? updatedAt,
@@ -100,6 +108,7 @@ class Transaction {
       type: type ?? this.type,
       categoryId: categoryId ?? this.categoryId,
       sourceId: sourceId ?? this.sourceId,
+      savingsGoalId: savingsGoalId ?? this.savingsGoalId,
       date: date ?? this.date,
       note: note ?? this.note,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -114,6 +123,7 @@ class Transaction {
       'type': type.name,
       'categoryId': categoryId,
       'sourceId': sourceId,
+      'savingsGoalId': savingsGoalId,
       'date': date.toIso8601String(),
       'note': note,
       'updatedAt': updatedAt.toIso8601String(),
@@ -128,6 +138,7 @@ class Transaction {
       type: TransactionType.values.byName(json['type'] as String),
       categoryId: json['categoryId'] as String,
       sourceId: json['sourceId'] as String? ?? defaultMoneySourceId,
+      savingsGoalId: json['savingsGoalId'] as String?,
       date: DateTime.parse(json['date'] as String),
       note: json['note'] as String?,
       updatedAt: json['updatedAt'] != null
@@ -160,4 +171,12 @@ String? _normalizeNote(String? note) {
   }
 
   return note;
+}
+
+String? _normalizeSavingsGoalId(String? savingsGoalId) {
+  if (savingsGoalId == null || savingsGoalId.isEmpty) {
+    return null;
+  }
+
+  return savingsGoalId;
 }

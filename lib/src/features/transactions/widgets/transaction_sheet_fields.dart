@@ -617,6 +617,118 @@ class _MoreMoneySourcesTile extends StatelessWidget {
   }
 }
 
+class _SavingsGoalPicker extends StatelessWidget {
+  const _SavingsGoalPicker({
+    required this.savingsGoals,
+    required this.selectedGoalId,
+    required this.actionColor,
+    required this.onSelected,
+  });
+
+  final List<SavingsGoal> savingsGoals;
+  final String? selectedGoalId;
+  final Color actionColor;
+  final ValueChanged<String?> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return _FormCard(
+      padding: EdgeInsets.fromLTRB(
+        context.scaled(14),
+        context.scaled(12),
+        context.scaled(14),
+        context.scaled(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Mục tiêu tiết kiệm',
+            style: context.appText.fieldLabel.copyWith(
+              color: context.appPalette.iconMuted,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: context.scaled(10)),
+          if (savingsGoals.isEmpty)
+            Text(
+              'Chưa có mục tiêu tiết kiệm',
+              style: context.appText.bodyStrong.copyWith(
+                color: context.appPalette.textSecondary,
+              ),
+            )
+          else
+            Wrap(
+              spacing: context.scaled(8),
+              runSpacing: context.scaled(8),
+              children: [
+                _SavingsGoalChoiceChip(
+                  label: 'Không gắn',
+                  selected: selectedGoalId == null,
+                  color: actionColor,
+                  onTap: () => onSelected(null),
+                ),
+                for (final goal in savingsGoals)
+                  _SavingsGoalChoiceChip(
+                    label: goal.title,
+                    selected: selectedGoalId == goal.id,
+                    color: actionColor,
+                    onTap: () => onSelected(goal.id),
+                  ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SavingsGoalChoiceChip extends StatelessWidget {
+  const _SavingsGoalChoiceChip({
+    required this.label,
+    required this.selected,
+    required this.color,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        constraints: BoxConstraints(maxWidth: context.scaled(150)),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.scaled(11),
+          vertical: context.scaled(9),
+        ),
+        decoration: BoxDecoration(
+          color: selected
+              ? color.withValues(alpha: 0.08)
+              : context.appPalette.surfaceMuted,
+          borderRadius: BorderRadius.circular(context.scaled(14)),
+          border: Border.all(
+            color: selected ? color : context.appPalette.border,
+          ),
+        ),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.appText.captionStrong.copyWith(
+            color: selected ? color : context.appPalette.textPrimary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _DateTrigger extends StatelessWidget {
   const _DateTrigger({required this.date, required this.onTap});
 

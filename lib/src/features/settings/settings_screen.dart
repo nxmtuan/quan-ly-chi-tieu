@@ -20,6 +20,7 @@ import '../../models/auto_sync_settings.dart';
 import '../../models/auto_sync_status.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/money_source_provider.dart';
+import '../../providers/savings_goal_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/storage_provider.dart';
 import '../../providers/transaction_provider.dart';

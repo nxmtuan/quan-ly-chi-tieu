@@ -4,6 +4,7 @@ import 'package:quan_ly_chi_tieu/src/core/services/sync_service.dart';
 import 'package:quan_ly_chi_tieu/src/models/category.dart';
 import 'package:quan_ly_chi_tieu/src/models/money_source.dart';
 import 'package:quan_ly_chi_tieu/src/models/recurring_item.dart';
+import 'package:quan_ly_chi_tieu/src/models/savings_goal.dart';
 import 'package:quan_ly_chi_tieu/src/models/transaction.dart';
 
 void main() {
@@ -115,6 +116,54 @@ void main() {
           MoneySource(
             id: 'purge-source-remote',
             name: 'Old deleted source remote',
+            updatedAt: expiredDeletedAt,
+            isDeleted: true,
+          ),
+        ],
+        localSavingsGoals: [
+          SavingsGoal(
+            id: 'keep-goal-local',
+            title: 'Emergency fund',
+            targetAmount: 5000000,
+            savedAmount: 1200000,
+            updatedAt: now.subtract(const Duration(days: 2)),
+          ),
+          SavingsGoal(
+            id: 'merge-goal',
+            title: 'Old local goal',
+            targetAmount: 3000000,
+            savedAmount: 1000000,
+            updatedAt: now.subtract(const Duration(days: 4)),
+          ),
+          SavingsGoal(
+            id: 'purge-goal-local',
+            title: 'Old deleted goal local',
+            targetAmount: 1000000,
+            savedAmount: 100000,
+            updatedAt: expiredDeletedAt,
+            isDeleted: true,
+          ),
+        ],
+        remoteSavingsGoals: [
+          SavingsGoal(
+            id: 'keep-goal-remote',
+            title: 'Remote fund',
+            targetAmount: 2000000,
+            savedAmount: 500000,
+            updatedAt: now.subtract(const Duration(hours: 5)),
+          ),
+          SavingsGoal(
+            id: 'merge-goal',
+            title: 'New remote goal',
+            targetAmount: 4000000,
+            savedAmount: 1500000,
+            updatedAt: now.subtract(const Duration(hours: 1)),
+          ),
+          SavingsGoal(
+            id: 'purge-goal-remote',
+            title: 'Old deleted goal remote',
+            targetAmount: 1000000,
+            savedAmount: 100000,
             updatedAt: expiredDeletedAt,
             isDeleted: true,
           ),
@@ -256,6 +305,19 @@ void main() {
       );
 
       expect(
+        snapshot.savingsGoals.map((goal) => goal.id),
+        containsAll(['keep-goal-local', 'keep-goal-remote', 'merge-goal']),
+      );
+      expect(
+        snapshot.savingsGoals.map((goal) => goal.id),
+        isNot(contains('purge-goal-local')),
+      );
+      expect(
+        snapshot.savingsGoals.map((goal) => goal.id),
+        isNot(contains('purge-goal-remote')),
+      );
+
+      expect(
         snapshot.recurringItems.map((item) => item.id),
         containsAll(['keep-recurring-local', 'keep-recurring-remote']),
       );
@@ -295,6 +357,12 @@ void main() {
       expect(mergedRecurring.reminderText, 'New remote reminder');
       expect(mergedRecurring.preNotifiedOccurrenceKeys, ['2026-01-01']);
       expect(mergedRecurring.dueNotifiedOccurrenceKeys, ['2026-01-01']);
+
+      final mergedGoal = snapshot.savingsGoals.firstWhere(
+        (goal) => goal.id == 'merge-goal',
+      );
+      expect(mergedGoal.title, 'New remote goal');
+      expect(mergedGoal.savedAmount, 1500000);
 
       expect(snapshot.purgedSoftDeleted, isTrue);
     });

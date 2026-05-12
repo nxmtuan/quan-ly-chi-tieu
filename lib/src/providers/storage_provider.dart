@@ -9,12 +9,14 @@ import '../core/storage/auth_storage.dart';
 import '../core/storage/category_storage.dart';
 import '../core/storage/money_source_storage.dart';
 import '../core/storage/recurring_storage.dart';
+import '../core/storage/savings_goal_storage.dart';
 import '../core/storage/settings_storage.dart';
 import '../core/storage/transaction_storage.dart';
 import '../core/storage/objectbox_database.dart';
 import '../models/transaction.dart';
 import '../models/category.dart';
 import '../models/money_source.dart';
+import '../models/savings_goal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final objectBoxProvider = Provider<ObjectBoxDatabase>((ref) {
@@ -38,6 +40,11 @@ final categoryStorageProvider = Provider<CategoryStorage>((ref) {
 final moneySourceStorageProvider = Provider<MoneySourceStorage>((ref) {
   final store = ref.watch(objectBoxProvider).store;
   return MoneySourceStorage(store.box<MoneySource>());
+});
+
+final savingsGoalStorageProvider = Provider<SavingsGoalStorage>((ref) {
+  final store = ref.watch(objectBoxProvider).store;
+  return SavingsGoalStorage(store.box<SavingsGoal>());
 });
 
 final recurringStorageProvider = Provider<RecurringStorage>((ref) {
@@ -72,6 +79,7 @@ final syncServiceProvider = Provider.family<SyncService, drive.DriveApi>((
     transactionBox: store.box<Transaction>(),
     categoryBox: store.box<Category>(),
     moneySourceBox: store.box<MoneySource>(),
+    savingsGoalBox: store.box<SavingsGoal>(),
     recurringStorage: ref.watch(recurringStorageProvider),
   );
 });
