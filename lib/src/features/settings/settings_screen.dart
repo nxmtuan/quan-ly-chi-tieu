@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -43,12 +44,40 @@ class SettingsScreen extends ConsumerWidget {
             context.scaled(24),
             context.scaled(16),
             context.scaled(24),
-            context.scaled(120) + MediaQuery.paddingOf(context).bottom,
+            context.scaled(32) + MediaQuery.paddingOf(context).bottom,
           ),
           children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: AppBounceBuilder(
+                scaleDown: 0.96,
+                onTap: () async {
+                  final didPop = await Navigator.of(context).maybePop();
+                  if (!didPop && context.mounted) {
+                    context.go('/');
+                  }
+                },
+                child: Container(
+                  width: context.scaled(44),
+                  height: context.scaled(44),
+                  decoration: BoxDecoration(
+                    color: context.appPalette.surface,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: context.appPalette.border),
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_rounded,
+                    color: context.appPalette.textPrimary,
+                    size: context.scaled(22),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: context.scaled(18)),
             const AppPageHeader(
               subtitle: 'Cài đặt',
               title: 'Tuỳ chỉnh ứng dụng',
+              showAvatar: false,
             ),
             SizedBox(height: context.scaled(24)),
             FlatCard(

@@ -16,11 +16,13 @@ class AppPageHeader extends ConsumerWidget {
     required this.subtitle,
     required this.title,
     this.titleColor,
+    this.showAvatar = true,
   });
 
   final String subtitle;
   final String title;
   final Color? titleColor;
+  final bool showAvatar;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,11 +50,13 @@ class AppPageHeader extends ConsumerWidget {
             ],
           ),
         ),
-        SizedBox(width: context.scaled(12)),
-        _ProfileAvatarButton(
-          authUser: authUser,
-          onTap: () => context.go('/settings'),
-        ),
+        if (showAvatar) ...[
+          SizedBox(width: context.scaled(12)),
+          _ProfileAvatarButton(
+            authUser: authUser,
+            onTap: () => context.push('/settings'),
+          ),
+        ],
       ],
     );
   }

@@ -35,8 +35,8 @@ final appRouter = GoRouter(
             return _buildPage(
               state: state,
               child: const ComingSoonScreen(
-                title: 'Ví',
-                icon: Icons.account_balance_wallet_rounded,
+                title: 'Tiết kiệm',
+                icon: Icons.savings_rounded,
               ),
             );
           },
@@ -54,12 +54,27 @@ final appRouter = GoRouter(
           },
         ),
         GoRoute(
-          path: '/settings',
+          path: '/budget',
           pageBuilder: (context, state) {
-            return _buildPage(state: state, child: const SettingsScreen());
+            return _buildPage(
+              state: state,
+              child: const ComingSoonScreen(
+                title: 'Ngân sách',
+                icon: Icons.pie_chart_rounded,
+              ),
+            );
           },
         ),
       ],
+    ),
+    GoRoute(
+      path: '/settings',
+      pageBuilder: (context, state) {
+        return _buildSettingsPage(
+          state: state,
+          child: const SafeArea(bottom: false, child: SettingsScreen()),
+        );
+      },
     ),
   ],
 );
@@ -96,6 +111,36 @@ CustomTransitionPage<void> _buildPage({
               child: child,
             ),
           ),
+        ),
+      );
+    },
+  );
+}
+
+CustomTransitionPage<void> _buildSettingsPage({
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    transitionDuration: const Duration(milliseconds: 340),
+    reverseTransitionDuration: const Duration(milliseconds: 320),
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      );
+
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(curvedAnimation),
+        child: Material(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: child,
         ),
       );
     },

@@ -37,7 +37,7 @@ class AppShell extends StatelessWidget {
       '/calendar' => 1,
       '/wallet' => 2,
       '/recurring' => 3,
-      '/settings' => 4,
+      '/budget' => 4,
       _ => 0,
     };
   }
@@ -53,7 +53,7 @@ class AppShell extends StatelessWidget {
       case 3:
         context.go('/recurring');
       case 4:
-        context.go('/settings');
+        context.go('/budget');
     }
   }
 }

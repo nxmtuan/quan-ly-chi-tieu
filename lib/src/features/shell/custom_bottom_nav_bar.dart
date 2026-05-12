@@ -25,9 +25,9 @@ class CustomBottomNavBar extends StatelessWidget {
     final items = [
       const _NavItem(Icons.grid_view_rounded, 'Tổng quan'),
       const _NavItem(Icons.calendar_month_rounded, 'Lịch'),
-      const _NavItem(Icons.account_balance_wallet_rounded, 'Ví'),
+      const _NavItem(Icons.savings_rounded, 'Tiết kiệm'),
       const _NavItem(Icons.repeat_rounded, 'Định kỳ'),
-      const _NavItem(Icons.settings_rounded, 'Cài đặt'),
+      const _NavItem(Icons.pie_chart_rounded, 'Ngân sách'),
     ];
 
     return Container(
