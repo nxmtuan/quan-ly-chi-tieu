@@ -60,41 +60,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           NotificationListener<UserScrollNotification>(
             onNotification: _handleScrollNotification,
-            child: CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    context.scaled(24),
-                    context.scaled(22),
-                    context.scaled(24),
-                    0,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child:
-                        const AppPageHeader(
+            child:
+                CustomScrollView(
+                      slivers: [
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(
+                            context.scaled(24),
+                            context.scaled(22),
+                            context.scaled(24),
+                            0,
+                          ),
+                          sliver: const SliverToBoxAdapter(
+                            child: AppPageHeader(
                               subtitle: 'Tổng quan',
                               title: 'Quản lý tài chính',
-                            )
-                            .animate()
-                            .fadeIn(duration: 260.ms)
-                            .slideY(
-                              begin: -0.08,
-                              end: 0,
-                              duration: 320.ms,
-                              curve: Curves.easeOutCubic,
                             ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    context.scaled(24),
-                    context.scaled(24),
-                    context.scaled(24),
-                    0,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child:
-                        SummaryCard(
+                          ),
+                        ),
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(
+                            context.scaled(24),
+                            context.scaled(24),
+                            context.scaled(24),
+                            0,
+                          ),
+                          sliver: SliverToBoxAdapter(
+                            child: SummaryCard(
                               summary: summary,
                               expenseComparison: expenseComparison,
                               scope: _selectedScope,
@@ -109,43 +100,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ? _goToNextScope
                                   : null,
                               onPickScope: _pickMonth,
-                            )
-                            .animate(delay: 80.ms)
-                            .fadeIn(duration: 320.ms)
-                            .slideY(
-                              begin: 0.08,
-                              end: 0,
-                              duration: 360.ms,
-                              curve: Curves.easeOutCubic,
                             ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    context.scaled(24),
-                    context.scaled(16),
-                    context.scaled(24),
-                    context.scaled(176) + MediaQuery.paddingOf(context).bottom,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child:
-                        RecentTransactions(
+                          ),
+                        ),
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(
+                            context.scaled(24),
+                            context.scaled(16),
+                            context.scaled(24),
+                            context.scaled(176) +
+                                MediaQuery.paddingOf(context).bottom,
+                          ),
+                          sliver: SliverToBoxAdapter(
+                            child: RecentTransactions(
                               scope: _selectedScope,
                               transactions: filteredTransactions,
                               selectedType: _selectedType,
-                            )
-                            .animate(delay: 150.ms)
-                            .fadeIn(duration: 320.ms)
-                            .slideY(
-                              begin: 0.06,
-                              end: 0,
-                              duration: 360.ms,
-                              curve: Curves.easeOutCubic,
                             ),
-                  ),
-                ),
-              ],
-            ),
+                          ),
+                        ),
+                      ],
+                    )
+                    .animate()
+                    .fadeIn(duration: 260.ms)
+                    .slideY(
+                      begin: 0.04,
+                      end: 0,
+                      duration: 340.ms,
+                      curve: Curves.easeOutCubic,
+                    ),
           ),
           Positioned(
             right: context.scaled(24),

@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -79,18 +78,10 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
                   else
                     for (final entry in items.indexed) ...[
                       _CategoryAmountRow(
-                            item: entry.$2,
-                            total: total,
-                            showDivider: false,
-                          )
-                          .animate(delay: Duration(milliseconds: 38 * entry.$1))
-                          .fadeIn(duration: 240.ms)
-                          .slideX(
-                            begin: 0.04,
-                            end: 0,
-                            duration: 280.ms,
-                            curve: Curves.easeOutCubic,
-                          ),
+                        item: entry.$2,
+                        total: total,
+                        showDivider: false,
+                      ),
                       if (entry.$1 < items.length - 1)
                         Divider(
                           height: context.scaled(1),
