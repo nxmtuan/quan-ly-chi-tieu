@@ -29,7 +29,12 @@ import '../auth/google_web_sign_in_button.dart';
 import '../categories/category_management_sheet.dart';
 import 'money_source_management_sheet.dart';
 
-part 'widgets/settings_sections.dart';
+part 'widgets/settings_auth_section.dart';
+part 'widgets/settings_common_widgets.dart';
+part 'widgets/settings_management_section.dart';
+part 'widgets/settings_security_section.dart';
+part 'widgets/settings_sync_section.dart';
+part 'widgets/settings_theme_section.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
