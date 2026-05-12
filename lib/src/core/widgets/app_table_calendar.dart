@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../utils/adaptive.dart';
+import 'app_bounce_builder.dart';
 import 'app_sheet.dart';
 import 'flat_card.dart';
 

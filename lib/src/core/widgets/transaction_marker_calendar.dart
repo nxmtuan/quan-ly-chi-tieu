@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/transaction_provider.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
 import '../utils/adaptive.dart';
 import '../utils/date_range.dart';
+import 'app_bounce_builder.dart';
 import 'app_sheet.dart';
 import 'app_table_calendar.dart';
 
@@ -211,12 +213,39 @@ class _TransactionCalendarBottomSheetState
           setState(() => _selectedDay = normalizeCalendarDay(selectedDay));
         },
       ),
-      action: AppPrimaryButton(
-        label: 'Áp dụng ngày này',
-        color: Theme.of(context).colorScheme.primary,
-        height: context.scaled(50),
-        radius: context.scaled(17),
-        onTap: () => Navigator.of(context).pop(_selectedDay),
+      action: Row(
+        children: [
+          Expanded(
+            child: AppBounceBuilder(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                height: context.scaled(50),
+                decoration: BoxDecoration(
+                  color: context.appPalette.surfaceMuted,
+                  borderRadius: BorderRadius.circular(context.scaled(17)),
+                  border: Border.all(color: context.appPalette.border),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Đóng',
+                  style: context.appText.buttonLabel.copyWith(
+                    color: context.appPalette.textPrimary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: AppPrimaryButton(
+              label: 'Áp dụng ngày này',
+              color: Theme.of(context).colorScheme.primary,
+              height: context.scaled(50),
+              radius: context.scaled(17),
+              onTap: () => Navigator.of(context).pop(_selectedDay),
+            ),
+          ),
+        ],
       ),
     );
   }

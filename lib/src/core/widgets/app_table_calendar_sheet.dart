@@ -80,12 +80,39 @@ class _CalendarBottomSheetState extends State<_CalendarBottomSheet> {
           setState(() => _focusedDay = _normalizeDate(focusedDay));
         },
       ),
-      action: AppPrimaryButton(
-        label: 'Áp dụng ngày này',
-        color: Theme.of(context).colorScheme.primary,
-        height: context.scaled(50),
-        radius: context.scaled(17),
-        onTap: () => Navigator.of(context).pop(_selectedDay),
+      action: Row(
+        children: [
+          Expanded(
+            child: AppBounceBuilder(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                height: context.scaled(50),
+                decoration: BoxDecoration(
+                  color: context.appPalette.surfaceMuted,
+                  borderRadius: BorderRadius.circular(context.scaled(17)),
+                  border: Border.all(color: context.appPalette.border),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Đóng',
+                  style: context.appText.buttonLabel.copyWith(
+                    color: context.appPalette.textPrimary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: AppPrimaryButton(
+              label: 'Áp dụng ngày này',
+              color: Theme.of(context).colorScheme.primary,
+              height: context.scaled(50),
+              radius: context.scaled(17),
+              onTap: () => Navigator.of(context).pop(_selectedDay),
+            ),
+          ),
+        ],
       ),
     );
   }

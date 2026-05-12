@@ -51,8 +51,14 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
         widget.initialScope.anchor!.year,
         widget.initialScope.anchor!.month,
       ),
-      HomeSummaryScopeType.year => DateTime(widget.initialScope.anchor!.year, 1),
-      HomeSummaryScopeType.all => DateTime(widget.lastMonth.year, widget.lastMonth.month),
+      HomeSummaryScopeType.year => DateTime(
+        widget.initialScope.anchor!.year,
+        1,
+      ),
+      HomeSummaryScopeType.all => DateTime(
+        widget.lastMonth.year,
+        widget.lastMonth.month,
+      ),
     };
     _selectedYear = widget.initialScope.anchor?.year ?? widget.lastMonth.year;
     final earliestYear = widget.lastMonth.year - (_yearRangeCount - 1);
@@ -119,7 +125,9 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                       size: context.scaled(26),
                       color: canGoPreviousYear
                           ? context.appPalette.textPrimary
-                          : context.appPalette.textSecondary.withValues(alpha: 0.3),
+                          : context.appPalette.textSecondary.withValues(
+                              alpha: 0.3,
+                            ),
                     ),
                   ),
                 ),
@@ -148,7 +156,9 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
                       size: context.scaled(26),
                       color: canGoNextYear
                           ? context.appPalette.textPrimary
-                          : context.appPalette.textSecondary.withValues(alpha: 0.3),
+                          : context.appPalette.textSecondary.withValues(
+                              alpha: 0.3,
+                            ),
                     ),
                   ),
                 ),
@@ -171,14 +181,41 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
           ),
         ],
       ),
-      action: AppPrimaryButton(
-        label: switch (_selectedTab) {
-          HomeSummaryScopeType.month => 'Chọn tháng',
-          HomeSummaryScopeType.year => 'Chọn năm',
-          HomeSummaryScopeType.all => 'Áp dụng tất cả',
-        },
-        color: AppColors.primary,
-        onTap: () => Navigator.of(context).pop(_selectedScope()),
+      action: Row(
+        children: [
+          Expanded(
+            child: AppBounceBuilder(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+                decoration: BoxDecoration(
+                  color: context.appPalette.surfaceMuted,
+                  borderRadius: BorderRadius.circular(context.scaled(16)),
+                  border: Border.all(color: context.appPalette.border),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Đóng',
+                  style: context.appText.buttonLabel.copyWith(
+                    color: context.appPalette.textPrimary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: context.scaled(12)),
+          Expanded(
+            child: AppPrimaryButton(
+              label: switch (_selectedTab) {
+                HomeSummaryScopeType.month => 'Chọn tháng',
+                HomeSummaryScopeType.year => 'Chọn năm',
+                HomeSummaryScopeType.all => 'Áp dụng tất cả',
+              },
+              color: AppColors.primary,
+              onTap: () => Navigator.of(context).pop(_selectedScope()),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -344,8 +381,10 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
     } else if (_selectedYear > currentYear) {
       _selectedYear = currentYear;
     }
-    final selectedIndex =
-        (currentYear - _selectedYear).clamp(0, _yearRangeCount - 1);
+    final selectedIndex = (currentYear - _selectedYear).clamp(
+      0,
+      _yearRangeCount - 1,
+    );
     final row = selectedIndex ~/ 2;
     final rowExtent = context.scaled(90);
     final targetOffset = (row * rowExtent) - context.scaled(12);
@@ -360,10 +399,7 @@ class _MonthPickerSheetState extends State<_MonthPickerSheet> {
 }
 
 class _PickerScopeTabs extends StatelessWidget {
-  const _PickerScopeTabs({
-    required this.selectedTab,
-    required this.onSelected,
-  });
+  const _PickerScopeTabs({required this.selectedTab, required this.onSelected});
 
   final HomeSummaryScopeType selectedTab;
   final ValueChanged<HomeSummaryScopeType> onSelected;
@@ -431,7 +467,9 @@ class _PickerScopeTab extends StatelessWidget {
           label,
           textAlign: TextAlign.center,
           style: context.appText.captionStrong.copyWith(
-            color: isSelected ? AppColors.primary : context.appPalette.textSecondary,
+            color: isSelected
+                ? AppColors.primary
+                : context.appPalette.textSecondary,
           ),
         ),
       ),
@@ -492,10 +530,7 @@ class _PickerGridOption extends StatelessWidget {
 }
 
 class _ScrollHintButton extends StatelessWidget {
-  const _ScrollHintButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _ScrollHintButton({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
@@ -518,7 +553,9 @@ class _ScrollHintButton extends StatelessWidget {
             border: Border.all(color: palette.border),
             boxShadow: [
               BoxShadow(
-                color: palette.shadow.withValues(alpha: context.isDarkMode ? 0.22 : 0.1),
+                color: palette.shadow.withValues(
+                  alpha: context.isDarkMode ? 0.22 : 0.1,
+                ),
                 blurRadius: context.scaled(10),
                 offset: Offset(0, context.scaled(4)),
               ),
