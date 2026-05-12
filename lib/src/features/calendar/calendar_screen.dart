@@ -81,6 +81,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               reverseDuration: const Duration(milliseconds: 220),
               switchInCurve: Curves.easeOutCubic,
               switchOutCurve: Curves.easeInCubic,
+              layoutBuilder: (currentChild, previousChildren) {
+                return Stack(
+                  alignment: Alignment.topCenter,
+                  children: [...previousChildren, ?currentChild],
+                );
+              },
               transitionBuilder: (child, animation) {
                 final isIncoming =
                     child.key == ValueKey<DateTime>(_selectedDay);
