@@ -5,11 +5,13 @@ class _CategoryAmountRow extends StatelessWidget {
     required this.item,
     required this.total,
     required this.showDivider,
+    required this.selected,
   });
 
   final _CategoryAmountItem item;
   final double total;
   final bool showDivider;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
@@ -22,18 +24,31 @@ class _CategoryAmountRow extends StatelessWidget {
       onTap: () {
         showCategoryTransactionsSheet(context, category: item.category);
       },
-      child: Padding(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
         padding: EdgeInsets.symmetric(
-          horizontal: context.scaled(4),
-          vertical: context.scaled(12),
+          horizontal: context.scaled(10),
+          vertical: context.scaled(10),
+        ),
+        decoration: BoxDecoration(
+          color: selected
+              ? item.color.withValues(alpha: context.isDarkMode ? 0.16 : 0.08)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(context.scaled(10)),
+          border: Border.all(
+            color: selected ? item.color : Colors.transparent,
+            width: selected ? 1.2 : 1,
+          ),
         ),
         child: Row(
           children: [
-            Container(
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
               width: context.scaled(52),
               height: context.scaled(52),
               decoration: BoxDecoration(
-                color: item.color.withValues(alpha: 0.13),
+                color: item.color.withValues(alpha: selected ? 0.18 : 0.13),
                 borderRadius: BorderRadius.circular(context.scaled(19)),
               ),
               child: Icon(
@@ -91,9 +106,14 @@ class _CategoryAmountItem {
     required this.category,
     required this.amount,
     required this.color,
+    this.highlightCategoryIds,
   });
 
   final Category category;
   final double amount;
   final Color color;
+  final Set<String>? highlightCategoryIds;
+
+  Set<String> get highlightCategoryIdsOrSelf =>
+      highlightCategoryIds ?? {category.id};
 }

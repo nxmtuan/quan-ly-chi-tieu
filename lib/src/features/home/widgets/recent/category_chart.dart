@@ -3,10 +3,17 @@ part of '../recent_transactions.dart';
 enum _CategoryChartView { pie, bar }
 
 class _CategoryDonutChart extends StatefulWidget {
-  const _CategoryDonutChart({required this.items, required this.total});
+  const _CategoryDonutChart({
+    required this.items,
+    required this.total,
+    required this.selectedCategoryIds,
+    required this.onSelectedCategoryChanged,
+  });
 
   final List<_CategoryAmountItem> items;
   final double total;
+  final Set<String> selectedCategoryIds;
+  final ValueChanged<Set<String>> onSelectedCategoryChanged;
 
   @override
   State<_CategoryDonutChart> createState() => _CategoryDonutChartState();
@@ -179,9 +186,19 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                     response?.touchedSection?.touchedSectionIndex ?? -1;
                 if (index < 0 || index >= chartItems.length) return;
 
+                final selectedItem = chartItems[index];
+                final nextCategoryIds =
+                    _isSameSelection(
+                      widget.selectedCategoryIds,
+                      selectedItem.highlightCategoryIdsOrSelf,
+                    )
+                    ? <String>{}
+                    : selectedItem.highlightCategoryIdsOrSelf;
+
                 setState(() {
                   _touchedIndex = _touchedIndex == index ? -1 : index;
                 });
+                widget.onSelectedCategoryChanged(nextCategoryIds);
               },
             ),
             sections: sections,
@@ -262,14 +279,25 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                       groupIndex < 0 ||
                       groupIndex >= chartItems.length) {
                     setState(() => _touchedBarIndex = null);
+                    widget.onSelectedCategoryChanged(const {});
                     return;
                   }
+
+                  final selectedItem = chartItems[groupIndex];
+                  final nextCategoryIds =
+                      _isSameSelection(
+                        widget.selectedCategoryIds,
+                        selectedItem.highlightCategoryIdsOrSelf,
+                      )
+                      ? <String>{}
+                      : selectedItem.highlightCategoryIdsOrSelf;
 
                   setState(() {
                     _touchedBarIndex = _touchedBarIndex == groupIndex
                         ? null
                         : groupIndex;
                   });
+                  widget.onSelectedCategoryChanged(nextCategoryIds);
                 },
                 touchTooltipData: BarTouchTooltipData(
                   direction: TooltipDirection.top,
@@ -352,9 +380,11 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
     }
 
     final visibleItems = widget.items.take(4).toList();
-    final remainingAmount = widget.items
-        .skip(4)
-        .fold<double>(0, (sum, item) => sum + item.amount);
+    final remainingItems = widget.items.skip(4).toList();
+    final remainingAmount = remainingItems.fold<double>(
+      0,
+      (sum, item) => sum + item.amount,
+    );
 
     return [
       ...visibleItems,
@@ -368,6 +398,9 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
         ),
         amount: remainingAmount,
         color: const Color(0xFFFFC107),
+        highlightCategoryIds: {
+          for (final item in remainingItems) item.category.id,
+        },
       ),
     ];
   }
@@ -411,6 +444,10 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
 
   double _staggeredProgress(double animationValue, int index, int itemCount) {
     return ((animationValue * itemCount) - index).clamp(0.0, 1.0).toDouble();
+  }
+
+  bool _isSameSelection(Set<String> left, Set<String> right) {
+    return left.length == right.length && left.containsAll(right);
   }
 }
 

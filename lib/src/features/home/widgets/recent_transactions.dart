@@ -38,11 +38,17 @@ class RecentTransactions extends ConsumerStatefulWidget {
 }
 
 class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
+  Set<String> _selectedCategoryIds = const {};
+
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(categoriesProvider);
     final items = _buildCategoryItems(categories);
     final total = items.fold<double>(0, (sum, item) => sum + item.amount);
+    final validCategoryIds = {for (final item in items) item.category.id};
+    final highlightedCategoryIds = _selectedCategoryIds
+        .where(validCategoryIds.contains)
+        .toSet();
     final chartHeight = context.scaled(350);
     final chartLift = context.scaled(6);
     final chartGap = context.scaled(16);
@@ -81,6 +87,9 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
                         item: entry.$2,
                         total: total,
                         showDivider: false,
+                        selected: highlightedCategoryIds.contains(
+                          entry.$2.category.id,
+                        ),
                       ),
                       if (entry.$1 < items.length - 1)
                         Divider(
@@ -101,7 +110,14 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
                       showShadow: false,
                       child: Center(child: Text('Chưa có dữ liệu')),
                     )
-                  : _CategoryDonutChart(items: items, total: total),
+                  : _CategoryDonutChart(
+                      items: items,
+                      total: total,
+                      selectedCategoryIds: highlightedCategoryIds,
+                      onSelectedCategoryChanged: (categoryIds) {
+                        setState(() => _selectedCategoryIds = categoryIds);
+                      },
+                    ),
             ),
           ),
         ],
