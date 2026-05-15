@@ -252,7 +252,7 @@ class _BudgetOverviewSection extends StatelessWidget {
       padding: EdgeInsets.all(context.scaled(10)),
       decoration: BoxDecoration(
         color: palette.surface,
-        borderRadius: BorderRadius.circular(context.scaled(10)),
+        borderRadius: BorderRadius.circular(context.scaled(26)),
         border: Border.all(color: palette.border),
       ),
       child: Column(

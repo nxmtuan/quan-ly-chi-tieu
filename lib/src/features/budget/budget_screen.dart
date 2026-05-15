@@ -14,6 +14,8 @@ import '../../models/category.dart';
 import '../../models/transaction.dart';
 import '../../providers/budget_provider.dart';
 import '../../providers/category_provider.dart';
+import '../home/models/home_summary_scope.dart';
+import '../home/widgets/summary_card.dart';
 import 'budget_detail_sheet.dart';
 import 'budget_sheet.dart';
 
@@ -65,6 +67,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                   SizedBox(height: context.scaled(20)),
                   _MonthControl(
                     month: _selectedMonth,
+                    onPick: _pickMonth,
                     onPrevious: () => setState(() {
                       _selectedMonth = DateTime(
                         _selectedMonth.year,
@@ -117,16 +120,33 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
               ),
     );
   }
+
+  Future<void> _pickMonth() async {
+    final selectedScope = await showMonthPickerSheet(
+      context,
+      initialScope: HomeSummaryScope.month(_selectedMonth),
+      lastMonth: DateTime.now(),
+    );
+
+    final anchor = selectedScope?.anchor;
+    if (anchor == null || !mounted) {
+      return;
+    }
+
+    setState(() => _selectedMonth = DateTime(anchor.year, anchor.month));
+  }
 }
 
 class _MonthControl extends StatelessWidget {
   const _MonthControl({
     required this.month,
+    required this.onPick,
     required this.onPrevious,
     required this.onNext,
   });
 
   final DateTime month;
+  final VoidCallback onPick;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
 
@@ -148,11 +168,14 @@ class _MonthControl extends StatelessWidget {
         children: [
           _MonthIconButton(icon: Icons.chevron_left_rounded, onTap: onPrevious),
           Expanded(
-            child: Text(
-              formatMonthYear(month),
-              textAlign: TextAlign.center,
-              style: context.appText.bodyStrong.copyWith(
-                fontSize: context.scaledFont(15, min: 14),
+            child: AppBounceBuilder(
+              onTap: onPick,
+              child: Text(
+                formatMonthYear(month),
+                textAlign: TextAlign.center,
+                style: context.appText.bodyStrong.copyWith(
+                  fontSize: context.scaledFont(15, min: 14),
+                ),
               ),
             ),
           ),

@@ -15,27 +15,23 @@ class _MonthSelectorBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final scale = context.adaptiveScale;
+    final palette = context.appPalette;
 
     return Container(
-      height: context.scaled(72),
-      padding: EdgeInsets.symmetric(horizontal: context.scaled(18)),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.scaled(8),
+        vertical: context.scaled(8),
+      ),
       decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(context.scaled(20)),
+        color: palette.surface,
+        borderRadius: BorderRadius.circular(context.scaled(18)),
+        border: Border.all(color: palette.border),
       ),
       child: Row(
         children: [
-          AppBounceBuilder(
+          _MonthSelectorIconButton(
+            icon: Icons.chevron_left_rounded,
             onTap: onPreviousScope,
-            child: Icon(
-              Icons.chevron_left_rounded,
-              color: onPreviousScope != null
-                  ? colors.onSurface
-                  : colors.onSurface.withValues(alpha: 0.24),
-              size: context.scaled(28),
-            ),
           ),
           Expanded(
             child: AppBounceBuilder(
@@ -44,24 +40,48 @@ class _MonthSelectorBar extends StatelessWidget {
                 scope.label,
                 textAlign: TextAlign.center,
                 style: context.appText.cardTitle.copyWith(
-                  color: colors.onSurface,
+                  color: palette.textPrimary,
                   fontSize: context.scaledFont(16, min: 15),
-                  letterSpacing: -0.2 * scale,
                 ),
               ),
             ),
           ),
-          AppBounceBuilder(
+          _MonthSelectorIconButton(
+            icon: Icons.chevron_right_rounded,
             onTap: onNextScope,
-            child: Icon(
-              Icons.chevron_right_rounded,
-              color: onNextScope != null
-                  ? colors.onSurface
-                  : colors.onSurface.withValues(alpha: 0.24),
-              size: context.scaled(28),
-            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _MonthSelectorIconButton extends StatelessWidget {
+  const _MonthSelectorIconButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: Container(
+        width: context.scaled(38),
+        height: context.scaled(38),
+        decoration: BoxDecoration(
+          color: context.appPalette.surfaceMuted,
+          borderRadius: BorderRadius.circular(context.scaled(14)),
+        ),
+        child: Icon(
+          icon,
+          color: enabled
+              ? context.appPalette.textPrimary
+              : context.appPalette.iconMuted.withValues(alpha: 0.32),
+          size: context.scaled(22),
+        ),
       ),
     );
   }

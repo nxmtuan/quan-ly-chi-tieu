@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
-import '../../core/utils/date_range.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/local_id.dart';
 import '../../core/widgets/app_bounce_builder.dart';
@@ -16,7 +15,9 @@ import '../../models/category.dart';
 import '../../models/transaction.dart';
 import '../../providers/budget_provider.dart';
 import '../../providers/category_provider.dart';
-import '../../providers/transaction_provider.dart';
+import '../home/models/home_summary_scope.dart';
+import '../home/widgets/summary_card.dart';
+import '../transactions/add_transaction_sheet.dart';
 
 Future<Budget?> showBudgetSheet(
   BuildContext context, {
@@ -47,6 +48,7 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
   late DateTime _periodStart;
   late double _warningPercent;
   String? _selectedCategoryId;
+  String? _promotedCategoryId;
 
   bool get _isEditing => widget.budget != null;
 
@@ -56,6 +58,7 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
     final budget = widget.budget;
     final initialMonth = widget.initialMonth ?? DateTime.now();
     _selectedCategoryId = budget?.categoryId;
+    _promotedCategoryId = budget?.categoryId;
     _periodStart =
         budget?.periodStart ?? DateTime(initialMonth.year, initialMonth.month);
     _warningPercent = budget?.warningPercent ?? defaultBudgetWarningPercent;
@@ -86,22 +89,6 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
       categoriesByTypeProvider(TransactionType.expense),
     );
     _selectedCategoryId ??= expenseCategories.firstOrNull?.id;
-    final selectedMonthRange = monthDateRange(_periodStart);
-    final existingTransactions = _selectedCategoryId == null
-        ? const <Transaction>[]
-        : ref.watch(
-            transactionsQueryProvider((
-              categoryId: _selectedCategoryId,
-              fromDate: selectedMonthRange.start,
-              limit: null,
-              toDate: selectedMonthRange.end,
-              type: TransactionType.expense,
-            )),
-          );
-    final existingSpent = existingTransactions.fold<double>(
-      0,
-      (total, transaction) => total + transaction.amount,
-    );
 
     return Padding(
       padding: EdgeInsets.only(
@@ -119,12 +106,17 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
               if (expenseCategories.isEmpty)
                 _EmptyCategoryNotice()
               else
-                _CategoryGrid(
+                _BudgetCategoryPicker(
                   categories: expenseCategories,
                   selectedCategoryId: _selectedCategoryId,
+                  promotedCategoryId: _promotedCategoryId,
                   onSelected: (category) {
-                    setState(() => _selectedCategoryId = category.id);
+                    setState(() {
+                      _selectedCategoryId = category.id;
+                      _promotedCategoryId = category.id;
+                    });
                   },
+                  onShowAll: () => _showAllCategories(expenseCategories),
                 ),
               SizedBox(height: context.scaled(14)),
               _BudgetAmountField(
@@ -135,6 +127,7 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
               SizedBox(height: context.scaled(14)),
               _MonthPickerCard(
                 month: _periodStart,
+                onPick: _pickMonth,
                 onPrevious: () => setState(() {
                   _periodStart = DateTime(
                     _periodStart.year,
@@ -147,11 +140,6 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
                     _periodStart.month + 1,
                   );
                 }),
-              ),
-              SizedBox(height: context.scaled(14)),
-              _ExistingSpendingNotice(
-                transactionCount: existingTransactions.length,
-                totalSpent: existingSpent,
               ),
               SizedBox(height: context.scaled(14)),
               _WarningSliderCard(
@@ -197,6 +185,38 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
         ),
       ),
     );
+  }
+
+  Future<void> _showAllCategories(List<Category> categories) async {
+    final selectedCategory = await showAllCategoriesSheet(
+      context,
+      categories: categories,
+      initialSelectedCategoryId: _selectedCategoryId,
+      transactionType: TransactionType.expense,
+      actionColor: AppColors.danger,
+    );
+
+    if (selectedCategory != null && mounted) {
+      setState(() {
+        _selectedCategoryId = selectedCategory.id;
+        _promotedCategoryId = selectedCategory.id;
+      });
+    }
+  }
+
+  Future<void> _pickMonth() async {
+    final selectedScope = await showMonthPickerSheet(
+      context,
+      initialScope: HomeSummaryScope.month(_periodStart),
+      lastMonth: DateTime.now(),
+    );
+
+    final anchor = selectedScope?.anchor;
+    if (anchor == null || !mounted) {
+      return;
+    }
+
+    setState(() => _periodStart = DateTime(anchor.year, anchor.month));
   }
 
   Future<void> _save() async {
@@ -287,40 +307,72 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _CategoryGrid extends StatelessWidget {
-  const _CategoryGrid({
+class _BudgetCategoryPicker extends StatelessWidget {
+  const _BudgetCategoryPicker({
     required this.categories,
     required this.selectedCategoryId,
+    required this.promotedCategoryId,
     required this.onSelected,
+    required this.onShowAll,
   });
 
   final List<Category> categories;
   final String? selectedCategoryId;
+  final String? promotedCategoryId;
   final ValueChanged<Category> onSelected;
+  final VoidCallback onShowAll;
 
   @override
   Widget build(BuildContext context) {
+    final orderedCategories = _orderedCategories();
+    final visibleCategories = orderedCategories.take(3).toList();
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        final itemWidth = (constraints.maxWidth - context.scaled(16)) / 3;
+        final itemWidth = (constraints.maxWidth - context.scaled(24)) / 4;
 
         return Wrap(
           spacing: context.scaled(8),
           runSpacing: context.scaled(8),
           children: [
-            for (final category in categories)
+            for (final category in visibleCategories)
               SizedBox(
                 width: itemWidth,
                 child: _CategoryOption(
                   category: category,
                   selected: category.id == selectedCategoryId,
+                  actionColor: AppColors.danger,
                   onTap: () => onSelected(category),
                 ),
               ),
+            SizedBox(
+              width: itemWidth,
+              child: _MoreCategoriesOption(onTap: onShowAll),
+            ),
           ],
         );
       },
     );
+  }
+
+  List<Category> _orderedCategories() {
+    if (promotedCategoryId == null) {
+      return categories;
+    }
+
+    final selectedCategory = categories
+        .where((category) => category.id == promotedCategoryId)
+        .firstOrNull;
+
+    if (selectedCategory == null) {
+      return categories;
+    }
+
+    return [
+      selectedCategory,
+      for (final category in categories)
+        if (category.id != selectedCategory.id) category,
+    ];
   }
 }
 
@@ -328,11 +380,13 @@ class _CategoryOption extends StatelessWidget {
   const _CategoryOption({
     required this.category,
     required this.selected,
+    required this.actionColor,
     required this.onTap,
   });
 
   final Category category;
   final bool selected;
+  final Color actionColor;
   final VoidCallback onTap;
 
   @override
@@ -341,18 +395,18 @@ class _CategoryOption extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        height: context.scaled(96),
+        height: context.scaled(104),
         padding: EdgeInsets.symmetric(
-          horizontal: context.scaled(7),
-          vertical: context.scaled(9),
+          horizontal: context.scaled(6),
+          vertical: context.scaled(10),
         ),
         decoration: BoxDecoration(
           color: selected
-              ? category.color.withValues(alpha: 0.08)
+              ? actionColor.withValues(alpha: 0.045)
               : context.appPalette.surface,
-          borderRadius: BorderRadius.circular(context.scaled(16)),
+          borderRadius: BorderRadius.circular(context.scaled(10)),
           border: Border.all(
-            color: selected ? category.color : context.appPalette.border,
+            color: selected ? actionColor : context.appPalette.border,
             width: selected ? 1.2 : 1,
           ),
         ),
@@ -379,10 +433,62 @@ class _CategoryOption extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: context.appText.captionStrong.copyWith(
-                color: selected
-                    ? category.color
-                    : context.appPalette.textPrimary,
-                fontSize: context.scaledFont(11.5, min: 10.5),
+                color: selected ? actionColor : context.appPalette.textPrimary,
+                fontSize: context.scaledFont(12, min: 12),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MoreCategoriesOption extends StatelessWidget {
+  const _MoreCategoriesOption({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBounceBuilder(
+      onTap: onTap,
+      child: Container(
+        height: context.scaled(104),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.scaled(6),
+          vertical: context.scaled(10),
+        ),
+        decoration: BoxDecoration(
+          color: context.appPalette.surfaceMuted,
+          borderRadius: BorderRadius.circular(context.scaled(10)),
+          border: Border.all(color: context.appPalette.border),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: context.scaled(36),
+              height: context.scaled(36),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Icon(
+                Icons.more_horiz_rounded,
+                color: AppColors.primary,
+                size: context.scaled(20),
+              ),
+            ),
+            SizedBox(height: context.scaled(9)),
+            Text(
+              'Khác',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: context.appText.captionStrong.copyWith(
+                color: context.appPalette.textPrimary,
+                fontSize: context.scaledFont(12, min: 12),
               ),
             ),
           ],
@@ -421,40 +527,59 @@ class _BudgetAmountField extends StatelessWidget {
   Widget build(BuildContext context) {
     return _FormCard(
       isFocused: isFocused,
-      child: Row(
+      padding: EdgeInsets.fromLTRB(
+        context.scaled(14),
+        context.scaled(12),
+        context.scaled(14),
+        context.scaled(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _LeadingIcon(icon: Icons.payments_rounded),
-          SizedBox(width: context.scaled(10)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _FieldLabel(label: 'Hạn mức', required: true),
-                SizedBox(height: context.scaled(5)),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: controller,
-                        focusNode: focusNode,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: const [_AmountInputFormatter()],
-                        style: context.appText.fieldValue.copyWith(
-                          fontSize: context.scaledFont(17, min: 16),
-                        ),
-                        cursorColor: AppColors.primary,
-                        decoration: _fieldDecoration(context, '0'),
+          _FieldLabel(label: 'Hạn mức', required: true),
+          SizedBox(height: context.scaled(6)),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: const [_AmountInputFormatter()],
+                  style: context.appText.amountXL.copyWith(
+                    fontSize: context.scaledFont(28, min: 24),
+                  ),
+                  cursorColor: AppColors.primary,
+                  decoration: InputDecoration(
+                    hintText: '0',
+                    hintStyle: context.appText.amountXL.copyWith(
+                      color: context.appPalette.textSecondary.withValues(
+                        alpha: 0.55,
                       ),
+                      fontSize: context.scaledFont(28, min: 24),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: context.scaled(1)),
-                      child: Text('đ', style: context.appText.fieldValue),
-                    ),
-                  ],
+                    filled: false,
+                    fillColor: Colors.transparent,
+                    isDense: true,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(width: context.scaled(8)),
+              Padding(
+                padding: EdgeInsets.only(bottom: context.scaled(3)),
+                child: Text(
+                  'đ',
+                  style: context.appText.amountXL.copyWith(
+                    fontSize: context.scaledFont(28, min: 24),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -465,11 +590,13 @@ class _BudgetAmountField extends StatelessWidget {
 class _MonthPickerCard extends StatelessWidget {
   const _MonthPickerCard({
     required this.month,
+    required this.onPick,
     required this.onPrevious,
     required this.onNext,
   });
 
   final DateTime month;
+  final VoidCallback onPick;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
 
@@ -481,13 +608,19 @@ class _MonthPickerCard extends StatelessWidget {
           const _LeadingIcon(icon: Icons.calendar_month_rounded),
           SizedBox(width: context.scaled(10)),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _FieldLabel(label: 'Tháng áp dụng'),
-                SizedBox(height: context.scaled(5)),
-                Text(formatMonthYear(month), style: context.appText.fieldValue),
-              ],
+            child: AppBounceBuilder(
+              onTap: onPick,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _FieldLabel(label: 'Tháng áp dụng'),
+                  SizedBox(height: context.scaled(5)),
+                  Text(
+                    formatMonthYear(month),
+                    style: context.appText.fieldValue,
+                  ),
+                ],
+              ),
             ),
           ),
           _SmallIconButton(icon: Icons.chevron_left_rounded, onTap: onPrevious),
@@ -550,73 +683,6 @@ class _WarningSliderCard extends StatelessWidget {
   }
 }
 
-class _ExistingSpendingNotice extends StatelessWidget {
-  const _ExistingSpendingNotice({
-    required this.transactionCount,
-    required this.totalSpent,
-  });
-
-  final int transactionCount;
-  final double totalSpent;
-
-  @override
-  Widget build(BuildContext context) {
-    final hasTransactions = transactionCount > 0;
-    final color = hasTransactions
-        ? AppColors.primary
-        : context.appPalette.textSecondary;
-
-    return _FormCard(
-      child: Row(
-        children: [
-          Container(
-            width: context.scaled(38),
-            height: context.scaled(38),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: hasTransactions ? 0.1 : 0.08),
-              borderRadius: BorderRadius.circular(context.scaled(14)),
-            ),
-            child: Icon(
-              hasTransactions
-                  ? Icons.playlist_add_check_rounded
-                  : Icons.receipt_long_rounded,
-              color: color,
-              size: context.scaled(19),
-            ),
-          ),
-          SizedBox(width: context.scaled(10)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  hasTransactions
-                      ? 'Đã có chi tiêu trong tháng'
-                      : 'Chưa có chi tiêu',
-                  style: context.appText.fieldLabel.copyWith(
-                    color: context.appPalette.iconMuted,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                SizedBox(height: context.scaled(5)),
-                Text(
-                  hasTransactions
-                      ? '$transactionCount giao dịch, ${formatCurrency(totalSpent)} sẽ được tính vào ngân sách'
-                      : 'Ngân sách sẽ tự cập nhật khi có giao dịch mới',
-                  style: context.appText.caption.copyWith(
-                    color: context.appPalette.textSecondary,
-                    height: 1.3,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _SmallIconButton extends StatelessWidget {
   const _SmallIconButton({required this.icon, required this.onTap});
 
@@ -646,10 +712,11 @@ class _SmallIconButton extends StatelessWidget {
 }
 
 class _FormCard extends StatelessWidget {
-  const _FormCard({required this.child, this.isFocused = false});
+  const _FormCard({required this.child, this.isFocused = false, this.padding});
 
   final Widget child;
   final bool isFocused;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -657,10 +724,12 @@ class _FormCard extends StatelessWidget {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 160),
-      padding: EdgeInsets.symmetric(
-        horizontal: context.scaled(14),
-        vertical: context.scaled(12),
-      ),
+      padding:
+          padding ??
+          EdgeInsets.symmetric(
+            horizontal: context.scaled(14),
+            vertical: context.scaled(12),
+          ),
       decoration: BoxDecoration(
         color: palette.surface,
         borderRadius: BorderRadius.circular(context.scaled(18)),
@@ -720,25 +789,6 @@ class _FieldLabel extends StatelessWidget {
       ),
     );
   }
-}
-
-InputDecoration _fieldDecoration(BuildContext context, String hintText) {
-  return InputDecoration(
-    hintText: hintText,
-    hintStyle: context.appText.fieldValue.copyWith(
-      color: context.appPalette.textSecondary.withValues(alpha: 0.65),
-    ),
-    filled: false,
-    fillColor: Colors.transparent,
-    isDense: true,
-    border: InputBorder.none,
-    enabledBorder: InputBorder.none,
-    focusedBorder: InputBorder.none,
-    disabledBorder: InputBorder.none,
-    errorBorder: InputBorder.none,
-    focusedErrorBorder: InputBorder.none,
-    contentPadding: EdgeInsets.zero,
-  );
 }
 
 String _formatAmountInput(num amount) {

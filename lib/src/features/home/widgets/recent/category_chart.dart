@@ -135,30 +135,44 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
         .map((item) => '${item.category.id}:${item.amount}')
         .join('|');
 
-    return PieChart(
-      key: ValueKey('pie-$chartSignature'),
-      duration: const Duration(milliseconds: 320),
+    return TweenAnimationBuilder<double>(
+      key: ValueKey('pie-progress-$chartSignature'),
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 920),
       curve: Curves.easeOutCubic,
-      PieChartData(
-        centerSpaceRadius: 0,
-        sectionsSpace: 4,
-        startDegreeOffset: -90,
-        pieTouchData: PieTouchData(
-          touchCallback: (event, response) {
-            if (event is! FlTapUpEvent) return;
-            final index = response?.touchedSection?.touchedSectionIndex ?? -1;
-            if (index < 0 || index >= chartItems.length) return;
+      builder: (context, animationValue, child) {
+        return PieChart(
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOutCubic,
+          PieChartData(
+            centerSpaceRadius: 0,
+            sectionsSpace: 4,
+            startDegreeOffset: -90,
+            pieTouchData: PieTouchData(
+              touchCallback: (event, response) {
+                if (event is! FlTapUpEvent) return;
+                final index =
+                    response?.touchedSection?.touchedSectionIndex ?? -1;
+                if (index < 0 || index >= chartItems.length) return;
 
-            setState(() {
-              _touchedIndex = _touchedIndex == index ? -1 : index;
-            });
-          },
-        ),
-        sections: [
-          for (final entry in chartItems.indexed)
-            _buildSection(entry.$1, entry.$2, chartSize),
-        ],
-      ),
+                setState(() {
+                  _touchedIndex = _touchedIndex == index ? -1 : index;
+                });
+              },
+            ),
+            sections: [
+              for (final entry in chartItems.indexed)
+                _buildSection(
+                  entry.$1,
+                  entry.$2,
+                  chartSize,
+                  animationValue,
+                  chartItems.length,
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -173,76 +187,87 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 280),
-      child: BarChart(
-        key: ValueKey('bar-$chartSignature'),
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeOutQuad,
-        BarChartData(
-          minY: 0,
-          maxY: maxAmount == 0 ? 1 : maxAmount * 1.28,
-          alignment: BarChartAlignment.spaceAround,
-          gridData: const FlGridData(show: false),
-          borderData: FlBorderData(show: false),
-          titlesData: FlTitlesData(
-            show: true,
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 46,
-                getTitlesWidget: (value, meta) {
-                  final index = value.toInt();
-                  if (index < 0 || index >= chartItems.length) {
-                    return const SizedBox.shrink();
-                  }
+      child: TweenAnimationBuilder<double>(
+        key: ValueKey('bar-progress-$chartSignature'),
+        tween: Tween(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 680),
+        curve: Curves.easeOutCubic,
+        builder: (context, animationValue, child) {
+          return BarChart(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            BarChartData(
+              minY: 0,
+              maxY: maxAmount == 0 ? 1 : maxAmount * 1.28,
+              alignment: BarChartAlignment.spaceAround,
+              gridData: const FlGridData(show: false),
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(
+                show: true,
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 46,
+                    getTitlesWidget: (value, meta) {
+                      final index = value.toInt();
+                      if (index < 0 || index >= chartItems.length) {
+                        return const SizedBox.shrink();
+                      }
 
-                  final item = chartItems[index];
+                      final item = chartItems[index];
 
-                  return SideTitleWidget(
-                    meta: meta,
-                    space: 8,
-                    child: _BarCategoryIcon(
-                      item: item,
-                      selected: index == _touchedBarIndex,
-                    ),
-                  );
+                      return SideTitleWidget(
+                        meta: meta,
+                        space: 8,
+                        child: _BarCategoryIcon(
+                          item: item,
+                          selected: index == _touchedBarIndex,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                leftTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+              ),
+              barTouchData: BarTouchData(
+                enabled: true,
+                handleBuiltInTouches: false,
+                touchCallback: (event, response) {
+                  if (event is! FlTapUpEvent) return;
+                  final groupIndex = response?.spot?.touchedBarGroupIndex;
+                  if (groupIndex == null) return;
+
+                  setState(() {
+                    _touchedBarIndex = _touchedBarIndex == groupIndex
+                        ? null
+                        : groupIndex;
+                  });
                 },
               ),
+              barGroups: [
+                for (final entry in chartItems.indexed)
+                  _buildBarGroup(entry.$1, entry.$2, animationValue),
+              ],
             ),
-            leftTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-          ),
-          barTouchData: BarTouchData(
-            enabled: true,
-            handleBuiltInTouches: false,
-            touchCallback: (event, response) {
-              if (event is! FlTapUpEvent) return;
-              final groupIndex = response?.spot?.touchedBarGroupIndex;
-              if (groupIndex == null) return;
-
-              setState(() {
-                _touchedBarIndex = _touchedBarIndex == groupIndex
-                    ? null
-                    : groupIndex;
-              });
-            },
-          ),
-          barGroups: [
-            for (final entry in chartItems.indexed)
-              _buildBarGroup(entry.$1, entry.$2),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  BarChartGroupData _buildBarGroup(int index, _CategoryAmountItem item) {
+  BarChartGroupData _buildBarGroup(
+    int index,
+    _CategoryAmountItem item,
+    double animationValue,
+  ) {
     final isTouched = index == _touchedBarIndex;
     final percent = ((item.amount / widget.total) * 100).round();
 
@@ -250,14 +275,12 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
       x: index,
       barRods: [
         BarChartRodData(
-          toY: item.amount,
-          width: isTouched ? 36.0 : 30.0,
-          gradient: LinearGradient(
-            colors: [item.color.withValues(alpha: 0.62), item.color],
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
+          toY: item.amount * animationValue,
+          width: context.scaled(54),
+          color: isTouched ? item.color : item.color.withValues(alpha: 0.42),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(context.scaled(6)),
           ),
-          borderRadius: BorderRadius.circular(9),
           label: BarChartRodLabel(
             text: '$percent%',
             style: TextStyle(
@@ -301,18 +324,31 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
     int index,
     _CategoryAmountItem item,
     double chartSize,
+    double animationValue,
+    int itemCount,
   ) {
     final isTouched = index == _touchedIndex;
     final percent = ((item.amount / widget.total) * 100).round();
+    final sectionProgress = ((animationValue * itemCount) - index)
+        .clamp(0.0, 1.0)
+        .toDouble();
+    final isVisible = sectionProgress > 0.01;
 
     return PieChartSectionData(
-      value: item.amount,
-      color: item.color,
+      value: isVisible ? item.amount * sectionProgress : 0.0001,
+      color: item.color.withValues(alpha: isVisible ? 1 : 0),
       radius: isTouched ? chartSize * 0.49 : chartSize * 0.45,
       cornerRadius: 10,
-      title: percent >= 5 || isTouched ? '$percent%' : '',
+      title: sectionProgress > 0.82 && (percent >= 5 || isTouched)
+          ? '$percent%'
+          : '',
       titlePositionPercentageOffset: 0.55,
-      badgeWidget: _CategoryBadge(item: item, selected: isTouched),
+      badgeWidget: sectionProgress > 0.72
+          ? Opacity(
+              opacity: sectionProgress,
+              child: _CategoryBadge(item: item, selected: isTouched),
+            )
+          : const SizedBox.shrink(),
       badgePositionPercentageOffset: 0.98,
       titleStyle: TextStyle(
         color: Colors.white,

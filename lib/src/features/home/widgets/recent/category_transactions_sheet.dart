@@ -204,82 +204,101 @@ class _CategoryMonthlyChart extends StatelessWidget {
           SizedBox(height: context.scaled(14)),
           SizedBox(
             height: chartHeight,
-            child: BarChart(
-              BarChartData(
-                minY: 0,
-                maxY: maxAmount == 0 ? 1 : maxAmount * 1.24,
-                gridData: const FlGridData(show: false),
-                borderData: FlBorderData(show: false),
-                barTouchData: BarTouchData(
-                  enabled: true,
-                  handleBuiltInTouches: false,
-                  touchCallback: (event, response) {
-                    if (event is! FlTapUpEvent) {
-                      return;
-                    }
-
-                    final groupIndex = response?.spot?.touchedBarGroupIndex;
-                    if (groupIndex == null ||
-                        groupIndex < 0 ||
-                        groupIndex >= points.length) {
-                      return;
-                    }
-
-                    onSelected(points[groupIndex].month);
-                  },
-                ),
-                titlesData: FlTitlesData(
-                  leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: context.scaled(34),
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index < 0 || index >= points.length) {
-                          return const SizedBox.shrink();
+            child: TweenAnimationBuilder<double>(
+              key: ValueKey(
+                points
+                    .map(
+                      (point) =>
+                          '${point.month.year}-${point.month.month}:${point.amount}',
+                    )
+                    .join('|'),
+              ),
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 680),
+              curve: Curves.easeOutCubic,
+              builder: (context, animationValue, child) {
+                return BarChart(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    minY: 0,
+                    maxY: maxAmount == 0 ? 1 : maxAmount * 1.24,
+                    gridData: const FlGridData(show: false),
+                    borderData: FlBorderData(show: false),
+                    barTouchData: BarTouchData(
+                      enabled: true,
+                      handleBuiltInTouches: false,
+                      touchCallback: (event, response) {
+                        if (event is! FlTapUpEvent) {
+                          return;
                         }
 
-                        final point = points[index];
-                        final selected = _isSameMonth(
-                          point.month,
-                          selectedMonth,
-                        );
+                        final groupIndex = response?.spot?.touchedBarGroupIndex;
+                        if (groupIndex == null ||
+                            groupIndex < 0 ||
+                            groupIndex >= points.length) {
+                          return;
+                        }
 
-                        return SideTitleWidget(
-                          meta: meta,
-                          space: context.scaled(8),
-                          child: Text(
-                            'T${point.month.month}',
-                            style: context.appText.captionStrong.copyWith(
-                              color: selected
-                                  ? category.color
-                                  : palette.textSecondary,
-                            ),
-                          ),
-                        );
+                        onSelected(points[groupIndex].month);
                       },
                     ),
-                  ),
-                ),
-                barGroups: [
-                  for (final entry in points.indexed)
-                    _barGroup(
-                      context,
-                      index: entry.$1,
-                      point: entry.$2,
-                      selected: _isSameMonth(entry.$2.month, selectedMonth),
+                    titlesData: FlTitlesData(
+                      leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: context.scaled(34),
+                          getTitlesWidget: (value, meta) {
+                            final index = value.toInt();
+                            if (index < 0 || index >= points.length) {
+                              return const SizedBox.shrink();
+                            }
+
+                            final point = points[index];
+                            final selected = _isSameMonth(
+                              point.month,
+                              selectedMonth,
+                            );
+
+                            return SideTitleWidget(
+                              meta: meta,
+                              space: context.scaled(8),
+                              child: Text(
+                                'T${point.month.month}',
+                                style: context.appText.captionStrong.copyWith(
+                                  color: selected
+                                      ? category.color
+                                      : palette.textSecondary,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                ],
-              ),
+                    barGroups: [
+                      for (final entry in points.indexed)
+                        _barGroup(
+                          context,
+                          index: entry.$1,
+                          point: entry.$2,
+                          selected: _isSameMonth(entry.$2.month, selectedMonth),
+                          animationValue: animationValue,
+                        ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -292,19 +311,22 @@ class _CategoryMonthlyChart extends StatelessWidget {
     required int index,
     required _CategoryMonthlyPoint point,
     required bool selected,
+    required double animationValue,
   }) {
     return BarChartGroupData(
       x: index,
       barRods: [
         BarChartRodData(
-          toY: point.amount,
-          width: context.scaled(selected ? 24 : 20),
+          toY: point.amount * animationValue,
+          width: context.scaled(54),
           color: selected
               ? category.color
               : category.color.withValues(
                   alpha: point.amount == 0 ? 0.16 : 0.4,
                 ),
-          borderRadius: BorderRadius.circular(context.scaled(9)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(context.scaled(6)),
+          ),
           label: BarChartRodLabel(
             text: point.amount == 0 ? '' : formatCurrency(point.amount),
             style: context.appText.captionStrong.copyWith(
