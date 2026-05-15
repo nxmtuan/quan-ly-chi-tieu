@@ -14,6 +14,7 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'src/models/budget.dart';
 import 'src/models/category.dart';
 import 'src/models/money_source.dart';
 import 'src/models/savings_goal.dart';
@@ -313,6 +314,74 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(7, 5027326062470403617),
+    name: 'Budget',
+    lastPropertyId: const obx_int.IdUid(9, 7680539986417524578),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 5492822279000084004),
+        name: 'obxId',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 195958745756149980),
+        name: 'id',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(14, 1707014768316864259),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 8193943846200550975),
+        name: 'categoryId',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(15, 2870329007639757159),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 856484352848977374),
+        name: 'limitAmount',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 4424175570079819775),
+        name: 'periodStart',
+        type: 10,
+        flags: 8,
+        indexId: const obx_int.IdUid(16, 8873063483196581557),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 6887893767136089472),
+        name: 'warningPercent',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 955996273534305911),
+        name: 'createdAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 9071170801313566729),
+        name: 'updatedAt',
+        type: 10,
+        flags: 8,
+        indexId: const obx_int.IdUid(17, 1741580117996319481),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 7680539986417524578),
+        name: 'isDeleted',
+        type: 1,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -358,8 +427,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(6, 4449110663233528591),
-    lastIndexId: const obx_int.IdUid(13, 1091651197108033581),
+    lastEntityId: const obx_int.IdUid(7, 5027326062470403617),
+    lastIndexId: const obx_int.IdUid(17, 1741580117996319481),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [2958872209723789033, 7083601830508858313],
@@ -753,6 +822,87 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    Budget: obx_int.EntityDefinition<Budget>(
+      model: _entities[4],
+      toOneRelations: (Budget object) => [],
+      toManyRelations: (Budget object) => {},
+      getId: (Budget object) => object.obxId,
+      setId: (Budget object, int id) {
+        object.obxId = id;
+      },
+      objectToFB: (Budget object, fb.Builder fbb) {
+        final idOffset = fbb.writeString(object.id);
+        final categoryIdOffset = fbb.writeString(object.categoryId);
+        fbb.startTable(10);
+        fbb.addInt64(0, object.obxId);
+        fbb.addOffset(1, idOffset);
+        fbb.addOffset(2, categoryIdOffset);
+        fbb.addFloat64(3, object.limitAmount);
+        fbb.addInt64(4, object.periodStart.millisecondsSinceEpoch);
+        fbb.addFloat64(5, object.warningPercent);
+        fbb.addInt64(6, object.createdAt.millisecondsSinceEpoch);
+        fbb.addInt64(7, object.updatedAt.millisecondsSinceEpoch);
+        fbb.addBool(8, object.isDeleted);
+        fbb.finish(fbb.endTable());
+        return object.obxId;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final obxIdParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final idParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final categoryIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final limitAmountParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final periodStartParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0),
+        );
+        final warningPercentParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          0,
+        );
+        final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0),
+        );
+        final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0),
+        );
+        final isDeletedParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          20,
+          false,
+        );
+        final object = Budget(
+          obxId: obxIdParam,
+          id: idParam,
+          categoryId: categoryIdParam,
+          limitAmount: limitAmountParam,
+          periodStart: periodStartParam,
+          warningPercent: warningPercentParam,
+          createdAt: createdAtParam,
+          updatedAt: updatedAtParam,
+          isDeleted: isDeletedParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -967,5 +1117,51 @@ class SavingsGoal_ {
   /// See [SavingsGoal.colorHex].
   static final colorHex = obx.QueryIntegerProperty<SavingsGoal>(
     _entities[3].properties[12],
+  );
+}
+
+/// [Budget] entity fields to define ObjectBox queries.
+class Budget_ {
+  /// See [Budget.obxId].
+  static final obxId = obx.QueryIntegerProperty<Budget>(
+    _entities[4].properties[0],
+  );
+
+  /// See [Budget.id].
+  static final id = obx.QueryStringProperty<Budget>(_entities[4].properties[1]);
+
+  /// See [Budget.categoryId].
+  static final categoryId = obx.QueryStringProperty<Budget>(
+    _entities[4].properties[2],
+  );
+
+  /// See [Budget.limitAmount].
+  static final limitAmount = obx.QueryDoubleProperty<Budget>(
+    _entities[4].properties[3],
+  );
+
+  /// See [Budget.periodStart].
+  static final periodStart = obx.QueryDateProperty<Budget>(
+    _entities[4].properties[4],
+  );
+
+  /// See [Budget.warningPercent].
+  static final warningPercent = obx.QueryDoubleProperty<Budget>(
+    _entities[4].properties[5],
+  );
+
+  /// See [Budget.createdAt].
+  static final createdAt = obx.QueryDateProperty<Budget>(
+    _entities[4].properties[6],
+  );
+
+  /// See [Budget.updatedAt].
+  static final updatedAt = obx.QueryDateProperty<Budget>(
+    _entities[4].properties[7],
+  );
+
+  /// See [Budget.isDeleted].
+  static final isDeleted = obx.QueryBooleanProperty<Budget>(
+    _entities[4].properties[8],
   );
 }

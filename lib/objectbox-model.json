@@ -260,10 +260,72 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "7:5027326062470403617",
+      "lastPropertyId": "9:7680539986417524578",
+      "name": "Budget",
+      "properties": [
+        {
+          "id": "1:5492822279000084004",
+          "name": "obxId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:195958745756149980",
+          "name": "id",
+          "indexId": "14:1707014768316864259",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:8193943846200550975",
+          "name": "categoryId",
+          "indexId": "15:2870329007639757159",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "4:856484352848977374",
+          "name": "limitAmount",
+          "type": 8
+        },
+        {
+          "id": "5:4424175570079819775",
+          "name": "periodStart",
+          "indexId": "16:8873063483196581557",
+          "type": 10,
+          "flags": 8
+        },
+        {
+          "id": "6:6887893767136089472",
+          "name": "warningPercent",
+          "type": 8
+        },
+        {
+          "id": "7:955996273534305911",
+          "name": "createdAt",
+          "type": 10
+        },
+        {
+          "id": "8:9071170801313566729",
+          "name": "updatedAt",
+          "indexId": "17:1741580117996319481",
+          "type": 10,
+          "flags": 8
+        },
+        {
+          "id": "9:7680539986417524578",
+          "name": "isDeleted",
+          "type": 1
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "6:4449110663233528591",
-  "lastIndexId": "13:1091651197108033581",
+  "lastEntityId": "7:5027326062470403617",
+  "lastIndexId": "17:1741580117996319481",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

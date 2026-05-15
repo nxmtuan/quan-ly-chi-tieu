@@ -6,6 +6,7 @@ import '../core/network/google_drive_service.dart';
 import '../core/services/biometric_auth_service.dart';
 
 import '../core/storage/auth_storage.dart';
+import '../core/storage/budget_storage.dart';
 import '../core/storage/category_storage.dart';
 import '../core/storage/money_source_storage.dart';
 import '../core/storage/recurring_storage.dart';
@@ -14,6 +15,7 @@ import '../core/storage/settings_storage.dart';
 import '../core/storage/transaction_storage.dart';
 import '../core/storage/objectbox_database.dart';
 import '../models/transaction.dart';
+import '../models/budget.dart';
 import '../models/category.dart';
 import '../models/money_source.dart';
 import '../models/savings_goal.dart';
@@ -45,6 +47,11 @@ final moneySourceStorageProvider = Provider<MoneySourceStorage>((ref) {
 final savingsGoalStorageProvider = Provider<SavingsGoalStorage>((ref) {
   final store = ref.watch(objectBoxProvider).store;
   return SavingsGoalStorage(store.box<SavingsGoal>());
+});
+
+final budgetStorageProvider = Provider<BudgetStorage>((ref) {
+  final store = ref.watch(objectBoxProvider).store;
+  return BudgetStorage(store.box<Budget>());
 });
 
 final recurringStorageProvider = Provider<RecurringStorage>((ref) {
@@ -80,6 +87,7 @@ final syncServiceProvider = Provider.family<SyncService, drive.DriveApi>((
     categoryBox: store.box<Category>(),
     moneySourceBox: store.box<MoneySource>(),
     savingsGoalBox: store.box<SavingsGoal>(),
+    budgetBox: store.box<Budget>(),
     recurringStorage: ref.watch(recurringStorageProvider),
   );
 });

@@ -5,6 +5,7 @@ import '../background/background_recurring.dart';
 import '../storage/recurring_storage.dart';
 import '../storage/settings_storage.dart';
 import '../../models/transaction.dart';
+import '../../models/budget.dart';
 import '../../models/category.dart';
 import '../../models/money_source.dart';
 import '../../models/recurring_item.dart';
@@ -19,6 +20,7 @@ class SyncService {
     required this.categoryBox,
     required this.moneySourceBox,
     required this.savingsGoalBox,
+    required this.budgetBox,
     required this.recurringStorage,
   });
 
@@ -28,6 +30,7 @@ class SyncService {
   final Box<Category> categoryBox;
   final Box<MoneySource> moneySourceBox;
   final Box<SavingsGoal> savingsGoalBox;
+  final Box<Budget> budgetBox;
   final RecurringStorage recurringStorage;
 
   Future<void> syncData() async {
@@ -37,6 +40,7 @@ class SyncService {
     final Map<String, Category> remoteCategories = {};
     final Map<String, MoneySource> remoteMoneySources = {};
     final Map<String, SavingsGoal> remoteSavingsGoals = {};
+    final Map<String, Budget> remoteBudgets = {};
     final Map<String, RecurringItem> remoteRecurringItems = {};
 
     if (remoteJsonString != null && remoteJsonString.isNotEmpty) {
@@ -66,6 +70,12 @@ class SyncService {
         remoteSavingsGoals[goal.id] = goal;
       }
 
+      final budgetList = decoded['budgets'] as List<dynamic>? ?? [];
+      for (final budgetJson in budgetList) {
+        final budget = Budget.fromJson(budgetJson as Map<String, dynamic>);
+        remoteBudgets[budget.id] = budget;
+      }
+
       final recurringList = decoded['recurringItems'] as List<dynamic>? ?? [];
       for (final recurringJson in recurringList) {
         final recurring = RecurringItem.fromJson(
@@ -87,6 +97,8 @@ class SyncService {
       remoteMoneySources: remoteMoneySources.values,
       localSavingsGoals: savingsGoalBox.getAll(),
       remoteSavingsGoals: remoteSavingsGoals.values,
+      localBudgets: budgetBox.getAll(),
+      remoteBudgets: remoteBudgets.values,
       localRecurringItems: recurringStorage.readItems(),
       remoteRecurringItems: remoteRecurringItems.values,
       syncStartedAt: syncStartedAt,
@@ -99,6 +111,7 @@ class SyncService {
       'savingsGoals': snapshot.savingsGoals
           .map((goal) => goal.toJson())
           .toList(),
+      'budgets': snapshot.budgets.map((budget) => budget.toJson()).toList(),
       'transactions': snapshot.transactions.map((t) => t.toJson()).toList(),
       'recurringItems': snapshot.recurringItems
           .map(
@@ -118,6 +131,8 @@ class SyncService {
     moneySourceBox.putMany(snapshot.moneySources);
     savingsGoalBox.removeAll();
     savingsGoalBox.putMany(snapshot.savingsGoals);
+    budgetBox.removeAll();
+    budgetBox.putMany(snapshot.budgets);
     transactionBox.removeAll();
     transactionBox.putMany(snapshot.transactions);
     await recurringStorage.saveItems(snapshot.recurringItems);
@@ -142,6 +157,8 @@ SyncSnapshot buildSyncSnapshot({
   required Iterable<MoneySource> remoteMoneySources,
   Iterable<SavingsGoal> localSavingsGoals = const [],
   Iterable<SavingsGoal> remoteSavingsGoals = const [],
+  Iterable<Budget> localBudgets = const [],
+  Iterable<Budget> remoteBudgets = const [],
   required Iterable<RecurringItem> localRecurringItems,
   required Iterable<RecurringItem> remoteRecurringItems,
   required DateTime syncStartedAt,
@@ -189,8 +206,20 @@ SyncSnapshot buildSyncSnapshot({
 
   for (final remoteGoal in remoteSavingsGoals) {
     final localGoal = mergedSavingsGoals[remoteGoal.id];
-    if (localGoal == null || remoteGoal.updatedAt.isAfter(localGoal.updatedAt)) {
+    if (localGoal == null ||
+        remoteGoal.updatedAt.isAfter(localGoal.updatedAt)) {
       mergedSavingsGoals[remoteGoal.id] = remoteGoal;
+    }
+  }
+
+  final localBudgetMap = {for (final budget in localBudgets) budget.id: budget};
+  final mergedBudgets = <String, Budget>{...localBudgetMap};
+
+  for (final remoteBudget in remoteBudgets) {
+    final localBudget = mergedBudgets[remoteBudget.id];
+    if (localBudget == null ||
+        remoteBudget.updatedAt.isAfter(localBudget.updatedAt)) {
+      mergedBudgets[remoteBudget.id] = remoteBudget;
     }
   }
 
@@ -230,6 +259,10 @@ SyncSnapshot buildSyncSnapshot({
     for (final goal in mergedSavingsGoals.values)
       goal.compactedForStorage().copyWith(obxId: 0),
   ];
+  var compactedBudgets = [
+    for (final budget in mergedBudgets.values)
+      budget.compactedForStorage().copyWith(obxId: 0),
+  ];
   var mergedRecurringItemList = [
     for (final item in mergedRecurringItems.values) item,
   ];
@@ -267,12 +300,17 @@ SyncSnapshot buildSyncSnapshot({
     ];
     compactedSavingsGoals = [
       for (final goal in compactedSavingsGoals)
+        if (!_shouldPurgeDeleted(goal.isDeleted, goal.updatedAt, purgeCutoff))
+          goal,
+    ];
+    compactedBudgets = [
+      for (final budget in compactedBudgets)
         if (!_shouldPurgeDeleted(
-          goal.isDeleted,
-          goal.updatedAt,
+          budget.isDeleted,
+          budget.updatedAt,
           purgeCutoff,
         ))
-          goal,
+          budget,
     ];
     mergedRecurringItemList = [
       for (final item in mergedRecurringItemList)
@@ -285,6 +323,7 @@ SyncSnapshot buildSyncSnapshot({
     categories: compactedCategories,
     moneySources: compactedMoneySources,
     savingsGoals: compactedSavingsGoals,
+    budgets: compactedBudgets,
     transactions: compactedTransactions,
     recurringItems: mergedRecurringItemList,
     purgedSoftDeleted: shouldPurgeSoftDeleted,
@@ -300,6 +339,7 @@ class SyncSnapshot {
     required this.categories,
     required this.moneySources,
     required this.savingsGoals,
+    required this.budgets,
     required this.transactions,
     required this.recurringItems,
     required this.purgedSoftDeleted,
@@ -308,6 +348,7 @@ class SyncSnapshot {
   final List<Category> categories;
   final List<MoneySource> moneySources;
   final List<SavingsGoal> savingsGoals;
+  final List<Budget> budgets;
   final List<Transaction> transactions;
   final List<RecurringItem> recurringItems;
   final bool purgedSoftDeleted;

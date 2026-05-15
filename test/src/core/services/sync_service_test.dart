@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quan_ly_chi_tieu/src/core/services/sync_service.dart';
+import 'package:quan_ly_chi_tieu/src/models/budget.dart';
 import 'package:quan_ly_chi_tieu/src/models/category.dart';
 import 'package:quan_ly_chi_tieu/src/models/money_source.dart';
 import 'package:quan_ly_chi_tieu/src/models/recurring_item.dart';
@@ -168,6 +169,58 @@ void main() {
             isDeleted: true,
           ),
         ],
+        localBudgets: [
+          Budget(
+            id: 'keep-budget-local',
+            categoryId: 'food',
+            limitAmount: 3000000,
+            periodStart: DateTime(2026, 5, 15),
+            warningPercent: 80,
+            updatedAt: now.subtract(const Duration(days: 2)),
+          ),
+          Budget(
+            id: 'merge-budget',
+            categoryId: 'transport',
+            limitAmount: 1000000,
+            periodStart: DateTime(2026, 5),
+            warningPercent: 75,
+            updatedAt: now.subtract(const Duration(days: 4)),
+          ),
+          Budget(
+            id: 'purge-budget-local',
+            categoryId: 'bills',
+            limitAmount: 500000,
+            periodStart: DateTime(2026, 5),
+            updatedAt: expiredDeletedAt,
+            isDeleted: true,
+          ),
+        ],
+        remoteBudgets: [
+          Budget(
+            id: 'keep-budget-remote',
+            categoryId: 'study',
+            limitAmount: 2000000,
+            periodStart: DateTime(2026, 5),
+            warningPercent: 85,
+            updatedAt: now.subtract(const Duration(hours: 5)),
+          ),
+          Budget(
+            id: 'merge-budget',
+            categoryId: 'transport',
+            limitAmount: 1500000,
+            periodStart: DateTime(2026, 5),
+            warningPercent: 90,
+            updatedAt: now.subtract(const Duration(hours: 1)),
+          ),
+          Budget(
+            id: 'purge-budget-remote',
+            categoryId: 'food',
+            limitAmount: 700000,
+            periodStart: DateTime(2026, 5),
+            updatedAt: expiredDeletedAt,
+            isDeleted: true,
+          ),
+        ],
         localRecurringItems: [
           RecurringItem(
             id: 'keep-recurring-local',
@@ -318,6 +371,23 @@ void main() {
       );
 
       expect(
+        snapshot.budgets.map((budget) => budget.id),
+        containsAll([
+          'keep-budget-local',
+          'keep-budget-remote',
+          'merge-budget',
+        ]),
+      );
+      expect(
+        snapshot.budgets.map((budget) => budget.id),
+        isNot(contains('purge-budget-local')),
+      );
+      expect(
+        snapshot.budgets.map((budget) => budget.id),
+        isNot(contains('purge-budget-remote')),
+      );
+
+      expect(
         snapshot.recurringItems.map((item) => item.id),
         containsAll(['keep-recurring-local', 'keep-recurring-remote']),
       );
@@ -363,6 +433,17 @@ void main() {
       );
       expect(mergedGoal.title, 'New remote goal');
       expect(mergedGoal.savedAmount, 1500000);
+
+      final keepBudget = snapshot.budgets.firstWhere(
+        (budget) => budget.id == 'keep-budget-local',
+      );
+      expect(keepBudget.periodStart, DateTime(2026, 5));
+
+      final mergedBudget = snapshot.budgets.firstWhere(
+        (budget) => budget.id == 'merge-budget',
+      );
+      expect(mergedBudget.limitAmount, 1500000);
+      expect(mergedBudget.warningPercent, 90);
 
       expect(snapshot.purgedSoftDeleted, isTrue);
     });
