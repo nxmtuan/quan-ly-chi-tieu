@@ -48,12 +48,6 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
             ],
           ),
           const SizedBox(height: 8),
-          _BarTooltipRow(
-            chartItems: chartItems,
-            touchedBarIndex: _touchedBarIndex,
-            isBarChart: _selectedChartView == _CategoryChartView.bar,
-          ),
-          const SizedBox(height: 4),
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -240,10 +234,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                       return SideTitleWidget(
                         meta: meta,
                         space: 8,
-                        child: _BarCategoryIcon(
-                          item: item,
-                          selected: index == _touchedBarIndex,
-                        ),
+                        child: _BarCategoryIcon(item: item),
                       );
                     },
                   ),
@@ -262,9 +253,17 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                 enabled: true,
                 handleBuiltInTouches: false,
                 touchCallback: (event, response) {
-                  if (event is! FlTapUpEvent) return;
+                  if (event is! FlTapUpEvent) {
+                    return;
+                  }
+
                   final groupIndex = response?.spot?.touchedBarGroupIndex;
-                  if (groupIndex == null) return;
+                  if (groupIndex == null ||
+                      groupIndex < 0 ||
+                      groupIndex >= chartItems.length) {
+                    setState(() => _touchedBarIndex = null);
+                    return;
+                  }
 
                   setState(() {
                     _touchedBarIndex = _touchedBarIndex == groupIndex
@@ -272,6 +271,35 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                         : groupIndex;
                   });
                 },
+                touchTooltipData: BarTouchTooltipData(
+                  direction: TooltipDirection.top,
+                  fitInsideHorizontally: true,
+                  fitInsideVertically: true,
+                  tooltipBorderRadius: BorderRadius.circular(6),
+                  tooltipPadding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 5,
+                  ),
+                  tooltipMargin: 8,
+                  maxContentWidth: 92,
+                  getTooltipColor: (_) => const Color(0xE6333333),
+                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                    if (groupIndex < 0 || groupIndex >= chartItems.length) {
+                      return null;
+                    }
+
+                    final item = chartItems[groupIndex];
+                    return BarTooltipItem(
+                      '${item.category.name}\n${formatCurrency(item.amount)}',
+                      const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        height: 1.25,
+                      ),
+                    );
+                  },
+                ),
               ),
               barGroups: [
                 for (final entry in chartItems.indexed)
@@ -289,25 +317,28 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
     _CategoryAmountItem item,
     double animationValue,
   ) {
-    final isTouched = index == _touchedBarIndex;
     final percent = ((item.amount / widget.total) * 100).round();
 
     return BarChartGroupData(
       x: index,
+      showingTooltipIndicators: _touchedBarIndex == index
+          ? const [0]
+          : const [],
       barRods: [
         BarChartRodData(
           toY: item.amount * animationValue,
           width: context.scaled(54),
-          color: isTouched ? item.color : item.color.withValues(alpha: 0.42),
+          color: item.color,
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(context.scaled(6)),
           ),
           label: BarChartRodLabel(
-            text: '$percent%',
+            text: '$percent%\n${item.category.name}',
             style: TextStyle(
               color: item.color,
               fontWeight: FontWeight.w700,
-              fontSize: 16,
+              fontSize: 10,
+              height: 1.12,
             ),
           ),
         ),
@@ -450,10 +481,9 @@ class _CategoryBadge extends StatelessWidget {
 }
 
 class _BarCategoryIcon extends StatelessWidget {
-  const _BarCategoryIcon({required this.item, this.selected = false});
+  const _BarCategoryIcon({required this.item});
 
   final _CategoryAmountItem item;
-  final bool selected;
 
   @override
   Widget build(BuildContext context) {
@@ -483,98 +513,6 @@ class _BarCategoryIcon extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _BarTooltipRow extends StatelessWidget {
-  const _BarTooltipRow({
-    required this.chartItems,
-    required this.touchedBarIndex,
-    required this.isBarChart,
-  });
-
-  final List<_CategoryAmountItem> chartItems;
-  final int? touchedBarIndex;
-  final bool isBarChart;
-
-  @override
-  Widget build(BuildContext context) {
-    final showTooltip =
-        isBarChart &&
-        touchedBarIndex != null &&
-        touchedBarIndex! >= 0 &&
-        touchedBarIndex! < chartItems.length;
-
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOutCubic,
-      alignment: Alignment.topCenter,
-      child: showTooltip
-          ? _buildTooltipContent(context, chartItems[touchedBarIndex!])
-          : const SizedBox(width: double.infinity, height: 0),
-    );
-  }
-
-  Widget _buildTooltipContent(BuildContext context, _CategoryAmountItem item) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      switchInCurve: Curves.easeOutCubic,
-      child: Container(
-        key: ValueKey(item.category.id),
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        decoration: BoxDecoration(
-          color: item.color.withValues(alpha: 0.09),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: item.color.withValues(alpha: 0.18),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 26,
-              height: 26,
-              decoration: BoxDecoration(
-                color: item.color.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Center(
-                child: Icon(
-                  item.category.iconData,
-                  color: item.color,
-                  size: 14,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                item.category.name,
-                style: TextStyle(
-                  color: item.color,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              formatCurrency(item.amount),
-              style: TextStyle(
-                color: context.appPalette.textPrimary,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
