@@ -17,6 +17,7 @@ class TransactionMarkerCalendar extends ConsumerStatefulWidget {
     required this.onDaySelected,
     this.initialFocusedDay,
     this.onFocusedDayChanged,
+    this.onHeaderTapped,
     this.showShadow = true,
   });
 
@@ -24,6 +25,7 @@ class TransactionMarkerCalendar extends ConsumerStatefulWidget {
   final ValueChanged<DateTime> onDaySelected;
   final DateTime? initialFocusedDay;
   final ValueChanged<DateTime>? onFocusedDayChanged;
+  final ValueChanged<DateTime>? onHeaderTapped;
   final bool showShadow;
 
   @override
@@ -81,6 +83,7 @@ class _TransactionMarkerCalendarState
         });
         widget.onFocusedDayChanged?.call(normalized);
       },
+      onHeaderTapped: widget.onHeaderTapped,
       showShadow: widget.showShadow,
     );
   }

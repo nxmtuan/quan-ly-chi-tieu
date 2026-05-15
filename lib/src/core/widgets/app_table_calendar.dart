@@ -13,6 +13,16 @@ part 'app_table_calendar_helpers.dart';
 
 typedef CalendarEventLoader = List<Object> Function(DateTime day);
 
+DateTime defaultCalendarFirstDay([DateTime? now]) {
+  final anchor = now ?? DateTime.now();
+  return DateTime(anchor.year - 39);
+}
+
+DateTime defaultCalendarLastDay([DateTime? now]) {
+  final anchor = now ?? DateTime.now();
+  return DateTime(anchor.year + 10, 12, 31);
+}
+
 class AppTableCalendar extends StatelessWidget {
   const AppTableCalendar({
     super.key,
@@ -22,6 +32,7 @@ class AppTableCalendar extends StatelessWidget {
     this.firstDay,
     this.lastDay,
     this.onPageChanged,
+    this.onHeaderTapped,
     this.eventLoader,
     this.showShadow = true,
   });
@@ -32,6 +43,7 @@ class AppTableCalendar extends StatelessWidget {
   final DateTime? firstDay;
   final DateTime? lastDay;
   final ValueChanged<DateTime>? onPageChanged;
+  final ValueChanged<DateTime>? onHeaderTapped;
   final CalendarEventLoader? eventLoader;
   final bool showShadow;
 
@@ -60,8 +72,8 @@ class AppTableCalendar extends StatelessWidget {
       ),
       child: TableCalendar<Object>(
         locale: 'vi_VN',
-        firstDay: firstDay ?? DateTime(2020),
-        lastDay: lastDay ?? DateTime(2035),
+        firstDay: firstDay ?? defaultCalendarFirstDay(),
+        lastDay: lastDay ?? defaultCalendarLastDay(),
         focusedDay: focusedDay,
         currentDay: DateTime.now(),
         availableCalendarFormats: const {CalendarFormat.month: 'Month'},
@@ -96,6 +108,7 @@ class AppTableCalendar extends StatelessWidget {
           onPageChanged?.call(focusedDay);
         },
         onPageChanged: onPageChanged,
+        onHeaderTapped: onHeaderTapped,
         calendarStyle: CalendarStyle(
           outsideDaysVisible: false,
           defaultDecoration: baseCellDecoration,
