@@ -141,6 +141,36 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
       duration: const Duration(milliseconds: 920),
       curve: Curves.easeOutCubic,
       builder: (context, animationValue, child) {
+        final sections = <PieChartSectionData>[];
+        var visibleAmount = 0.0;
+
+        for (final entry in chartItems.indexed) {
+          final sectionProgress = _staggeredProgress(
+            animationValue,
+            entry.$1,
+            chartItems.length,
+          );
+          visibleAmount += entry.$2.amount * sectionProgress;
+          sections.add(
+            _buildSection(entry.$1, entry.$2, chartSize, sectionProgress),
+          );
+        }
+
+        final remainingAmount = (widget.total - visibleAmount)
+            .clamp(0.0, widget.total)
+            .toDouble();
+        if (remainingAmount > 0.001) {
+          sections.add(
+            PieChartSectionData(
+              value: remainingAmount,
+              color: Colors.transparent,
+              radius: chartSize * 0.45,
+              title: '',
+              badgeWidget: const SizedBox.shrink(),
+            ),
+          );
+        }
+
         return PieChart(
           duration: const Duration(milliseconds: 160),
           curve: Curves.easeOutCubic,
@@ -160,16 +190,7 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
                 });
               },
             ),
-            sections: [
-              for (final entry in chartItems.indexed)
-                _buildSection(
-                  entry.$1,
-                  entry.$2,
-                  chartSize,
-                  animationValue,
-                  chartItems.length,
-                ),
-            ],
+            sections: sections,
           ),
         );
       },
@@ -324,14 +345,10 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
     int index,
     _CategoryAmountItem item,
     double chartSize,
-    double animationValue,
-    int itemCount,
+    double sectionProgress,
   ) {
     final isTouched = index == _touchedIndex;
     final percent = ((item.amount / widget.total) * 100).round();
-    final sectionProgress = ((animationValue * itemCount) - index)
-        .clamp(0.0, 1.0)
-        .toDouble();
     final isVisible = sectionProgress > 0.01;
 
     return PieChartSectionData(
@@ -359,6 +376,10 @@ class _CategoryDonutChartState extends State<_CategoryDonutChart> {
         ],
       ),
     );
+  }
+
+  double _staggeredProgress(double animationValue, int index, int itemCount) {
+    return ((animationValue * itemCount) - index).clamp(0.0, 1.0).toDouble();
   }
 }
 
