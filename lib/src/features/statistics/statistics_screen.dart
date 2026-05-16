@@ -8,6 +8,7 @@ import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/utils/date_range.dart';
 import '../../core/widgets/app_page_header.dart';
+import '../../core/widgets/app_refresh_indicator.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../core/widgets/app_bounce_builder.dart';
@@ -50,54 +51,56 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
       (total, item) => total + item.amount,
     );
 
-    return ListView(
-          padding: EdgeInsets.fromLTRB(
-            context.scaled(24),
-            context.scaled(16),
-            context.scaled(24),
-            context.scaled(120) + MediaQuery.paddingOf(context).bottom,
-          ),
-          children: [
-            const AppPageHeader(
-              subtitle: 'Thống kê',
-              title: 'Phân tích chi tiêu',
-            ),
-            SizedBox(height: context.scaled(22)),
-            _RangeSelector(
-              selectedRange: _selectedRange,
-              onChanged: (range) => setState(() => _selectedRange = range),
-            ),
-            SizedBox(height: context.scaled(22)),
-            _ExpenseOverviewCard(
-              totalExpense: totalExpense,
-              breakdown: breakdown,
-            ),
-            SizedBox(height: context.scaled(24)),
-            Text(
-              'Breakdown',
-              style: context.appText.sectionTitle,
-            ),
-            SizedBox(height: context.scaled(16)),
-            if (breakdown.isEmpty)
-              const FlatCard(
-                child: Center(child: Text('No breakdown available')),
-              )
-            else
-              for (final item in breakdown)
-                Padding(
-                  padding: EdgeInsets.only(bottom: context.scaled(12)),
-                  child: _BreakdownRow(item: item),
+    return AppRefreshIndicator(
+      child:
+          ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(
+                  context.scaled(24),
+                  context.scaled(16),
+                  context.scaled(24),
+                  context.scaled(120) + MediaQuery.paddingOf(context).bottom,
                 ),
-          ],
-        )
-        .animate()
-        .fadeIn(duration: 260.ms)
-        .slideY(
-          begin: 0.04,
-          end: 0,
-          duration: 340.ms,
-          curve: Curves.easeOutCubic,
-        );
+                children: [
+                  const AppPageHeader(
+                    subtitle: 'Thống kê',
+                    title: 'Phân tích chi tiêu',
+                  ),
+                  SizedBox(height: context.scaled(22)),
+                  _RangeSelector(
+                    selectedRange: _selectedRange,
+                    onChanged: (range) =>
+                        setState(() => _selectedRange = range),
+                  ),
+                  SizedBox(height: context.scaled(22)),
+                  _ExpenseOverviewCard(
+                    totalExpense: totalExpense,
+                    breakdown: breakdown,
+                  ),
+                  SizedBox(height: context.scaled(24)),
+                  Text('Breakdown', style: context.appText.sectionTitle),
+                  SizedBox(height: context.scaled(16)),
+                  if (breakdown.isEmpty)
+                    const FlatCard(
+                      child: Center(child: Text('No breakdown available')),
+                    )
+                  else
+                    for (final item in breakdown)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: context.scaled(12)),
+                        child: _BreakdownRow(item: item),
+                      ),
+                ],
+              )
+              .animate()
+              .fadeIn(duration: 260.ms)
+              .slideY(
+                begin: 0.04,
+                end: 0,
+                duration: 340.ms,
+                curve: Curves.easeOutCubic,
+              ),
+    );
   }
 
   List<_BreakdownItem> _buildBreakdown(

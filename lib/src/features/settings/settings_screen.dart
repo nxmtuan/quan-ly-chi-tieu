@@ -8,8 +8,10 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
+import '../../core/utils/app_data_refresh.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_page_header.dart';
+import '../../core/widgets/app_refresh_indicator.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_time_picker.dart';
 import '../../core/widgets/app_toast.dart';
@@ -25,7 +27,6 @@ import '../../providers/settings_provider.dart';
 import '../../providers/storage_provider.dart';
 import '../../providers/transaction_provider.dart';
 import '../../providers/category_provider.dart';
-import '../../providers/recurring_provider.dart';
 import '../auth/google_web_sign_in_button.dart';
 import '../categories/category_management_sheet.dart';
 import 'money_source_management_sheet.dart';
@@ -45,81 +46,87 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final authUser = ref.watch(authProvider);
 
-    return ListView(
-          padding: EdgeInsets.fromLTRB(
-            context.scaled(24),
-            context.scaled(16),
-            context.scaled(24),
-            context.scaled(32) + MediaQuery.paddingOf(context).bottom,
-          ),
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: AppBounceBuilder(
-                scaleDown: 0.96,
-                onTap: () async {
-                  final didPop = await Navigator.of(context).maybePop();
-                  if (!didPop && context.mounted) {
-                    context.go('/');
-                  }
-                },
-                child: Container(
-                  width: context.scaled(44),
-                  height: context.scaled(44),
-                  decoration: BoxDecoration(
-                    color: context.appPalette.surface,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: context.appPalette.border),
-                  ),
-                  child: Icon(
-                    Icons.arrow_back_rounded,
-                    color: context.appPalette.textPrimary,
-                    size: context.scaled(22),
-                  ),
+    return AppRefreshIndicator(
+      child:
+          ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(
+                  context.scaled(24),
+                  context.scaled(16),
+                  context.scaled(24),
+                  context.scaled(32) + MediaQuery.paddingOf(context).bottom,
                 ),
-              ),
-            ),
-            SizedBox(height: context.scaled(18)),
-            const AppPageHeader(title: 'Cài đặt', showAvatar: false),
-            SizedBox(height: context.scaled(24)),
-            FlatCard(
-              radius: context.scaled(24),
-              showShadow: false,
-              padding: EdgeInsets.all(context.scaled(10)),
-              child: Column(
                 children: [
-                  _ThemeSettingsRow(themeMode: themeMode),
-                  const _DividerIndent(),
-                  const _BiometricUnlockRow(),
-                  const _DividerIndent(),
-                  const _ManageCategoriesRow(),
-                  const _DividerIndent(),
-                  const _ManageMoneySourcesRow(),
-                  if (authUser != null) ...[
-                    const _DividerIndent(),
-                    const _SyncDataRow(),
-                  ],
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: AppBounceBuilder(
+                      scaleDown: 0.96,
+                      onTap: () async {
+                        final didPop = await Navigator.of(context).maybePop();
+                        if (!didPop && context.mounted) {
+                          context.go('/');
+                        }
+                      },
+                      child: Container(
+                        width: context.scaled(44),
+                        height: context.scaled(44),
+                        decoration: BoxDecoration(
+                          color: context.appPalette.surface,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: context.appPalette.border),
+                        ),
+                        child: Icon(
+                          Icons.arrow_back_rounded,
+                          color: context.appPalette.textPrimary,
+                          size: context.scaled(22),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: context.scaled(18)),
+                  const AppPageHeader(title: 'Cài đặt', showAvatar: false),
+                  SizedBox(height: context.scaled(24)),
+                  FlatCard(
+                    radius: context.scaled(24),
+                    showShadow: false,
+                    padding: EdgeInsets.all(context.scaled(10)),
+                    child: Column(
+                      children: [
+                        _ThemeSettingsRow(themeMode: themeMode),
+                        const _DividerIndent(),
+                        const _BiometricUnlockRow(),
+                        const _DividerIndent(),
+                        const _ManageCategoriesRow(),
+                        const _DividerIndent(),
+                        const _ManageMoneySourcesRow(),
+                        if (authUser != null) ...[
+                          const _DividerIndent(),
+                          const _SyncDataRow(),
+                        ],
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: context.scaled(24)),
+                  const _SettingsTipCard(),
+                  SizedBox(height: context.scaled(24)),
+                  FlatCard(
+                    radius: context.scaled(24),
+                    showShadow: false,
+                    padding: EdgeInsets.all(context.scaled(10)),
+                    child: Column(
+                      children: [_AuthSettingsRow(authUser: authUser)],
+                    ),
+                  ),
                 ],
+              )
+              .animate()
+              .fadeIn(duration: 260.ms)
+              .slideY(
+                begin: 0.04,
+                end: 0,
+                duration: 340.ms,
+                curve: Curves.easeOutCubic,
               ),
-            ),
-            SizedBox(height: context.scaled(24)),
-            const _SettingsTipCard(),
-            SizedBox(height: context.scaled(24)),
-            FlatCard(
-              radius: context.scaled(24),
-              showShadow: false,
-              padding: EdgeInsets.all(context.scaled(10)),
-              child: Column(children: [_AuthSettingsRow(authUser: authUser)]),
-            ),
-          ],
-        )
-        .animate()
-        .fadeIn(duration: 260.ms)
-        .slideY(
-          begin: 0.04,
-          end: 0,
-          duration: 340.ms,
-          curve: Curves.easeOutCubic,
-        );
+    );
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_page_header.dart';
+import '../../core/widgets/app_refresh_indicator.dart';
 import '../../models/transaction.dart';
 import '../../providers/transaction_provider.dart';
 import 'models/home_summary_scope.dart';
@@ -59,129 +60,133 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Stack(
         children: [
-          NotificationListener<UserScrollNotification>(
-            onNotification: _handleScrollNotification,
-            child:
-                CustomScrollView(
-                      slivers: [
-                        SliverPadding(
-                          padding: EdgeInsets.fromLTRB(
-                            context.scaled(24),
-                            context.scaled(22),
-                            context.scaled(24),
-                            0,
-                          ),
-                          sliver: const SliverToBoxAdapter(
-                            child: AppPageHeader(
-                              subtitle: 'Tổng quan',
-                              title: 'Quản lý tài chính',
+          AppRefreshIndicator(
+            child: NotificationListener<UserScrollNotification>(
+              onNotification: _handleScrollNotification,
+              child:
+                  CustomScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        slivers: [
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              context.scaled(24),
+                              context.scaled(22),
+                              context.scaled(24),
+                              0,
                             ),
-                          ),
-                        ),
-                        SliverPadding(
-                          padding: EdgeInsets.fromLTRB(
-                            context.scaled(24),
-                            context.scaled(24),
-                            context.scaled(24),
-                            0,
-                          ),
-                          sliver: SliverToBoxAdapter(
-                            child: SummaryCard(
-                              summary: summary,
-                              expenseComparison: expenseComparison,
-                              scope: _selectedScope,
-                              selectedType: _selectedType,
-                              onSelectedType: (type) {
-                                if (type == _selectedType) {
-                                  return;
-                                }
-
-                                setState(() {
-                                  _previousSelectedType = _selectedType;
-                                  _selectedType = type;
-                                });
-                              },
-                              onPreviousScope: _selectedScope.canGoPrevious
-                                  ? _goToPreviousScope
-                                  : null,
-                              onNextScope: _selectedScope.canGoNext(now)
-                                  ? _goToNextScope
-                                  : null,
-                              onPickScope: _pickMonth,
-                            ),
-                          ),
-                        ),
-                        SliverPadding(
-                          padding: EdgeInsets.fromLTRB(
-                            context.scaled(24),
-                            context.scaled(16),
-                            context.scaled(24),
-                            context.scaled(176) +
-                                MediaQuery.paddingOf(context).bottom,
-                          ),
-                          sliver: SliverToBoxAdapter(
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 260),
-                              reverseDuration: const Duration(
-                                milliseconds: 220,
+                            sliver: const SliverToBoxAdapter(
+                              child: AppPageHeader(
+                                subtitle: 'Tổng quan',
+                                title: 'Quản lý tài chính',
                               ),
-                              switchInCurve: Curves.easeOutCubic,
-                              switchOutCurve: Curves.easeInCubic,
-                              layoutBuilder: (currentChild, previousChildren) {
-                                return Stack(
-                                  alignment: Alignment.topCenter,
-                                  children: [
-                                    ...previousChildren,
-                                    ?currentChild,
-                                  ],
-                                );
-                              },
-                              transitionBuilder: (child, animation) {
-                                final isIncoming =
-                                    child.key ==
-                                    ValueKey<TransactionType>(_selectedType);
-                                final slideDirection =
-                                    _selectedType.index >=
-                                        _previousSelectedType.index
-                                    ? 1.0
-                                    : -1.0;
-                                final beginOffset = Offset(
-                                  isIncoming
-                                      ? 0.08 * slideDirection
-                                      : -0.04 * slideDirection,
-                                  0,
-                                );
-
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: beginOffset,
-                                      end: Offset.zero,
-                                    ).animate(animation),
-                                    child: child,
-                                  ),
-                                );
-                              },
-                              child: RecentTransactions(
-                                key: ValueKey(_selectedType),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              context.scaled(24),
+                              context.scaled(24),
+                              context.scaled(24),
+                              0,
+                            ),
+                            sliver: SliverToBoxAdapter(
+                              child: SummaryCard(
+                                summary: summary,
+                                expenseComparison: expenseComparison,
                                 scope: _selectedScope,
-                                transactions: filteredTransactions,
                                 selectedType: _selectedType,
+                                onSelectedType: (type) {
+                                  if (type == _selectedType) {
+                                    return;
+                                  }
+
+                                  setState(() {
+                                    _previousSelectedType = _selectedType;
+                                    _selectedType = type;
+                                  });
+                                },
+                                onPreviousScope: _selectedScope.canGoPrevious
+                                    ? _goToPreviousScope
+                                    : null,
+                                onNextScope: _selectedScope.canGoNext(now)
+                                    ? _goToNextScope
+                                    : null,
+                                onPickScope: _pickMonth,
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    )
-                    .animate()
-                    .fadeIn(duration: 260.ms)
-                    .slideY(
-                      begin: 0.04,
-                      end: 0,
-                      duration: 340.ms,
-                      curve: Curves.easeOutCubic,
-                    ),
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              context.scaled(24),
+                              context.scaled(16),
+                              context.scaled(24),
+                              context.scaled(176) +
+                                  MediaQuery.paddingOf(context).bottom,
+                            ),
+                            sliver: SliverToBoxAdapter(
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 260),
+                                reverseDuration: const Duration(
+                                  milliseconds: 220,
+                                ),
+                                switchInCurve: Curves.easeOutCubic,
+                                switchOutCurve: Curves.easeInCubic,
+                                layoutBuilder:
+                                    (currentChild, previousChildren) {
+                                      return Stack(
+                                        alignment: Alignment.topCenter,
+                                        children: [
+                                          ...previousChildren,
+                                          ?currentChild,
+                                        ],
+                                      );
+                                    },
+                                transitionBuilder: (child, animation) {
+                                  final isIncoming =
+                                      child.key ==
+                                      ValueKey<TransactionType>(_selectedType);
+                                  final slideDirection =
+                                      _selectedType.index >=
+                                          _previousSelectedType.index
+                                      ? 1.0
+                                      : -1.0;
+                                  final beginOffset = Offset(
+                                    isIncoming
+                                        ? 0.08 * slideDirection
+                                        : -0.04 * slideDirection,
+                                    0,
+                                  );
+
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: beginOffset,
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                                child: RecentTransactions(
+                                  key: ValueKey(_selectedType),
+                                  scope: _selectedScope,
+                                  transactions: filteredTransactions,
+                                  selectedType: _selectedType,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                      .animate()
+                      .fadeIn(duration: 260.ms)
+                      .slideY(
+                        begin: 0.04,
+                        end: 0,
+                        duration: 340.ms,
+                        curve: Curves.easeOutCubic,
+                      ),
+            ),
           ),
           Positioned(
             right: context.scaled(24),

@@ -7,6 +7,7 @@ import '../../core/utils/adaptive.dart';
 import '../../core/utils/local_id.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_page_header.dart';
+import '../../core/widgets/app_refresh_indicator.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../core/widgets/app_bounce_builder.dart';
@@ -26,34 +27,32 @@ class CategoriesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final categories = ref.watch(categoriesProvider);
 
-    return ListView(
-      padding: EdgeInsets.fromLTRB(
-        context.scaled(24),
-        context.scaled(22),
-        context.scaled(24),
-        context.scaled(120),
-      ),
-      children: [
-        const AppPageHeader(
-          subtitle: 'Danh mục',
-          title: 'Quản lý danh mục',
+    return AppRefreshIndicator(
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(
+          context.scaled(24),
+          context.scaled(22),
+          context.scaled(24),
+          context.scaled(120),
         ),
-        SizedBox(height: context.scaled(22)),
-        _AddCategoryCard(
-          onTap: () => showCategoryDialog(context, ref),
-        ),
-        SizedBox(height: context.scaled(22)),
-        for (final type in TransactionType.values) ...[
-          _CategorySection(
-            type: type,
-            categories: [
-              for (final category in categories)
-                if (category.type == type) category,
-            ],
-          ),
-          SizedBox(height: context.scaled(14)),
+        children: [
+          const AppPageHeader(subtitle: 'Danh mục', title: 'Quản lý danh mục'),
+          SizedBox(height: context.scaled(22)),
+          _AddCategoryCard(onTap: () => showCategoryDialog(context, ref)),
+          SizedBox(height: context.scaled(22)),
+          for (final type in TransactionType.values) ...[
+            _CategorySection(
+              type: type,
+              categories: [
+                for (final category in categories)
+                  if (category.type == type) category,
+              ],
+            ),
+            SizedBox(height: context.scaled(14)),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -92,10 +91,7 @@ class _AddCategoryCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Thêm danh mục mới',
-                    style: context.appText.cardTitle,
-                  ),
+                  Text('Thêm danh mục mới', style: context.appText.cardTitle),
                   SizedBox(height: context.scaled(4)),
                   Text(
                     'Tạo nhóm thu hoặc chi với icon và màu riêng.',
@@ -120,10 +116,7 @@ class _AddCategoryCard extends StatelessWidget {
 }
 
 class _CategorySection extends StatelessWidget {
-  const _CategorySection({
-    required this.type,
-    required this.categories,
-  });
+  const _CategorySection({required this.type, required this.categories});
 
   final TransactionType type;
   final List<Category> categories;
@@ -137,9 +130,7 @@ class _CategorySection extends StatelessWidget {
         : 'Các nhóm chi tiêu và mua sắm.';
     final accentColor = isIncome ? AppColors.success : AppColors.danger;
     final accentBackground = accentColor.withValues(alpha: 0.12);
-    final icon = isIncome
-        ? Icons.south_west_rounded
-        : Icons.north_east_rounded;
+    final icon = isIncome ? Icons.south_west_rounded : Icons.north_east_rounded;
 
     return FlatCard(
       padding: EdgeInsets.fromLTRB(
@@ -160,21 +151,14 @@ class _CategorySection extends StatelessWidget {
                   color: accentBackground,
                   borderRadius: BorderRadius.circular(context.scaled(16)),
                 ),
-                child: Icon(
-                  icon,
-                  color: accentColor,
-                  size: context.scaled(21),
-                ),
+                child: Icon(icon, color: accentColor, size: context.scaled(21)),
               ),
               SizedBox(width: context.scaled(12)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: context.appText.cardTitle,
-                    ),
+                    Text(title, style: context.appText.cardTitle),
                     SizedBox(height: context.scaled(4)),
                     Text(
                       subtitle,

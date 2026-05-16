@@ -8,6 +8,7 @@ import '../../core/utils/adaptive.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_page_header.dart';
+import '../../core/widgets/app_refresh_indicator.dart';
 import '../../core/widgets/flat_card.dart';
 import '../../models/budget.dart';
 import '../../models/category.dart';
@@ -51,69 +52,73 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
 
     return ColoredBox(
       color: Theme.of(context).scaffoldBackgroundColor,
-      child:
-          ListView(
-                padding: EdgeInsets.fromLTRB(
-                  context.scaled(24),
-                  context.scaled(22),
-                  context.scaled(24),
-                  context.scaled(176) + MediaQuery.paddingOf(context).bottom,
-                ),
-                children: [
-                  const AppPageHeader(
-                    subtitle: 'Ngân sách',
-                    title: 'Theo dõi hạn mức',
+      child: AppRefreshIndicator(
+        child:
+            ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(
+                    context.scaled(24),
+                    context.scaled(22),
+                    context.scaled(24),
+                    context.scaled(176) + MediaQuery.paddingOf(context).bottom,
                   ),
-                  SizedBox(height: context.scaled(20)),
-                  _MonthControl(
-                    month: _selectedMonth,
-                    onPick: _pickMonth,
-                    onPrevious: () => setState(() {
-                      _selectedMonth = DateTime(
-                        _selectedMonth.year,
-                        _selectedMonth.month - 1,
-                      );
-                    }),
-                    onNext: () => setState(() {
-                      _selectedMonth = DateTime(
-                        _selectedMonth.year,
-                        _selectedMonth.month + 1,
-                      );
-                    }),
-                  ),
-                  SizedBox(height: context.scaled(18)),
-                  _BudgetListHeader(
-                    count: budgets.length,
-                    onAdd: () => showBudgetSheet(context),
-                  ),
-                  SizedBox(height: context.scaled(12)),
-                  if (budgets.isEmpty)
-                    _EmptyBudgetCard(
-                      hasExpenseCategories: categories.isNotEmpty,
-                      onAdd: categories.isEmpty
-                          ? null
-                          : () => showBudgetSheet(context),
-                    )
-                  else
-                    for (final budget in budgets)
-                      Padding(
-                        padding: EdgeInsets.only(bottom: context.scaled(12)),
-                        child: _BudgetCard(
-                          budget: budget,
-                          category: categoriesById[budget.categoryId],
-                          spentAmount: spentByCategory[budget.categoryId] ?? 0,
+                  children: [
+                    const AppPageHeader(
+                      subtitle: 'Ngân sách',
+                      title: 'Theo dõi hạn mức',
+                    ),
+                    SizedBox(height: context.scaled(20)),
+                    _MonthControl(
+                      month: _selectedMonth,
+                      onPick: _pickMonth,
+                      onPrevious: () => setState(() {
+                        _selectedMonth = DateTime(
+                          _selectedMonth.year,
+                          _selectedMonth.month - 1,
+                        );
+                      }),
+                      onNext: () => setState(() {
+                        _selectedMonth = DateTime(
+                          _selectedMonth.year,
+                          _selectedMonth.month + 1,
+                        );
+                      }),
+                    ),
+                    SizedBox(height: context.scaled(18)),
+                    _BudgetListHeader(
+                      count: budgets.length,
+                      onAdd: () => showBudgetSheet(context),
+                    ),
+                    SizedBox(height: context.scaled(12)),
+                    if (budgets.isEmpty)
+                      _EmptyBudgetCard(
+                        hasExpenseCategories: categories.isNotEmpty,
+                        onAdd: categories.isEmpty
+                            ? null
+                            : () => showBudgetSheet(context),
+                      )
+                    else
+                      for (final budget in budgets)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: context.scaled(12)),
+                          child: _BudgetCard(
+                            budget: budget,
+                            category: categoriesById[budget.categoryId],
+                            spentAmount:
+                                spentByCategory[budget.categoryId] ?? 0,
+                          ),
                         ),
-                      ),
-                ],
-              )
-              .animate()
-              .fadeIn(duration: 260.ms)
-              .slideY(
-                begin: 0.04,
-                end: 0,
-                duration: 340.ms,
-                curve: Curves.easeOutCubic,
-              ),
+                  ],
+                )
+                .animate()
+                .fadeIn(duration: 260.ms)
+                .slideY(
+                  begin: 0.04,
+                  end: 0,
+                  duration: 340.ms,
+                  curve: Curves.easeOutCubic,
+                ),
+      ),
     );
   }
 

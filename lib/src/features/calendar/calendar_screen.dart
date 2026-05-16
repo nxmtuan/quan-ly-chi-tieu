@@ -8,6 +8,7 @@ import '../../core/utils/date_range.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_page_header.dart';
+import '../../core/widgets/app_refresh_indicator.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_table_calendar.dart';
 import '../../core/utils/formatters.dart';
@@ -56,98 +57,109 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         .where((transaction) => transaction.type == TransactionType.expense)
         .fold<double>(0, (total, transaction) => total + transaction.amount);
 
-    return ListView(
-          padding: EdgeInsets.fromLTRB(
-            context.scaled(24),
-            context.scaled(22),
-            context.scaled(24),
-            context.scaled(120) + MediaQuery.paddingOf(context).bottom,
-          ),
-          children: [
-            const AppPageHeader(subtitle: 'Lịch', title: 'Thống kê giao dịch'),
-            SizedBox(height: context.scaled(22)),
-            TransactionMarkerCalendar(
-              selectedDay: _selectedDay,
-              initialFocusedDay: _focusedDay,
-              showShadow: false,
-              onDaySelected: (selectedDay) {
-                final normalizedDay = _normalizeCalendarDay(selectedDay);
-                if (DateUtils.isSameDay(normalizedDay, _selectedDay)) {
-                  return;
-                }
-                setState(() {
-                  _previousSelectedDay = _selectedDay;
-                  _selectedDay = normalizedDay;
-                  _focusedDay = DateTime(
-                    normalizedDay.year,
-                    normalizedDay.month,
-                  );
-                });
-              },
-              onFocusedDayChanged: (focusedDay) {
-                final normalizedMonth = DateTime(
-                  focusedDay.year,
-                  focusedDay.month,
-                );
-                if (normalizedMonth == _focusedDay) {
-                  return;
-                }
-                setState(() => _focusedDay = normalizedMonth);
-              },
-              onHeaderTapped: (_) => _pickMonth(),
-            ),
-            SizedBox(height: context.scaled(18)),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 260),
-              reverseDuration: const Duration(milliseconds: 220),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              layoutBuilder: (currentChild, previousChildren) {
-                return Stack(
-                  alignment: Alignment.topCenter,
-                  children: [...previousChildren, ?currentChild],
-                );
-              },
-              transitionBuilder: (child, animation) {
-                final isIncoming =
-                    child.key == ValueKey<DateTime>(_selectedDay);
-                final slideDirection =
-                    _selectedDay.isAfter(_previousSelectedDay) ? 1.0 : -1.0;
-                final beginOffset = Offset(
-                  isIncoming ? 0.08 * slideDirection : -0.04 * slideDirection,
-                  0,
-                );
-
-                return FadeTransition(
-                  opacity: animation,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: beginOffset,
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
+    return AppRefreshIndicator(
+      child:
+          ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(
+                  context.scaled(24),
+                  context.scaled(22),
+                  context.scaled(24),
+                  context.scaled(120) + MediaQuery.paddingOf(context).bottom,
+                ),
+                children: [
+                  const AppPageHeader(
+                    subtitle: 'Lịch',
+                    title: 'Thống kê giao dịch',
                   ),
-                );
-              },
-              child: _CalendarDayContent(
-                key: ValueKey(_selectedDay),
-                day: _selectedDay,
-                transactions: dailyTransactions,
-                income: income,
-                expense: expense,
-                headline: _calendarHeadline(_selectedDay),
+                  SizedBox(height: context.scaled(22)),
+                  TransactionMarkerCalendar(
+                    selectedDay: _selectedDay,
+                    initialFocusedDay: _focusedDay,
+                    showShadow: false,
+                    onDaySelected: (selectedDay) {
+                      final normalizedDay = _normalizeCalendarDay(selectedDay);
+                      if (DateUtils.isSameDay(normalizedDay, _selectedDay)) {
+                        return;
+                      }
+                      setState(() {
+                        _previousSelectedDay = _selectedDay;
+                        _selectedDay = normalizedDay;
+                        _focusedDay = DateTime(
+                          normalizedDay.year,
+                          normalizedDay.month,
+                        );
+                      });
+                    },
+                    onFocusedDayChanged: (focusedDay) {
+                      final normalizedMonth = DateTime(
+                        focusedDay.year,
+                        focusedDay.month,
+                      );
+                      if (normalizedMonth == _focusedDay) {
+                        return;
+                      }
+                      setState(() => _focusedDay = normalizedMonth);
+                    },
+                    onHeaderTapped: (_) => _pickMonth(),
+                  ),
+                  SizedBox(height: context.scaled(18)),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 260),
+                    reverseDuration: const Duration(milliseconds: 220),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    layoutBuilder: (currentChild, previousChildren) {
+                      return Stack(
+                        alignment: Alignment.topCenter,
+                        children: [...previousChildren, ?currentChild],
+                      );
+                    },
+                    transitionBuilder: (child, animation) {
+                      final isIncoming =
+                          child.key == ValueKey<DateTime>(_selectedDay);
+                      final slideDirection =
+                          _selectedDay.isAfter(_previousSelectedDay)
+                          ? 1.0
+                          : -1.0;
+                      final beginOffset = Offset(
+                        isIncoming
+                            ? 0.08 * slideDirection
+                            : -0.04 * slideDirection,
+                        0,
+                      );
+
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: beginOffset,
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: _CalendarDayContent(
+                      key: ValueKey(_selectedDay),
+                      day: _selectedDay,
+                      transactions: dailyTransactions,
+                      income: income,
+                      expense: expense,
+                      headline: _calendarHeadline(_selectedDay),
+                    ),
+                  ),
+                ],
+              )
+              .animate()
+              .fadeIn(duration: 260.ms)
+              .slideY(
+                begin: 0.04,
+                end: 0,
+                duration: 340.ms,
+                curve: Curves.easeOutCubic,
               ),
-            ),
-          ],
-        )
-        .animate()
-        .fadeIn(duration: 260.ms)
-        .slideY(
-          begin: 0.04,
-          end: 0,
-          duration: 340.ms,
-          curve: Curves.easeOutCubic,
-        );
+    );
   }
 
   String _calendarHeadline(DateTime day) {

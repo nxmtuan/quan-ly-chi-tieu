@@ -203,11 +203,7 @@ class _SyncSettingsSheetState extends ConsumerState<_SyncSettingsSheet> {
       await ref
           .read(autoSyncStatusProvider.notifier)
           .markSuccess(DateTime.now());
-      ref.read(transactionsProvider.notifier).reload();
-      ref.read(categoriesProvider.notifier).reload();
-      ref.read(moneySourcesProvider.notifier).reload();
-      ref.read(savingsGoalsProvider.notifier).reload();
-      ref.read(recurringItemsProvider.notifier).reload();
+      reloadAppData(ref);
 
       if (mounted) {
         AppToast.show(

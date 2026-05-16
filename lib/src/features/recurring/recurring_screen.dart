@@ -11,6 +11,7 @@ import '../../core/utils/local_id.dart';
 import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_page_header.dart';
+import '../../core/widgets/app_refresh_indicator.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_toast.dart';
 import '../../core/widgets/flat_card.dart';
@@ -49,85 +50,94 @@ class _RecurringScreenState extends ConsumerState<RecurringScreen> {
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Stack(
         children: [
-          ListView(
-                padding: EdgeInsets.fromLTRB(
-                  context.scaled(24),
-                  context.scaled(22),
-                  context.scaled(24),
-                  context.scaled(176) + MediaQuery.paddingOf(context).bottom,
-                ),
-                children: [
-                  const AppPageHeader(
-                    subtitle: 'Định kỳ',
-                    title: 'Tự động & nhắc nhở',
-                  ),
-                  SizedBox(height: context.scaled(22)),
-                  _RecurringTabBar(
-                    selectedTab: _selectedTab,
-                    onSelected: (tab) {
-                      if (tab == _selectedTab) {
-                        return;
-                      }
-                      setState(() {
-                        _previousTab = _selectedTab;
-                        _selectedTab = tab;
-                      });
-                    },
-                  ),
-                  SizedBox(height: context.scaled(18)),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 260),
-                    reverseDuration: const Duration(milliseconds: 220),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    layoutBuilder: (currentChild, previousChildren) {
-                      return Stack(
-                        alignment: Alignment.topCenter,
-                        children: [...previousChildren, ?currentChild],
-                      );
-                    },
-                    transitionBuilder: (child, animation) {
-                      final isIncoming =
-                          child.key ==
-                          ValueKey<RecurringItemKind>(_selectedTab);
-                      final slideDirection =
-                          _selectedTab.index >= _previousTab.index ? 1.0 : -1.0;
-                      final beginOffset = Offset(
-                        isIncoming
-                            ? 0.08 * slideDirection
-                            : -0.04 * slideDirection,
-                        0,
-                      );
-
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: beginOffset,
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: child,
+          AppRefreshIndicator(
+            child:
+                ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.fromLTRB(
+                        context.scaled(24),
+                        context.scaled(22),
+                        context.scaled(24),
+                        context.scaled(176) +
+                            MediaQuery.paddingOf(context).bottom,
+                      ),
+                      children: [
+                        const AppPageHeader(
+                          subtitle: 'Định kỳ',
+                          title: 'Tự động & nhắc nhở',
                         ),
-                      );
-                    },
-                    child: _RecurringTabContent(
-                      key: ValueKey(_selectedTab),
-                      items: items,
-                      kind: _selectedTab,
-                      onAdd: () =>
-                          showRecurringAddSheet(context, kind: _selectedTab),
+                        SizedBox(height: context.scaled(22)),
+                        _RecurringTabBar(
+                          selectedTab: _selectedTab,
+                          onSelected: (tab) {
+                            if (tab == _selectedTab) {
+                              return;
+                            }
+                            setState(() {
+                              _previousTab = _selectedTab;
+                              _selectedTab = tab;
+                            });
+                          },
+                        ),
+                        SizedBox(height: context.scaled(18)),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 260),
+                          reverseDuration: const Duration(milliseconds: 220),
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
+                          layoutBuilder: (currentChild, previousChildren) {
+                            return Stack(
+                              alignment: Alignment.topCenter,
+                              children: [...previousChildren, ?currentChild],
+                            );
+                          },
+                          transitionBuilder: (child, animation) {
+                            final isIncoming =
+                                child.key ==
+                                ValueKey<RecurringItemKind>(_selectedTab);
+                            final slideDirection =
+                                _selectedTab.index >= _previousTab.index
+                                ? 1.0
+                                : -1.0;
+                            final beginOffset = Offset(
+                              isIncoming
+                                  ? 0.08 * slideDirection
+                                  : -0.04 * slideDirection,
+                              0,
+                            );
+
+                            return FadeTransition(
+                              opacity: animation,
+                              child: SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: beginOffset,
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: _RecurringTabContent(
+                            key: ValueKey(_selectedTab),
+                            items: items,
+                            kind: _selectedTab,
+                            onAdd: () => showRecurringAddSheet(
+                              context,
+                              kind: _selectedTab,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                    .animate()
+                    .fadeIn(duration: 260.ms)
+                    .slideY(
+                      begin: 0.04,
+                      end: 0,
+                      duration: 340.ms,
+                      curve: Curves.easeOutCubic,
                     ),
-                  ),
-                ],
-              )
-              .animate()
-              .fadeIn(duration: 260.ms)
-              .slideY(
-                begin: 0.04,
-                end: 0,
-                duration: 340.ms,
-                curve: Curves.easeOutCubic,
-              ),
+          ),
         ],
       ),
     );
