@@ -319,6 +319,8 @@ SyncSnapshot buildSyncSnapshot({
     ];
   }
 
+  compactedBudgets = _dedupeActiveBudgetsByPeriod(compactedBudgets);
+
   return SyncSnapshot(
     categories: compactedCategories,
     moneySources: compactedMoneySources,
@@ -332,6 +334,39 @@ SyncSnapshot buildSyncSnapshot({
 
 bool _shouldPurgeDeleted(bool isDeleted, DateTime updatedAt, DateTime cutoff) {
   return isDeleted && !updatedAt.isAfter(cutoff);
+}
+
+List<Budget> _dedupeActiveBudgetsByPeriod(List<Budget> budgets) {
+  final deletedBudgets = <Budget>[];
+  final activeBudgetsByPeriod = <String, Budget>{};
+
+  for (final budget in budgets) {
+    if (budget.isDeleted) {
+      deletedBudgets.add(budget);
+      continue;
+    }
+
+    final key = _budgetPeriodKey(budget);
+    final existing = activeBudgetsByPeriod[key];
+    if (existing == null || _isNewerBudgetVersion(budget, existing)) {
+      activeBudgetsByPeriod[key] = budget;
+    }
+  }
+
+  return [...deletedBudgets, ...activeBudgetsByPeriod.values];
+}
+
+String _budgetPeriodKey(Budget budget) {
+  return '${budget.categoryId}:${budget.periodStart.year}-${budget.periodStart.month}';
+}
+
+bool _isNewerBudgetVersion(Budget candidate, Budget existing) {
+  if (candidate.updatedAt.isAfter(existing.updatedAt)) {
+    return true;
+  }
+
+  return candidate.updatedAt == existing.updatedAt &&
+      candidate.id.compareTo(existing.id) > 0;
 }
 
 class SyncSnapshot {

@@ -194,6 +194,14 @@ void main() {
             updatedAt: expiredDeletedAt,
             isDeleted: true,
           ),
+          Budget(
+            id: 'duplicate-budget-old',
+            categoryId: 'food',
+            limitAmount: 1000000,
+            periodStart: DateTime(2026, 6),
+            warningPercent: 70,
+            updatedAt: now.subtract(const Duration(days: 3)),
+          ),
         ],
         remoteBudgets: [
           Budget(
@@ -219,6 +227,14 @@ void main() {
             periodStart: DateTime(2026, 5),
             updatedAt: expiredDeletedAt,
             isDeleted: true,
+          ),
+          Budget(
+            id: 'duplicate-budget-new',
+            categoryId: 'food',
+            limitAmount: 2500000,
+            periodStart: DateTime(2026, 6),
+            warningPercent: 88,
+            updatedAt: now.subtract(const Duration(hours: 2)),
           ),
         ],
         localRecurringItems: [
@@ -376,6 +392,7 @@ void main() {
           'keep-budget-local',
           'keep-budget-remote',
           'merge-budget',
+          'duplicate-budget-new',
         ]),
       );
       expect(
@@ -385,6 +402,10 @@ void main() {
       expect(
         snapshot.budgets.map((budget) => budget.id),
         isNot(contains('purge-budget-remote')),
+      );
+      expect(
+        snapshot.budgets.map((budget) => budget.id),
+        isNot(contains('duplicate-budget-old')),
       );
 
       expect(
@@ -444,6 +465,12 @@ void main() {
       );
       expect(mergedBudget.limitAmount, 1500000);
       expect(mergedBudget.warningPercent, 90);
+
+      final dedupedBudget = snapshot.budgets.firstWhere(
+        (budget) => budget.id == 'duplicate-budget-new',
+      );
+      expect(dedupedBudget.limitAmount, 2500000);
+      expect(dedupedBudget.warningPercent, 88);
 
       expect(snapshot.purgedSoftDeleted, isTrue);
     });
