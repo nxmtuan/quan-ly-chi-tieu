@@ -1,6 +1,3 @@
-import 'dart:math' as math;
-
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,6 +10,7 @@ import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_toast.dart';
+import '../../core/widgets/monthly_bar_chart.dart';
 import '../../models/budget.dart';
 import '../../models/category.dart';
 import '../../models/transaction.dart';
@@ -91,7 +89,7 @@ class _BudgetDetailSheetState extends ConsumerState<_BudgetDetailSheet> {
     );
     final chartData = [
       for (final period in chartPeriods)
-        _ChartBarData(
+        MonthlyBarChartPoint(
           label: period.label,
           month: period.start,
           amount: _sumTransactionsInRange(chartTransactions, period),
@@ -99,6 +97,7 @@ class _BudgetDetailSheetState extends ConsumerState<_BudgetDetailSheet> {
         ),
     ];
     final status = _BudgetDetailStatus.fromBudget(budget, spentAmount);
+    final isCurrentBudget = _isSameMonth(budget.periodStart, DateTime.now());
 
     return AppSheetScaffold(
       title: 'Chi tiết ngân sách',
@@ -159,7 +158,12 @@ class _BudgetDetailSheetState extends ConsumerState<_BudgetDetailSheet> {
             child: AppBounceBuilder(
               onTap: () {
                 Navigator.of(context).pop();
-                showBudgetSheet(context, budget: budget, replaceSheet: true);
+                showBudgetSheet(
+                  context,
+                  budget: isCurrentBudget ? budget : null,
+                  templateBudget: isCurrentBudget ? null : budget,
+                  replaceSheet: true,
+                );
               },
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
@@ -175,7 +179,10 @@ class _BudgetDetailSheetState extends ConsumerState<_BudgetDetailSheet> {
                   ],
                 ),
                 alignment: Alignment.center,
-                child: Text('Chỉnh sửa', style: context.appText.buttonLabel),
+                child: Text(
+                  isCurrentBudget ? 'Chỉnh sửa' : 'Tạo lại',
+                  style: context.appText.buttonLabel,
+                ),
               ),
             ),
           ),
@@ -218,7 +225,7 @@ class _SpendingChartSection extends StatelessWidget {
   });
 
   final Category? category;
-  final List<_ChartBarData> data;
+  final List<MonthlyBarChartPoint> data;
   final double budgetLimit;
   final ValueChanged<DateTime> onMonthSelected;
 
@@ -228,10 +235,11 @@ class _SpendingChartSection extends StatelessWidget {
 
     return SizedBox(
       height: context.scaled(190),
-      child: _BudgetBarChart(
-        data: data,
+      child: MonthlyBarChart(
+        points: data,
         color: categoryColor,
-        budgetLimit: budgetLimit,
+        limitAmount: budgetLimit,
+        maxYMultiplier: 1.16,
         onSelected: onMonthSelected,
       ),
     );
@@ -265,153 +273,6 @@ class _BudgetOverviewSection extends StatelessWidget {
           info,
         ],
       ),
-    );
-  }
-}
-
-class _BudgetBarChart extends StatelessWidget {
-  const _BudgetBarChart({
-    required this.data,
-    required this.color,
-    required this.budgetLimit,
-    required this.onSelected,
-  });
-
-  final List<_ChartBarData> data;
-  final Color color;
-  final double budgetLimit;
-  final ValueChanged<DateTime> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.appPalette;
-    final maxAmount = data.fold<double>(
-      0,
-      (current, item) => math.max(current, item.amount),
-    );
-    final chartMaxAmount = math.max(maxAmount, budgetLimit);
-    final maxY = chartMaxAmount <= 0 ? 1.0 : chartMaxAmount * 1.16;
-
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 680),
-      curve: Curves.easeOutCubic,
-      builder: (context, animationValue, child) {
-        return BarChart(
-          BarChartData(
-            alignment: BarChartAlignment.spaceAround,
-            maxY: maxY,
-            minY: 0,
-            gridData: const FlGridData(show: false),
-            extraLinesData: ExtraLinesData(
-              horizontalLines: [
-                HorizontalLine(
-                  y: budgetLimit,
-                  color: AppColors.primary.withValues(alpha: 0.55),
-                  strokeWidth: context.scaled(1.2),
-                  dashArray: const [7, 6],
-                  label: HorizontalLineLabel(
-                    show: true,
-                    alignment: Alignment.topLeft,
-                    padding: EdgeInsets.only(bottom: context.scaled(4)),
-                    labelResolver: (_) =>
-                        formatCurrency(budgetLimit).replaceAll(' ₫', ''),
-                    style: context.appText.captionStrong.copyWith(
-                      color: AppColors.primary,
-                      fontSize: context.scaledFont(10, min: 9),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            borderData: FlBorderData(show: false),
-            barTouchData: BarTouchData(
-              touchCallback: (event, response) {
-                if (!event.isInterestedForInteractions || response == null) {
-                  return;
-                }
-
-                final groupIndex = response.spot?.touchedBarGroupIndex;
-                if (groupIndex == null ||
-                    groupIndex < 0 ||
-                    groupIndex >= data.length) {
-                  return;
-                }
-
-                onSelected(data[groupIndex].month);
-              },
-              touchTooltipData: BarTouchTooltipData(
-                getTooltipColor: (_) => palette.textPrimary,
-                getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                  return BarTooltipItem(
-                    formatCurrency(data[group.x].amount),
-                    context.appText.captionStrong.copyWith(color: Colors.white),
-                  );
-                },
-              ),
-            ),
-            titlesData: FlTitlesData(
-              leftTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              topTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              rightTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: context.scaled(36),
-                  getTitlesWidget: (value, meta) {
-                    final index = value.toInt();
-                    if (index < 0 || index >= data.length) {
-                      return const SizedBox.shrink();
-                    }
-
-                    return SideTitleWidget(
-                      meta: meta,
-                      space: context.scaled(8),
-                      child: Text(
-                        data[index].label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.appText.caption.copyWith(
-                          color: palette.textSecondary,
-                          fontSize: context.scaledFont(10, min: 9),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            barGroups: [
-              for (var index = 0; index < data.length; index++)
-                BarChartGroupData(
-                  x: index,
-                  barRods: [
-                    BarChartRodData(
-                      toY: data[index].amount * animationValue,
-                      width: context.scaled(54),
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(context.scaled(6)),
-                      ),
-                      color: data[index].selected
-                          ? color
-                          : data[index].amount > 0
-                          ? color.withValues(alpha: 0.42)
-                          : palette.surfaceMuted,
-                    ),
-                  ],
-                ),
-            ],
-          ),
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-        );
-      },
     );
   }
 }
@@ -782,20 +643,6 @@ class _ChartPeriod {
   final String label;
   final DateTime start;
   final DateTime end;
-}
-
-class _ChartBarData {
-  const _ChartBarData({
-    required this.label,
-    required this.month,
-    required this.amount,
-    required this.selected,
-  });
-
-  final String label;
-  final DateTime month;
-  final double amount;
-  final bool selected;
 }
 
 List<_ChartPeriod> _lastSixMonths(DateTime anchorMonth) {

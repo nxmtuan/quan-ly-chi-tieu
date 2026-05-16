@@ -84,8 +84,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                   SizedBox(height: context.scaled(18)),
                   _BudgetListHeader(
                     count: budgets.length,
-                    onAdd: () =>
-                        showBudgetSheet(context, initialMonth: _selectedMonth),
+                    onAdd: () => showBudgetSheet(context),
                   ),
                   SizedBox(height: context.scaled(12)),
                   if (budgets.isEmpty)
@@ -93,10 +92,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                       hasExpenseCategories: categories.isNotEmpty,
                       onAdd: categories.isEmpty
                           ? null
-                          : () => showBudgetSheet(
-                              context,
-                              initialMonth: _selectedMonth,
-                            ),
+                          : () => showBudgetSheet(context),
                     )
                   else
                     for (final budget in budgets)

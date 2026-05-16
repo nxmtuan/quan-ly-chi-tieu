@@ -15,28 +15,27 @@ import '../../models/category.dart';
 import '../../models/transaction.dart';
 import '../../providers/budget_provider.dart';
 import '../../providers/category_provider.dart';
-import '../home/models/home_summary_scope.dart';
-import '../home/widgets/summary_card.dart';
 import '../transactions/add_transaction_sheet.dart';
 
 Future<Budget?> showBudgetSheet(
   BuildContext context, {
   Budget? budget,
-  DateTime? initialMonth,
+  Budget? templateBudget,
   bool replaceSheet = false,
 }) {
   return showAppBottomSheet<Budget>(
     context: context,
     replacesCurrentSheet: replaceSheet,
-    builder: (_) => _BudgetSheet(budget: budget, initialMonth: initialMonth),
+    builder: (_) =>
+        _BudgetSheet(budget: budget, templateBudget: templateBudget),
   );
 }
 
 class _BudgetSheet extends ConsumerStatefulWidget {
-  const _BudgetSheet({this.budget, this.initialMonth});
+  const _BudgetSheet({this.budget, this.templateBudget});
 
   final Budget? budget;
-  final DateTime? initialMonth;
+  final Budget? templateBudget;
 
   @override
   ConsumerState<_BudgetSheet> createState() => _BudgetSheetState();
@@ -56,14 +55,21 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
   void initState() {
     super.initState();
     final budget = widget.budget;
-    final initialMonth = widget.initialMonth ?? DateTime.now();
-    _selectedCategoryId = budget?.categoryId;
-    _promotedCategoryId = budget?.categoryId;
-    _periodStart =
-        budget?.periodStart ?? DateTime(initialMonth.year, initialMonth.month);
-    _warningPercent = budget?.warningPercent ?? defaultBudgetWarningPercent;
+    final templateBudget = widget.templateBudget;
+    final initialMonth = _isEditing
+        ? budget!.periodStart
+        : _currentMonth(DateTime.now());
+    _selectedCategoryId = budget?.categoryId ?? templateBudget?.categoryId;
+    _promotedCategoryId = _selectedCategoryId;
+    _periodStart = _currentMonth(initialMonth);
+    _warningPercent =
+        budget?.warningPercent ??
+        templateBudget?.warningPercent ??
+        defaultBudgetWarningPercent;
     _amountController = TextEditingController(
-      text: budget == null ? '' : _formatAmountInput(budget.limitAmount),
+      text: budget == null && templateBudget == null
+          ? ''
+          : _formatAmountInput((budget ?? templateBudget)!.limitAmount),
     );
     _amountFocusNode = FocusNode()..addListener(_handleFocusChanged);
   }
@@ -88,19 +94,42 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
     final expenseCategories = ref.watch(
       categoriesByTypeProvider(TransactionType.expense),
     );
-    _selectedCategoryId ??= expenseCategories.firstOrNull?.id;
+    final usedCategoryIds = {
+      for (final budget in ref.watch(budgetsForMonthProvider(_periodStart)))
+        if (budget.id != widget.budget?.id) budget.categoryId,
+    };
+    final selectableCategories = [
+      for (final category in expenseCategories)
+        if (!usedCategoryIds.contains(category.id)) category,
+    ];
+
+    if (_selectedCategoryId == null ||
+        usedCategoryIds.contains(_selectedCategoryId)) {
+      _selectedCategoryId = selectableCategories.firstOrNull?.id;
+      _promotedCategoryId = _selectedCategoryId;
+    }
+    final canSave = _isEditing
+        ? expenseCategories.isNotEmpty
+        : selectableCategories.isNotEmpty;
 
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: AppSheetScaffold(
-        title: _isEditing ? 'Chỉnh sửa ngân sách' : 'Tạo ngân sách',
+        title:
+            '${_isEditing ? 'Sửa ngân sách' : 'Tạo ngân sách'} ${_lowerMonthLabel(_periodStart)}',
         body: SingleChildScrollView(
           padding: EdgeInsets.only(bottom: context.scaled(16)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              _BudgetAmountField(
+                controller: _amountController,
+                focusNode: _amountFocusNode,
+                isFocused: _amountFocusNode.hasFocus,
+              ),
+              SizedBox(height: context.scaled(14)),
               _SectionLabel(label: 'Danh mục chi tiêu'),
               SizedBox(height: context.scaled(10)),
               if (expenseCategories.isEmpty)
@@ -110,37 +139,21 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
                   categories: expenseCategories,
                   selectedCategoryId: _selectedCategoryId,
                   promotedCategoryId: _promotedCategoryId,
+                  disabledCategoryIds: usedCategoryIds,
                   onSelected: (category) {
+                    if (usedCategoryIds.contains(category.id)) {
+                      return;
+                    }
                     setState(() {
                       _selectedCategoryId = category.id;
                       _promotedCategoryId = category.id;
                     });
                   },
-                  onShowAll: () => _showAllCategories(expenseCategories),
+                  onShowAll: () => _showAllCategories(
+                    expenseCategories,
+                    disabledCategoryIds: usedCategoryIds,
+                  ),
                 ),
-              SizedBox(height: context.scaled(14)),
-              _BudgetAmountField(
-                controller: _amountController,
-                focusNode: _amountFocusNode,
-                isFocused: _amountFocusNode.hasFocus,
-              ),
-              SizedBox(height: context.scaled(14)),
-              _MonthPickerCard(
-                month: _periodStart,
-                onPick: _pickMonth,
-                onPrevious: () => setState(() {
-                  _periodStart = DateTime(
-                    _periodStart.year,
-                    _periodStart.month - 1,
-                  );
-                }),
-                onNext: () => setState(() {
-                  _periodStart = DateTime(
-                    _periodStart.year,
-                    _periodStart.month + 1,
-                  );
-                }),
-              ),
               SizedBox(height: context.scaled(14)),
               _WarningSliderCard(
                 warningPercent: _warningPercent,
@@ -178,7 +191,7 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
               child: AppPrimaryButton(
                 label: _isEditing ? 'Lưu thay đổi' : 'Tạo ngân sách',
                 color: AppColors.primary,
-                onTap: expenseCategories.isEmpty ? null : _save,
+                onTap: canSave ? _save : null,
               ),
             ),
           ],
@@ -187,13 +200,17 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
     );
   }
 
-  Future<void> _showAllCategories(List<Category> categories) async {
+  Future<void> _showAllCategories(
+    List<Category> categories, {
+    required Set<String> disabledCategoryIds,
+  }) async {
     final selectedCategory = await showAllCategoriesSheet(
       context,
       categories: categories,
       initialSelectedCategoryId: _selectedCategoryId,
       transactionType: TransactionType.expense,
-      actionColor: AppColors.danger,
+      actionColor: AppColors.primary,
+      disabledCategoryIds: disabledCategoryIds,
     );
 
     if (selectedCategory != null && mounted) {
@@ -202,21 +219,6 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
         _promotedCategoryId = selectedCategory.id;
       });
     }
-  }
-
-  Future<void> _pickMonth() async {
-    final selectedScope = await showMonthPickerSheet(
-      context,
-      initialScope: HomeSummaryScope.month(_periodStart),
-      lastMonth: DateTime.now(),
-    );
-
-    final anchor = selectedScope?.anchor;
-    if (anchor == null || !mounted) {
-      return;
-    }
-
-    setState(() => _periodStart = DateTime(anchor.year, anchor.month));
   }
 
   Future<void> _save() async {
@@ -312,6 +314,7 @@ class _BudgetCategoryPicker extends StatelessWidget {
     required this.categories,
     required this.selectedCategoryId,
     required this.promotedCategoryId,
+    required this.disabledCategoryIds,
     required this.onSelected,
     required this.onShowAll,
   });
@@ -319,6 +322,7 @@ class _BudgetCategoryPicker extends StatelessWidget {
   final List<Category> categories;
   final String? selectedCategoryId;
   final String? promotedCategoryId;
+  final Set<String> disabledCategoryIds;
   final ValueChanged<Category> onSelected;
   final VoidCallback onShowAll;
 
@@ -341,7 +345,8 @@ class _BudgetCategoryPicker extends StatelessWidget {
                 child: _CategoryOption(
                   category: category,
                   selected: category.id == selectedCategoryId,
-                  actionColor: AppColors.danger,
+                  disabled: disabledCategoryIds.contains(category.id),
+                  actionColor: AppColors.primary,
                   onTap: () => onSelected(category),
                 ),
               ),
@@ -380,19 +385,21 @@ class _CategoryOption extends StatelessWidget {
   const _CategoryOption({
     required this.category,
     required this.selected,
+    required this.disabled,
     required this.actionColor,
     required this.onTap,
   });
 
   final Category category;
   final bool selected;
+  final bool disabled;
   final Color actionColor;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return AppBounceBuilder(
-      onTap: onTap,
+      onTap: disabled ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         height: context.scaled(104),
@@ -401,12 +408,18 @@ class _CategoryOption extends StatelessWidget {
           vertical: context.scaled(10),
         ),
         decoration: BoxDecoration(
-          color: selected
+          color: disabled
+              ? context.appPalette.surfaceMuted
+              : selected
               ? actionColor.withValues(alpha: 0.045)
               : context.appPalette.surface,
           borderRadius: BorderRadius.circular(context.scaled(10)),
           border: Border.all(
-            color: selected ? actionColor : context.appPalette.border,
+            color: disabled
+                ? context.appPalette.border.withValues(alpha: 0.7)
+                : selected
+                ? actionColor
+                : context.appPalette.border,
             width: selected ? 1.2 : 1,
           ),
         ),
@@ -422,7 +435,9 @@ class _CategoryOption extends StatelessWidget {
               ),
               child: Icon(
                 category.iconData,
-                color: category.color,
+                color: disabled
+                    ? context.appPalette.textSecondary.withValues(alpha: 0.45)
+                    : category.color,
                 size: context.scaled(19),
               ),
             ),
@@ -433,7 +448,11 @@ class _CategoryOption extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: context.appText.captionStrong.copyWith(
-                color: selected ? actionColor : context.appPalette.textPrimary,
+                color: disabled
+                    ? context.appPalette.textSecondary.withValues(alpha: 0.5)
+                    : selected
+                    ? actionColor
+                    : context.appPalette.textPrimary,
                 fontSize: context.scaledFont(12, min: 12),
               ),
             ),
@@ -587,51 +606,6 @@ class _BudgetAmountField extends StatelessWidget {
   }
 }
 
-class _MonthPickerCard extends StatelessWidget {
-  const _MonthPickerCard({
-    required this.month,
-    required this.onPick,
-    required this.onPrevious,
-    required this.onNext,
-  });
-
-  final DateTime month;
-  final VoidCallback onPick;
-  final VoidCallback onPrevious;
-  final VoidCallback onNext;
-
-  @override
-  Widget build(BuildContext context) {
-    return _FormCard(
-      child: Row(
-        children: [
-          const _LeadingIcon(icon: Icons.calendar_month_rounded),
-          SizedBox(width: context.scaled(10)),
-          Expanded(
-            child: AppBounceBuilder(
-              onTap: onPick,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _FieldLabel(label: 'Tháng áp dụng'),
-                  SizedBox(height: context.scaled(5)),
-                  Text(
-                    formatMonthYear(month),
-                    style: context.appText.fieldValue,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          _SmallIconButton(icon: Icons.chevron_left_rounded, onTap: onPrevious),
-          SizedBox(width: context.scaled(8)),
-          _SmallIconButton(icon: Icons.chevron_right_rounded, onTap: onNext),
-        ],
-      ),
-    );
-  }
-}
-
 class _WarningSliderCard extends StatelessWidget {
   const _WarningSliderCard({
     required this.warningPercent,
@@ -678,34 +652,6 @@ class _WarningSliderCard extends StatelessWidget {
             onChanged: onChanged,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SmallIconButton extends StatelessWidget {
-  const _SmallIconButton({required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBounceBuilder(
-      onTap: onTap,
-      child: Container(
-        width: context.scaled(34),
-        height: context.scaled(34),
-        decoration: BoxDecoration(
-          color: context.appPalette.surfaceMuted,
-          borderRadius: BorderRadius.circular(context.scaled(12)),
-          border: Border.all(color: context.appPalette.border),
-        ),
-        child: Icon(
-          icon,
-          color: context.appPalette.textPrimary,
-          size: context.scaled(20),
-        ),
       ),
     );
   }
@@ -840,4 +786,13 @@ class _AmountInputFormatter extends TextInputFormatter {
       selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
+}
+
+DateTime _currentMonth([DateTime? date]) {
+  final value = date ?? DateTime.now();
+  return DateTime(value.year, value.month);
+}
+
+String _lowerMonthLabel(DateTime month) {
+  return formatMonthYear(month).replaceFirst('Tháng', 'tháng');
 }

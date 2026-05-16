@@ -6,6 +6,7 @@ Future<Category?> showAllCategoriesSheet(
   required String? initialSelectedCategoryId,
   required TransactionType transactionType,
   required Color actionColor,
+  Set<String> disabledCategoryIds = const {},
 }) {
   return showAppBottomSheet<Category>(
     context: context,
@@ -14,6 +15,7 @@ Future<Category?> showAllCategoriesSheet(
       initialSelectedCategoryId: initialSelectedCategoryId,
       transactionType: transactionType,
       actionColor: actionColor,
+      disabledCategoryIds: disabledCategoryIds,
     ),
   );
 }
@@ -24,12 +26,14 @@ class _AllCategoriesSheet extends StatefulWidget {
     required this.initialSelectedCategoryId,
     required this.transactionType,
     required this.actionColor,
+    required this.disabledCategoryIds,
   });
 
   final List<Category> categories;
   final String? initialSelectedCategoryId;
   final TransactionType transactionType;
   final Color actionColor;
+  final Set<String> disabledCategoryIds;
 
   @override
   State<_AllCategoriesSheet> createState() => _AllCategoriesSheetState();
@@ -41,7 +45,10 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
   @override
   void initState() {
     super.initState();
-    _selectedCategoryId = widget.initialSelectedCategoryId;
+    _selectedCategoryId =
+        widget.disabledCategoryIds.contains(widget.initialSelectedCategoryId)
+        ? null
+        : widget.initialSelectedCategoryId;
   }
 
   @override
@@ -53,8 +60,7 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
         padding: EdgeInsets.only(bottom: context.scaled(12)),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final itemWidth =
-                (constraints.maxWidth - context.scaled(24)) / 4;
+            final itemWidth = (constraints.maxWidth - context.scaled(24)) / 4;
 
             return Align(
               alignment: Alignment.topLeft,
@@ -70,6 +76,9 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
                         child: _CategoryTile(
                           category: category,
                           selected: category.id == _selectedCategoryId,
+                          enabled: !widget.disabledCategoryIds.contains(
+                            category.id,
+                          ),
                           actionColor: widget.actionColor,
                           onTap: () {
                             setState(() {
@@ -120,7 +129,9 @@ class _AllCategoriesSheetState extends State<_AllCategoriesSheet> {
             child: AppPrimaryButton(
               label: 'Chọn',
               color: widget.actionColor,
-              onTap: _selectedCategoryId == null
+              onTap:
+                  _selectedCategoryId == null ||
+                      widget.disabledCategoryIds.contains(_selectedCategoryId)
                   ? null
                   : () {
                       final category = widget.categories

@@ -9,6 +9,7 @@ import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/flat_card.dart';
 import '../../../core/widgets/app_bounce_builder.dart';
+import '../../../core/widgets/monthly_bar_chart.dart';
 import '../../../models/category.dart';
 import '../../../models/transaction.dart';
 import '../../../providers/category_provider.dart';

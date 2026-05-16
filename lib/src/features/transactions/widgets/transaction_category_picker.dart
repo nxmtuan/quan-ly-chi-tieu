@@ -101,17 +101,19 @@ class _CategoryTile extends StatelessWidget {
     required this.selected,
     required this.actionColor,
     required this.onTap,
+    this.enabled = true,
   });
 
   final Category category;
   final bool selected;
   final Color actionColor;
   final VoidCallback onTap;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     return AppBounceBuilder(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       child: SizedBox(
         height: context.scaled(110),
         child: AnimatedContainer(
@@ -123,12 +125,18 @@ class _CategoryTile extends StatelessWidget {
             context.scaled(8),
           ),
           decoration: BoxDecoration(
-            color: selected
+            color: !enabled
+                ? context.appPalette.surfaceMuted
+                : selected
                 ? actionColor.withValues(alpha: 0.045)
                 : context.appPalette.surface,
             borderRadius: BorderRadius.circular(context.scaled(14)),
             border: Border.all(
-              color: selected ? actionColor : context.appPalette.border,
+              color: !enabled
+                  ? context.appPalette.border.withValues(alpha: 0.7)
+                  : selected
+                  ? actionColor
+                  : context.appPalette.border,
               width: selected ? 1.2 : 1,
             ),
           ),
@@ -144,7 +152,11 @@ class _CategoryTile extends StatelessWidget {
                 ),
                 child: Icon(
                   category.iconData,
-                  color: category.color,
+                  color: enabled
+                      ? category.color
+                      : context.appPalette.textSecondary.withValues(
+                          alpha: 0.45,
+                        ),
                   size: context.scaled(19),
                 ),
               ),
@@ -155,7 +167,11 @@ class _CategoryTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: context.appText.captionStrong.copyWith(
-                  color: selected ? actionColor : context.appPalette.textPrimary,
+                  color: !enabled
+                      ? context.appPalette.textSecondary.withValues(alpha: 0.5)
+                      : selected
+                      ? actionColor
+                      : context.appPalette.textPrimary,
                   fontSize: context.scaledFont(12, min: 12),
                 ),
               ),
