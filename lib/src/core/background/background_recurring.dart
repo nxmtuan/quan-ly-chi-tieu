@@ -128,7 +128,11 @@ Future<RecurringItem> _processRecurringTransaction(
   BudgetStorage? budgetStorage,
   CategoryStorage? categoryStorage,
 }) async {
-  var nextRunAt = item.nextRunAt;
+  var nextRunAt = resolveFirstProcessableRecurringTransactionDate(
+    nextRunAt: item.nextRunAt,
+    frequency: item.frequency,
+    now: now,
+  );
   var createdCount = 0;
 
   while (!nextRunAt.isAfter(now) &&
@@ -165,6 +169,21 @@ Future<RecurringItem> _processRecurringTransaction(
     nextRunAt: nextRunAt,
     updatedAt: nextRunAt == item.nextRunAt ? item.updatedAt : now,
   );
+}
+
+DateTime resolveFirstProcessableRecurringTransactionDate({
+  required DateTime nextRunAt,
+  required RecurrenceFrequency frequency,
+  required DateTime now,
+}) {
+  var candidate = nextRunAt;
+  final today = _dateOnly(now);
+
+  while (today.difference(_dateOnly(candidate)).inDays >= 2) {
+    candidate = nextRecurringDate(candidate, frequency);
+  }
+
+  return candidate;
 }
 
 Future<void> _notifyBudgetIfRecurringTransactionCrossesLimit(
