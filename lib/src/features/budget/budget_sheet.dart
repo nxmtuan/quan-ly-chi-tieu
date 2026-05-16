@@ -61,7 +61,6 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
         ? budget!.periodStart
         : _currentMonth(DateTime.now());
     _selectedCategoryId = budget?.categoryId ?? templateBudget?.categoryId;
-    _promotedCategoryId = _selectedCategoryId;
     _periodStart = _currentMonth(initialMonth);
     _warningPercent =
         budget?.warningPercent ??
@@ -107,7 +106,6 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
     if (_selectedCategoryId == null ||
         usedCategoryIds.contains(_selectedCategoryId)) {
       _selectedCategoryId = selectableCategories.firstOrNull?.id;
-      _promotedCategoryId = _selectedCategoryId;
     }
     final canSave = _isEditing
         ? expenseCategories.isNotEmpty
@@ -151,7 +149,6 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
                           }
                           setState(() {
                             _selectedCategoryId = category.id;
-                            _promotedCategoryId = category.id;
                           });
                         },
                         onShowAll: () => _showAllCategories(
