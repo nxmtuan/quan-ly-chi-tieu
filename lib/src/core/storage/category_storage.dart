@@ -8,9 +8,7 @@ class CategoryStorage {
 
   List<Category> readCategories({bool includeDeleted = false}) {
     final query = _box
-        .query(
-          includeDeleted ? null : Category_.isDeleted.equals(false),
-        )
+        .query(includeDeleted ? null : Category_.isDeleted.equals(false))
         .build();
     try {
       return query.find();
@@ -25,6 +23,10 @@ class CategoryStorage {
       cat.obxId = 0;
     }
     _box.putMany(categories);
+  }
+
+  Future<void> clearAll() async {
+    _box.removeAll();
   }
 
   Future<void> putCategory(Category category) async {

@@ -8,9 +8,7 @@ class MoneySourceStorage {
 
   List<MoneySource> readMoneySources({bool includeDeleted = false}) {
     final query = _box
-        .query(
-          includeDeleted ? null : MoneySource_.isDeleted.equals(false),
-        )
+        .query(includeDeleted ? null : MoneySource_.isDeleted.equals(false))
         .build();
     try {
       return query.find();
@@ -25,6 +23,10 @@ class MoneySourceStorage {
       source.obxId = 0;
     }
     _box.putMany(sources);
+  }
+
+  Future<void> clearAll() async {
+    _box.removeAll();
   }
 
   Future<void> putMoneySource(MoneySource source) async {

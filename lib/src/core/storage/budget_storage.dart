@@ -27,6 +27,10 @@ class BudgetStorage {
     _box.putMany(budgets);
   }
 
+  Future<void> clearAll() async {
+    _box.removeAll();
+  }
+
   Future<void> putBudget(Budget budget) async {
     final existing = _findById(budget.id);
     final budgetToSave = budget

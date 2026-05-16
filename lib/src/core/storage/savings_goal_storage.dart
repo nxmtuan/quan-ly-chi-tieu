@@ -8,9 +8,7 @@ class SavingsGoalStorage {
 
   List<SavingsGoal> readSavingsGoals({bool includeDeleted = false}) {
     final query = _box
-        .query(
-          includeDeleted ? null : SavingsGoal_.isDeleted.equals(false),
-        )
+        .query(includeDeleted ? null : SavingsGoal_.isDeleted.equals(false))
         .build();
     try {
       final goals = query.find();
@@ -27,6 +25,10 @@ class SavingsGoalStorage {
       goal.obxId = 0;
     }
     _box.putMany(goals);
+  }
+
+  Future<void> clearAll() async {
+    _box.removeAll();
   }
 
   Future<void> putSavingsGoal(SavingsGoal goal) async {

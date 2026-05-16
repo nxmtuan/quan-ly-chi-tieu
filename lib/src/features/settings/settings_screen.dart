@@ -9,6 +9,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/adaptive.dart';
 import '../../core/utils/app_data_refresh.dart';
+import '../../core/utils/app_data_reset.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_page_header.dart';
 import '../../core/widgets/app_refresh_indicator.dart';
@@ -37,6 +38,7 @@ part 'widgets/settings_management_section.dart';
 part 'widgets/settings_security_section.dart';
 part 'widgets/settings_sync_section.dart';
 part 'widgets/settings_theme_section.dart';
+part 'widgets/settings_data_section.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -99,6 +101,8 @@ class SettingsScreen extends ConsumerWidget {
                         const _ManageCategoriesRow(),
                         const _DividerIndent(),
                         const _ManageMoneySourcesRow(),
+                        const _DividerIndent(),
+                        const _DeleteAllDataRow(),
                         if (authUser != null) ...[
                           const _DividerIndent(),
                           const _SyncDataRow(),

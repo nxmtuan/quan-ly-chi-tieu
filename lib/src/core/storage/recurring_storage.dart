@@ -36,6 +36,11 @@ class RecurringStorage {
     );
   }
 
+  Future<void> clearAll() async {
+    await _prefs.remove(_itemsKey);
+    await _prefs.remove(_nextRunAtKey);
+  }
+
   Future<void> upsertItem(RecurringItem item) async {
     final items = readItems();
     await saveItems([

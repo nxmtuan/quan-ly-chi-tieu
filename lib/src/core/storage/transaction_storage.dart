@@ -83,6 +83,10 @@ class TransactionStorage {
     _box.putMany(transactions);
   }
 
+  Future<void> clearAll() async {
+    _box.removeAll();
+  }
+
   Future<void> putTransaction(Transaction transaction) async {
     final existing = _findById(transaction.id);
     final transactionToSave = transaction
