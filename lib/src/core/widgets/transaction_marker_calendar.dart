@@ -222,10 +222,10 @@ class _TransactionCalendarBottomSheetState
             child: AppBounceBuilder(
               onTap: () => Navigator.of(context).pop(),
               child: Container(
-                height: context.scaled(50),
+                height: 50,
                 decoration: BoxDecoration(
                   color: context.appPalette.surfaceMuted,
-                  borderRadius: BorderRadius.circular(context.scaled(17)),
+                  borderRadius: BorderRadius.circular(context.scaled(16)),
                   border: Border.all(color: context.appPalette.border),
                 ),
                 alignment: Alignment.center,
@@ -243,8 +243,8 @@ class _TransactionCalendarBottomSheetState
             child: AppPrimaryButton(
               label: 'Áp dụng ngày này',
               color: Theme.of(context).colorScheme.primary,
-              height: context.scaled(50),
-              radius: context.scaled(17),
+              height: 50,
+              radius: 16,
               onTap: () => Navigator.of(context).pop(_selectedDay),
             ),
           ),
