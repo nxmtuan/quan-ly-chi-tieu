@@ -9,8 +9,12 @@ import '../../core/widgets/app_bounce_builder.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_toast.dart';
+import '../../models/category.dart';
 import '../../models/savings_goal.dart';
+import '../../models/transaction.dart';
+import '../../providers/category_provider.dart';
 import '../../providers/savings_goal_provider.dart';
+import '../../providers/transaction_provider.dart';
 import 'savings_goal_sheet.dart';
 
 void showSavingsGoalDetailSheet(
@@ -38,120 +42,43 @@ class _SavingsGoalDetailSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.appPalette;
-    final progress = goal.progressWith(savedAmount);
-    final remainingAmount = goal.remainingAmountWith(savedAmount);
-    final completed = goal.isCompletedWith(savedAmount);
-    final color = completed ? AppColors.success : AppColors.primary;
+    final status = _SavingsDetailStatus.fromGoal(goal, savedAmount);
+    final transactions = ref
+        .watch(
+          transactionsQueryProvider((
+            categoryId: null,
+            fromDate: null,
+            limit: null,
+            toDate: null,
+            type: TransactionType.expense,
+          )),
+        )
+        .where((transaction) => transaction.savingsGoalId == goal.id)
+        .toList();
+    final categoriesById = {
+      for (final category in ref.watch(categoriesProvider))
+        category.id: category,
+    };
 
     return AppSheetScaffold(
       title: 'Chi tiết mục tiêu',
       body: SingleChildScrollView(
+        padding: EdgeInsets.only(bottom: context.scaled(12)),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: context.scaled(24)),
-            Container(
-              width: context.scaled(72),
-              height: context.scaled(72),
-              decoration: BoxDecoration(
-                color: goal.color.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                completed ? Icons.check_circle_rounded : goal.iconData,
-                color: goal.color,
-                size: context.scaled(32),
+            _SavingsOverviewSection(
+              child: _SavingsGoalInfoSection(
+                goal: goal,
+                savedAmount: savedAmount,
+                status: status,
               ),
             ),
-            SizedBox(height: context.scaled(12)),
-            Text(
-              goal.title,
-              textAlign: TextAlign.center,
-              style: context.appText.amountLG,
+            SizedBox(height: context.scaled(40)),
+            _SavingsGoalTransactionsSection(
+              transactions: transactions,
+              categoriesById: categoriesById,
             ),
-            SizedBox(height: context.scaled(12)),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: context.scaled(10),
-                backgroundColor: palette.surfaceMuted,
-                valueColor: AlwaysStoppedAnimation(color),
-              ),
-            ),
-            SizedBox(height: context.scaled(8)),
-            Text(
-              '${(progress * 100).round()}%',
-              style: context.appText.bodyStrong.copyWith(color: color),
-            ),
-            if (goal.hasNote) ...[
-              SizedBox(height: context.scaled(14)),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.scaled(12),
-                  vertical: context.scaled(10),
-                ),
-                decoration: BoxDecoration(
-                  color: palette.inputBackground,
-                  borderRadius: BorderRadius.circular(context.scaled(12)),
-                ),
-                child: Text(
-                  goal.note!,
-                  textAlign: TextAlign.left,
-                  style: context.appText.body.copyWith(
-                    color: palette.iconMuted,
-                    height: 1.35,
-                  ),
-                ),
-              ),
-            ],
-            SizedBox(height: context.scaled(24)),
-            Container(
-              padding: EdgeInsets.all(context.scaled(16)),
-              decoration: BoxDecoration(
-                color: palette.surfaceMuted,
-                borderRadius: BorderRadius.circular(context.scaled(16)),
-                border: Border.all(color: palette.border),
-              ),
-              child: Column(
-                children: [
-                  _buildRow(
-                    context,
-                    label: 'Đã tiết kiệm',
-                    value: formatCurrency(savedAmount),
-                    valueColor: color,
-                  ),
-                  Divider(color: palette.border, height: context.scaled(24)),
-                  _buildRow(
-                    context,
-                    label: 'Còn lại',
-                    value: formatCurrency(remainingAmount),
-                  ),
-                  Divider(color: palette.border, height: context.scaled(24)),
-                  _buildRow(
-                    context,
-                    label: 'Mục tiêu',
-                    value: formatCurrency(goal.targetAmount),
-                  ),
-                  Divider(color: palette.border, height: context.scaled(24)),
-                  _buildRow(
-                    context,
-                    label: 'Ngày bắt đầu',
-                    value: formatShortDate(goal.startDate),
-                  ),
-                  Divider(color: palette.border, height: context.scaled(24)),
-                  _buildRow(
-                    context,
-                    label: 'Deadline',
-                    value: goal.deadline == null
-                        ? 'Không có'
-                        : formatShortDate(goal.deadline!),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: context.scaled(8)),
           ],
         ),
       ),
@@ -186,11 +113,11 @@ class _SavingsGoalDetailSheet extends ConsumerWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
                 decoration: BoxDecoration(
-                  color: color,
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(context.scaled(16)),
                   boxShadow: [
                     BoxShadow(
-                      color: color.withValues(alpha: 0.2),
+                      color: AppColors.primary.withValues(alpha: 0.2),
                       blurRadius: context.scaled(8),
                       offset: Offset(0, context.scaled(4)),
                     ),
@@ -230,35 +157,414 @@ class _SavingsGoalDetailSheet extends ConsumerWidget {
       Navigator.of(context).pop();
     }
   }
+}
 
-  Widget _buildRow(
-    BuildContext context, {
-    required String label,
-    required String value,
-    Color? valueColor,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: context.scaled(118),
-          child: Text(
-            label,
-            style: context.appText.body.copyWith(
-              color: context.appPalette.textSecondary,
+class _SavingsOverviewSection extends StatelessWidget {
+  const _SavingsOverviewSection({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
+    return Container(
+      padding: EdgeInsets.all(context.scaled(10)),
+      decoration: BoxDecoration(
+        color: palette.surface,
+        borderRadius: BorderRadius.circular(context.scaled(26)),
+        border: Border.all(color: palette.border),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _SavingsGoalInfoSection extends StatelessWidget {
+  const _SavingsGoalInfoSection({
+    required this.goal,
+    required this.savedAmount,
+    required this.status,
+  });
+
+  final SavingsGoal goal;
+  final double savedAmount;
+  final _SavingsDetailStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+    final progress = goal.progressWith(savedAmount);
+    final remainingAmount = goal.remainingAmountWith(savedAmount);
+
+    return Padding(
+      padding: EdgeInsets.all(context.scaled(4)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: context.scaled(48),
+                height: context.scaled(48),
+                decoration: BoxDecoration(
+                  color: goal.color.withValues(alpha: 0.13),
+                  borderRadius: BorderRadius.circular(context.scaled(17)),
+                ),
+                child: Icon(
+                  status.iconOverride ?? goal.iconData,
+                  color: goal.color,
+                  size: context.scaled(22),
+                ),
+              ),
+              SizedBox(width: context.scaled(12)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      goal.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.appText.fieldValue,
+                    ),
+                    SizedBox(height: context.scaled(6)),
+                    Text(
+                      status.label,
+                      style: context.appText.captionStrong.copyWith(
+                        color: status.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: context.scaled(10)),
+              Text(
+                '${(progress * 100).round()}%',
+                style: context.appText.bodyStrong.copyWith(color: status.color),
+              ),
+            ],
+          ),
+          SizedBox(height: context.scaled(14)),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: context.scaled(9),
+              backgroundColor: palette.surfaceMuted,
+              valueColor: AlwaysStoppedAnimation(status.color),
             ),
           ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            textAlign: TextAlign.right,
-            style: context.appText.bodyStrong.copyWith(
-              color: valueColor ?? context.appPalette.textPrimary,
+          SizedBox(height: context.scaled(14)),
+          Row(
+            children: [
+              Expanded(
+                child: _SavingsMetric(
+                  label: 'Đã tiết kiệm',
+                  value: formatCurrency(savedAmount),
+                  valueColor: status.color,
+                ),
+              ),
+              SizedBox(width: context.scaled(8)),
+              Expanded(
+                child: _SavingsMetric(
+                  label: 'Còn lại',
+                  value: formatCurrency(remainingAmount),
+                  alignCenter: true,
+                ),
+              ),
+              SizedBox(width: context.scaled(8)),
+              Expanded(
+                child: _SavingsMetric(
+                  label: 'Mục tiêu',
+                  value: formatCurrency(goal.targetAmount),
+                  alignEnd: true,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.scaled(12)),
+          Wrap(
+            spacing: context.scaled(7),
+            runSpacing: context.scaled(7),
+            children: [
+              _SavingsInfoChip(
+                icon: Icons.play_circle_rounded,
+                label: 'Bắt đầu ${formatShortDate(goal.startDate)}',
+              ),
+              _SavingsInfoChip(
+                icon: Icons.event_rounded,
+                label: goal.deadline == null
+                    ? 'Không có deadline'
+                    : 'Hạn ${formatShortDate(goal.deadline!)}',
+              ),
+            ],
+          ),
+          if (goal.hasNote) ...[
+            SizedBox(height: context.scaled(12)),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                horizontal: context.scaled(12),
+                vertical: context.scaled(10),
+              ),
+              decoration: BoxDecoration(
+                color: palette.surfaceMuted,
+                borderRadius: BorderRadius.circular(context.scaled(12)),
+              ),
+              child: Text(
+                goal.note!,
+                style: context.appText.caption.copyWith(
+                  color: palette.textSecondary,
+                  height: 1.35,
+                ),
+              ),
             ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SavingsMetric extends StatelessWidget {
+  const _SavingsMetric({
+    required this.label,
+    required this.value,
+    this.valueColor,
+    this.alignCenter = false,
+    this.alignEnd = false,
+  });
+
+  final String label;
+  final String value;
+  final Color? valueColor;
+  final bool alignCenter;
+  final bool alignEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    final alignment = alignEnd
+        ? CrossAxisAlignment.end
+        : alignCenter
+        ? CrossAxisAlignment.center
+        : CrossAxisAlignment.start;
+
+    return Column(
+      crossAxisAlignment: alignment,
+      children: [
+        Text(
+          label,
+          style: context.appText.caption.copyWith(
+            color: context.appPalette.textSecondary,
+          ),
+        ),
+        SizedBox(height: context.scaled(4)),
+        Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: alignEnd
+              ? TextAlign.end
+              : alignCenter
+              ? TextAlign.center
+              : TextAlign.start,
+          style: context.appText.captionStrong.copyWith(
+            color: valueColor ?? context.appPalette.textPrimary,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SavingsInfoChip extends StatelessWidget {
+  const _SavingsInfoChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.scaled(8),
+        vertical: context.scaled(5),
+      ),
+      decoration: BoxDecoration(
+        color: palette.surfaceMuted,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: palette.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: palette.textSecondary, size: context.scaled(13)),
+          SizedBox(width: context.scaled(4)),
+          Text(
+            label,
+            style: context.appText.captionStrong.copyWith(
+              color: palette.textSecondary,
+              fontSize: context.scaledFont(11, min: 10),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SavingsGoalTransactionsSection extends StatelessWidget {
+  const _SavingsGoalTransactionsSection({
+    required this.transactions,
+    required this.categoriesById,
+  });
+
+  final List<Transaction> transactions;
+  final Map<String, Category> categoriesById;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: context.scaled(4)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Giao dịch gắn mục tiêu', style: context.appText.bodyStrong),
+          SizedBox(height: context.scaled(10)),
+          if (transactions.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: context.scaled(16)),
+              child: Center(
+                child: Text(
+                  'Chưa có giao dịch nào gắn với mục tiêu này',
+                  style: context.appText.caption.copyWith(
+                    color: palette.textSecondary,
+                  ),
+                ),
+              ),
+            )
+          else
+            for (var index = 0; index < transactions.length; index++) ...[
+              _SavingsGoalTransactionRow(
+                transaction: transactions[index],
+                category: categoriesById[transactions[index].categoryId],
+              ),
+              if (index < transactions.length - 1)
+                Divider(color: palette.border, height: context.scaled(1)),
+            ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SavingsGoalTransactionRow extends StatelessWidget {
+  const _SavingsGoalTransactionRow({
+    required this.transaction,
+    required this.category,
+  });
+
+  final Transaction transaction;
+  final Category? category;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = category?.color ?? AppColors.danger;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: context.scaled(11)),
+      child: Row(
+        children: [
+          Container(
+            width: context.scaled(42),
+            height: context.scaled(42),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(context.scaled(15)),
+            ),
+            child: Icon(
+              category?.iconData ?? Icons.savings_rounded,
+              color: color,
+              size: context.scaled(20),
+            ),
+          ),
+          SizedBox(width: context.scaled(11)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  transaction.hasNote
+                      ? transaction.note!
+                      : category?.name ?? 'Giao dịch tiết kiệm',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.appText.bodyStrong,
+                ),
+                SizedBox(height: context.scaled(4)),
+                Text(
+                  [
+                    category?.name,
+                    formatShortDate(transaction.date),
+                  ].whereType<String>().join(' • '),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.appText.caption.copyWith(
+                    color: context.appPalette.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: context.scaled(10)),
+          Text(
+            '-${formatCurrency(transaction.amount)}',
+            textAlign: TextAlign.right,
+            style: context.appText.bodyStrong.copyWith(color: AppColors.danger),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SavingsDetailStatus {
+  const _SavingsDetailStatus({
+    required this.label,
+    required this.color,
+    this.iconOverride,
+  });
+
+  final String label;
+  final Color color;
+  final IconData? iconOverride;
+
+  factory _SavingsDetailStatus.fromGoal(SavingsGoal goal, double savedAmount) {
+    if (goal.isCompletedWith(savedAmount)) {
+      return const _SavingsDetailStatus(
+        label: 'Đã hoàn thành',
+        color: AppColors.success,
+        iconOverride: Icons.check_circle_rounded,
+      );
+    }
+
+    if (goal.isWaitingAt(DateTime.now())) {
+      return const _SavingsDetailStatus(
+        label: 'Đang chờ',
+        color: AppColors.warning,
+        iconOverride: Icons.schedule_rounded,
+      );
+    }
+
+    return const _SavingsDetailStatus(
+      label: 'Đang tiến hành',
+      color: AppColors.primary,
     );
   }
 }
