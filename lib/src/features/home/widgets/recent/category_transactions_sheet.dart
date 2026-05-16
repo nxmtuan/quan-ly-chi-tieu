@@ -82,50 +82,53 @@ class _CategoryTransactionsSheetState
       subtitle:
           '${_monthLabel(_selectedMonth)} • ${formatCurrency(selectedTotal)}',
       bodyPadding: EdgeInsets.zero,
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              context.scaled(16),
-              context.scaled(4),
-              context.scaled(16),
-              context.scaled(12),
-            ),
-            child: _CategoryMonthlyChart(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          context.scaled(16),
+          context.scaled(4),
+          context.scaled(16),
+          context.scaled(24),
+        ),
+        child: Column(
+          children: [
+            _CategoryMonthlyChart(
               category: widget.category,
               points: monthlyPoints,
               onSelected: (month) => setState(() => _selectedMonth = month),
             ),
-          ),
-          Expanded(
-            child: selectedTransactions.isEmpty
-                ? Center(
-                    child: Text(
-                      'Không có giao dịch nào trong ${_monthLabel(_selectedMonth).toLowerCase()}',
-                      textAlign: TextAlign.center,
-                      style: context.appText.bodyStrong.copyWith(
-                        color: context.appPalette.textSecondary,
-                      ),
-                    ),
-                  )
-                : ListView.separated(
-                    padding: EdgeInsets.fromLTRB(
-                      context.scaled(16),
-                      0,
-                      context.scaled(16),
-                      appSheetBottomPadding(context),
-                    ),
-                    itemCount: selectedTransactions.length,
-                    separatorBuilder: (_, _) =>
-                        SizedBox(height: context.scaled(12)),
-                    itemBuilder: (context, index) {
-                      return TransactionRow(
-                        transaction: selectedTransactions[index],
-                      );
-                    },
+            SizedBox(height: context.scaled(20)),
+            if (selectedTransactions.isEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: context.scaled(32)),
+                child: Text(
+                  'Không có giao dịch nào trong ${_monthLabel(_selectedMonth).toLowerCase()}',
+                  textAlign: TextAlign.center,
+                  style: context.appText.bodyStrong.copyWith(
+                    color: context.appPalette.textSecondary,
                   ),
-          ),
-        ],
+                ),
+              )
+            else
+              Column(
+                children: [
+                  for (
+                    var index = 0;
+                    index < selectedTransactions.length;
+                    index++
+                  ) ...[
+                    TransactionRow(transaction: selectedTransactions[index]),
+                    if (index != selectedTransactions.length - 1)
+                      SizedBox(height: context.scaled(12)),
+                  ],
+                ],
+              ),
+          ],
+        ),
+      ),
+      action: AppPrimaryButton(
+        label: 'Đóng',
+        color: AppColors.primary,
+        onTap: () => Navigator.of(context).pop(),
       ),
     );
   }
