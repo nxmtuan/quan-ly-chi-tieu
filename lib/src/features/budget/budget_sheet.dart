@@ -130,30 +130,37 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
                 isFocused: _amountFocusNode.hasFocus,
               ),
               SizedBox(height: context.scaled(14)),
-              _SectionLabel(label: 'Danh mục chi tiêu'),
-              SizedBox(height: context.scaled(10)),
-              if (expenseCategories.isEmpty)
-                _EmptyCategoryNotice()
-              else
-                _BudgetCategoryPicker(
-                  categories: expenseCategories,
-                  selectedCategoryId: _selectedCategoryId,
-                  promotedCategoryId: _promotedCategoryId,
-                  disabledCategoryIds: usedCategoryIds,
-                  onSelected: (category) {
-                    if (usedCategoryIds.contains(category.id)) {
-                      return;
-                    }
-                    setState(() {
-                      _selectedCategoryId = category.id;
-                      _promotedCategoryId = category.id;
-                    });
-                  },
-                  onShowAll: () => _showAllCategories(
-                    expenseCategories,
-                    disabledCategoryIds: usedCategoryIds,
-                  ),
+              _FormCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionLabel(label: 'Danh mục chi tiêu'),
+                    SizedBox(height: context.scaled(10)),
+                    if (expenseCategories.isEmpty)
+                      const _EmptyCategoryNotice()
+                    else
+                      _BudgetCategoryPicker(
+                        categories: expenseCategories,
+                        selectedCategoryId: _selectedCategoryId,
+                        promotedCategoryId: _promotedCategoryId,
+                        disabledCategoryIds: usedCategoryIds,
+                        onSelected: (category) {
+                          if (usedCategoryIds.contains(category.id)) {
+                            return;
+                          }
+                          setState(() {
+                            _selectedCategoryId = category.id;
+                            _promotedCategoryId = category.id;
+                          });
+                        },
+                        onShowAll: () => _showAllCategories(
+                          expenseCategories,
+                          disabledCategoryIds: usedCategoryIds,
+                        ),
+                      ),
+                  ],
                 ),
+              ),
               SizedBox(height: context.scaled(14)),
               _WarningSliderCard(
                 warningPercent: _warningPercent,
@@ -518,14 +525,14 @@ class _MoreCategoriesOption extends StatelessWidget {
 }
 
 class _EmptyCategoryNotice extends StatelessWidget {
+  const _EmptyCategoryNotice();
+
   @override
   Widget build(BuildContext context) {
-    return _FormCard(
-      child: Text(
-        'Chưa có danh mục chi tiêu để đặt ngân sách.',
-        style: context.appText.body.copyWith(
-          color: context.appPalette.textSecondary,
-        ),
+    return Text(
+      'Chưa có danh mục chi tiêu để đặt ngân sách.',
+      style: context.appText.body.copyWith(
+        color: context.appPalette.textSecondary,
       ),
     );
   }
