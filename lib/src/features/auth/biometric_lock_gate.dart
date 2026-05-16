@@ -140,7 +140,7 @@ class _BiometricLockGateState extends ConsumerState<BiometricLockGate>
         return;
       }
 
-      ref.read(biometricLockProvider.notifier).lock();
+      unawaited(ref.read(biometricLockProvider.notifier).lockForScreenOff());
     }, onError: (_) {});
   }
 }

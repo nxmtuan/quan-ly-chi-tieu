@@ -22,6 +22,8 @@ class SettingsStorage {
   static const _autoSyncNextRunAtKey = 'autoSyncNextRunAt';
   static const _biometricUnlockEnabledKey = 'biometricUnlockEnabled';
   static const _biometricLockTriggerKey = 'biometricLockTrigger';
+  static const _biometricScreenOffLockPendingKey =
+      'biometricScreenOffLockPending';
   static const _lastSoftDeletePurgeAtKey = 'lastSoftDeletePurgeAt';
 
   final SharedPreferences _prefs;
@@ -146,6 +148,14 @@ class SettingsStorage {
 
   Future<void> saveBiometricLockTrigger(String value) async {
     await _prefs.setString(_biometricLockTriggerKey, value);
+  }
+
+  bool readBiometricScreenOffLockPending() {
+    return _prefs.getBool(_biometricScreenOffLockPendingKey) ?? false;
+  }
+
+  Future<void> saveBiometricScreenOffLockPending(bool value) async {
+    await _prefs.setBool(_biometricScreenOffLockPendingKey, value);
   }
 
   DateTime? readLastSoftDeletePurgeAt() {

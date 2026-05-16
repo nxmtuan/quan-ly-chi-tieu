@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -181,10 +183,18 @@ class BiometricLockNotifier extends Notifier<BiometricLockState> {
     final lockTrigger = _lockTriggerFromStorage(
       storage.readBiometricLockTrigger(),
     );
+    final shouldStartLocked =
+        enabled &&
+        switch (lockTrigger) {
+          BiometricLockTrigger.onScreenOff =>
+            storage.readBiometricScreenOffLockPending(),
+          BiometricLockTrigger.onAppExit => true,
+          BiometricLockTrigger.afterTwoMinutes => true,
+        };
 
     return BiometricLockState(
       enabled: enabled,
-      unlocked: !enabled,
+      unlocked: !shouldStartLocked,
       lockTrigger: lockTrigger,
     );
   }
@@ -204,6 +214,9 @@ class BiometricLockNotifier extends Notifier<BiometricLockState> {
 
     if (result.success) {
       await ref.read(settingsStorageProvider).saveBiometricUnlockEnabled(true);
+      await ref
+          .read(settingsStorageProvider)
+          .saveBiometricScreenOffLockPending(false);
       state = state.copyWith(
         enabled: true,
         unlocked: true,
@@ -224,6 +237,9 @@ class BiometricLockNotifier extends Notifier<BiometricLockState> {
 
   Future<void> disable() async {
     await ref.read(settingsStorageProvider).saveBiometricUnlockEnabled(false);
+    await ref
+        .read(settingsStorageProvider)
+        .saveBiometricScreenOffLockPending(false);
     state = state.copyWith(
       enabled: false,
       unlocked: true,
@@ -237,6 +253,11 @@ class BiometricLockNotifier extends Notifier<BiometricLockState> {
     await ref
         .read(settingsStorageProvider)
         .saveBiometricLockTrigger(lockTrigger.name);
+    if (lockTrigger != BiometricLockTrigger.onScreenOff) {
+      await ref
+          .read(settingsStorageProvider)
+          .saveBiometricScreenOffLockPending(false);
+    }
   }
 
   void lock() {
@@ -244,6 +265,17 @@ class BiometricLockNotifier extends Notifier<BiometricLockState> {
       return;
     }
 
+    state = state.copyWith(unlocked: false, clearLastResult: true);
+  }
+
+  Future<void> lockForScreenOff() async {
+    if (!state.enabled || state.isAuthenticating) {
+      return;
+    }
+
+    await ref
+        .read(settingsStorageProvider)
+        .saveBiometricScreenOffLockPending(true);
     state = state.copyWith(unlocked: false, clearLastResult: true);
   }
 
@@ -264,18 +296,23 @@ class BiometricLockNotifier extends Notifier<BiometricLockState> {
         .read(biometricAuthServiceProvider)
         .authenticate(reason: 'Xác thực bằng bảo mật thiết bị để mở ứng dụng.');
 
-    state = result.success
-        ? state.copyWith(
-            enabled: true,
-            unlocked: true,
-            isAuthenticating: false,
-            clearLastResult: true,
-          )
-        : state.copyWith(
-            unlocked: false,
-            isAuthenticating: false,
-            lastResult: result,
-          );
+    if (result.success) {
+      await ref
+          .read(settingsStorageProvider)
+          .saveBiometricScreenOffLockPending(false);
+      state = state.copyWith(
+        enabled: true,
+        unlocked: true,
+        isAuthenticating: false,
+        clearLastResult: true,
+      );
+    } else {
+      state = state.copyWith(
+        unlocked: false,
+        isAuthenticating: false,
+        lastResult: result,
+      );
+    }
 
     return result;
   }
