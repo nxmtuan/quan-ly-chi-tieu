@@ -6,6 +6,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'src/app.dart';
 import 'src/core/services/sync_notification_service.dart';
 import 'src/core/services/recurring_notification_service.dart';
+import 'src/core/services/budget_notification_service.dart';
 import 'src/providers/storage_provider.dart';
 import 'src/core/storage/objectbox_database.dart';
 
@@ -29,6 +30,8 @@ Future<void> main() async {
   await SyncNotificationService.requestPermission();
   await RecurringNotificationService.initialize();
   await RecurringNotificationService.requestPermission();
+  await BudgetNotificationService.initialize();
+  await BudgetNotificationService.requestPermission();
 
   final objectBoxDb = await ObjectBoxDatabase.create();
 

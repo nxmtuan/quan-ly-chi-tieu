@@ -2,11 +2,16 @@ import 'dart:async';
 
 import 'package:workmanager/workmanager.dart';
 
+import '../../core/services/budget_notification_service.dart';
 import '../../core/services/recurring_notification_service.dart';
+import '../../core/storage/budget_storage.dart';
+import '../../core/storage/category_storage.dart';
 import '../../core/storage/recurring_storage.dart';
 import '../../core/storage/transaction_storage.dart';
+import '../../core/utils/date_range.dart';
 import '../../models/recurring_item.dart';
 import '../../models/transaction.dart';
+import '../../providers/category_provider.dart';
 
 const recurringTaskName = 'process_recurring_items';
 const recurringTaskTag = 'recurring_schedule';
@@ -44,6 +49,8 @@ Future<void> configureRecurringBackgroundProcessingFromStorage(
 Future<bool> processRecurringItems({
   required RecurringStorage recurringStorage,
   required TransactionStorage transactionStorage,
+  BudgetStorage? budgetStorage,
+  CategoryStorage? categoryStorage,
   DateTime? now,
 }) async {
   final currentTime = now ?? DateTime.now();
@@ -67,6 +74,8 @@ Future<bool> processRecurringItems({
         item,
         now: currentTime,
         transactionStorage: transactionStorage,
+        budgetStorage: budgetStorage,
+        categoryStorage: categoryStorage,
       ),
     );
   }
@@ -116,6 +125,8 @@ Future<RecurringItem> _processRecurringTransaction(
   RecurringItem item, {
   required DateTime now,
   required TransactionStorage transactionStorage,
+  BudgetStorage? budgetStorage,
+  CategoryStorage? categoryStorage,
 }) async {
   var nextRunAt = item.nextRunAt;
   var createdCount = 0;
@@ -131,6 +142,12 @@ Future<RecurringItem> _processRecurringTransaction(
       sourceId: item.sourceId,
       date: nextRunAt,
       note: item.note,
+    );
+    await _notifyBudgetIfRecurringTransactionCrossesLimit(
+      transaction,
+      transactionStorage: transactionStorage,
+      budgetStorage: budgetStorage,
+      categoryStorage: categoryStorage,
     );
     await transactionStorage.putTransaction(transaction);
     nextRunAt = nextRecurringDate(nextRunAt, item.frequency);
@@ -148,6 +165,72 @@ Future<RecurringItem> _processRecurringTransaction(
     nextRunAt: nextRunAt,
     updatedAt: nextRunAt == item.nextRunAt ? item.updatedAt : now,
   );
+}
+
+Future<void> _notifyBudgetIfRecurringTransactionCrossesLimit(
+  Transaction transaction, {
+  required TransactionStorage transactionStorage,
+  BudgetStorage? budgetStorage,
+  CategoryStorage? categoryStorage,
+}) async {
+  if (transaction.type != TransactionType.expense || budgetStorage == null) {
+    return;
+  }
+
+  final month = DateTime(transaction.date.year, transaction.date.month);
+  final range = monthDateRange(month);
+  final monthlyTransactions = transactionStorage.readTransactions(
+    categoryId: transaction.categoryId,
+    fromDate: range.start,
+    toDate: range.end,
+    type: TransactionType.expense,
+  );
+
+  if (monthlyTransactions.any((item) => item.id == transaction.id)) {
+    return;
+  }
+
+  final beforeSpent = monthlyTransactions.fold<double>(
+    0,
+    (total, item) => total + item.amount,
+  );
+  final afterSpent = beforeSpent + transaction.amount;
+  final budgets = budgetStorage.readBudgets().where(
+    (budget) =>
+        budget.categoryId == transaction.categoryId &&
+        budget.periodStart == month,
+  );
+
+  for (final budget in budgets) {
+    if (beforeSpent < budget.warningThresholdAmount &&
+        afterSpent >= budget.warningThresholdAmount) {
+      await BudgetNotificationService.showBudgetWarning(
+        budgetId: budget.id,
+        categoryName: _categoryName(transaction.categoryId, categoryStorage),
+        spentAmount: afterSpent,
+        warningAmount: budget.warningThresholdAmount,
+        limitAmount: budget.limitAmount,
+      );
+    }
+    if (beforeSpent <= budget.limitAmount && afterSpent > budget.limitAmount) {
+      await BudgetNotificationService.showBudgetExceeded(
+        budgetId: budget.id,
+        categoryName: _categoryName(transaction.categoryId, categoryStorage),
+        spentAmount: afterSpent,
+        limitAmount: budget.limitAmount,
+      );
+    }
+  }
+}
+
+String _categoryName(String categoryId, CategoryStorage? categoryStorage) {
+  final storedCategories = categoryStorage?.readCategories() ?? const [];
+  for (final category in [...storedCategories, ...defaultCategories]) {
+    if (category.id == categoryId) {
+      return category.name;
+    }
+  }
+  return 'Danh mục';
 }
 
 Future<List<RecurringItem>> _processRecurringReminders(

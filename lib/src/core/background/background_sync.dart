@@ -5,12 +5,16 @@ import 'package:workmanager/workmanager.dart';
 
 import '../../models/auto_sync_settings.dart';
 import '../../models/auto_sync_status.dart';
+import '../../models/budget.dart';
+import '../../models/category.dart';
 import '../../models/transaction.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/storage_provider.dart';
 import '../storage/recurring_storage.dart';
 import '../services/sync_notification_service.dart';
 import '../storage/auth_storage.dart';
+import '../storage/budget_storage.dart';
+import '../storage/category_storage.dart';
 import '../storage/objectbox_database.dart';
 import '../storage/settings_storage.dart';
 import '../storage/transaction_storage.dart';
@@ -40,6 +44,8 @@ void callbackDispatcher() {
           transactionStorage: TransactionStorage(
             objectBoxDb.store.box<Transaction>(),
           ),
+          budgetStorage: BudgetStorage(objectBoxDb.store.box<Budget>()),
+          categoryStorage: CategoryStorage(objectBoxDb.store.box<Category>()),
         );
         return Future.value(true);
       }

@@ -20,6 +20,7 @@ import '../../models/money_source.dart';
 import '../../models/savings_goal.dart';
 import '../../models/transaction.dart';
 import '../../providers/category_provider.dart';
+import '../../providers/budget_alert_provider.dart';
 import '../../providers/money_source_provider.dart';
 import '../../providers/savings_goal_provider.dart';
 import '../../providers/transaction_provider.dart';
@@ -377,6 +378,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
 
     if (widget.transaction == null) {
       await ref.read(transactionsProvider.notifier).addTransaction(transaction);
+      await ref
+          .read(budgetAlertServiceProvider)
+          .notifyAfterTransactionChange(currentTransaction: transaction);
       if (mounted) {
         AppToast.show(
           context,
@@ -385,9 +389,16 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         );
       }
     } else {
+      final previousTransaction = widget.transaction;
       await ref
           .read(transactionsProvider.notifier)
           .updateTransaction(transaction);
+      await ref
+          .read(budgetAlertServiceProvider)
+          .notifyAfterTransactionChange(
+            previousTransaction: previousTransaction,
+            currentTransaction: transaction,
+          );
       if (mounted) {
         AppToast.show(
           context,

@@ -14,6 +14,7 @@ import '../../models/budget.dart';
 import '../../models/category.dart';
 import '../../models/transaction.dart';
 import '../../providers/budget_provider.dart';
+import '../../providers/budget_alert_provider.dart';
 import '../../providers/category_provider.dart';
 import '../transactions/add_transaction_sheet.dart';
 
@@ -291,6 +292,12 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
     } else {
       await ref.read(budgetsProvider.notifier).addBudget(budget);
     }
+    await ref
+        .read(budgetAlertServiceProvider)
+        .notifyAfterBudgetChange(
+          previousBudget: existingBudget,
+          currentBudget: budget,
+        );
 
     if (!mounted) {
       return;
