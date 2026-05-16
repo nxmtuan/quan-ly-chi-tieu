@@ -139,13 +139,14 @@ class RecurringNotificationService {
       id: id,
       title: title,
       body: body,
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
           channelDescription: _channelDescription,
           importance: Importance.high,
           priority: Priority.high,
+          styleInformation: BigTextStyleInformation(body),
         ),
       ),
     );

@@ -83,19 +83,22 @@ class BudgetNotificationService {
       return;
     }
 
+    final body =
+        '$categoryName đã dùng ${formatCurrency(spentAmount)}, chạm ngưỡng cảnh báo ${formatCurrency(warningAmount)} trên hạn mức ${formatCurrency(limitAmount)}.';
+
     await initialize();
     await _plugin.show(
       id: _notificationId(budgetId, 1),
       title: 'Ngân sách sắp vượt hạn mức',
-      body:
-          '$categoryName đã dùng ${formatCurrency(spentAmount)}, chạm ngưỡng cảnh báo ${formatCurrency(warningAmount)} trên hạn mức ${formatCurrency(limitAmount)}.',
-      notificationDetails: const NotificationDetails(
+      body: body,
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
           channelDescription: _channelDescription,
           importance: Importance.high,
           priority: Priority.high,
+          styleInformation: BigTextStyleInformation(body),
         ),
       ),
     );
@@ -118,19 +121,22 @@ class BudgetNotificationService {
       return;
     }
 
+    final body =
+        '$categoryName đã dùng ${formatCurrency(spentAmount)}, vượt hạn mức ${formatCurrency(limitAmount)}.';
+
     await initialize();
     await _plugin.show(
       id: _notificationId(budgetId, 2),
       title: 'Ngân sách đã vượt hạn mức',
-      body:
-          '$categoryName đã dùng ${formatCurrency(spentAmount)}, vượt hạn mức ${formatCurrency(limitAmount)}.',
-      notificationDetails: const NotificationDetails(
+      body: body,
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
           channelDescription: _channelDescription,
           importance: Importance.high,
           priority: Priority.high,
+          styleInformation: BigTextStyleInformation(body),
         ),
       ),
     );

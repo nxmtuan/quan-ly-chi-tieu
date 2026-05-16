@@ -64,12 +64,13 @@ class SyncNotificationService {
   }
 
   static Future<void> showPreparing() async {
+    const body = 'Đang chuẩn bị đồng bộ...';
     await initialize();
     await _plugin.cancel(id: _resultNotificationId);
     await _plugin.show(
       id: _progressNotificationId,
       title: 'Đồng bộ dữ liệu',
-      body: 'Đang chuẩn bị đồng bộ...',
+      body: body,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _progressChannelId,
@@ -77,6 +78,7 @@ class SyncNotificationService {
           channelDescription: _progressChannelDescription,
           importance: Importance.low,
           priority: Priority.low,
+          styleInformation: BigTextStyleInformation(body),
           showProgress: true,
           indeterminate: true,
           onlyAlertOnce: true,
@@ -88,11 +90,12 @@ class SyncNotificationService {
   }
 
   static Future<void> showSyncing() async {
+    const body = 'Đang tiến hành đồng bộ...';
     await initialize();
     await _plugin.show(
       id: _progressNotificationId,
       title: 'Đồng bộ dữ liệu',
-      body: 'Đang tiến hành đồng bộ...',
+      body: body,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _progressChannelId,
@@ -100,6 +103,7 @@ class SyncNotificationService {
           channelDescription: _progressChannelDescription,
           importance: Importance.low,
           priority: Priority.low,
+          styleInformation: BigTextStyleInformation(body),
           showProgress: true,
           indeterminate: true,
           onlyAlertOnce: true,
@@ -152,6 +156,7 @@ class SyncNotificationService {
           channelDescription: _resultChannelDescription,
           importance: importance,
           priority: priority,
+          styleInformation: BigTextStyleInformation(body),
         ),
       ),
     );
